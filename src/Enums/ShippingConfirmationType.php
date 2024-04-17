@@ -9,4 +9,5 @@ enum ShippingConfirmationType: string
     case ALL = 'All';
     case TO_EUROPE = 'To Europe';
     case PR = 'Premium';
+
 }
