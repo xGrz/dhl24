@@ -7,13 +7,12 @@ use xGrz\Dhl24\Api\Structs\AuthData;
 
 class ConfigService
 {
+    /**
+     * @throws \SoapFault
+     */
     public function connection(): SoapClient
     {
-        try {
-            return new SoapClient(env('DHL24_URL'));
-        } catch (\SoapFault $e) {
-            dd($e->getMessage());
-        }
+        return new SoapClient(env('DHL24_URL'));
     }
 
     public static function getAuth(): AuthData

@@ -1,7 +1,6 @@
 <?php
 
 use xGrz\Dhl24\Api\Actions\DailyShippingConfirmationList;
-use xGrz\Dhl24\Api\Actions\Version;
 
 Route::middleware(['web'])
     ->prefix('dhl')
@@ -9,9 +8,10 @@ Route::middleware(['web'])
     ->group(function () {
         Route::get('/', function () {
             $request = new DailyShippingConfirmationList();
-            dd(
-                Version::getVersion(),
-                $request->getDocument()
-            );
+            return $request->download();
+//            dd(
+//                Version::getVersion(),
+//                $request->download()
+//            );
         });
     });
