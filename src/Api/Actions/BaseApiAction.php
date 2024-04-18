@@ -3,6 +3,7 @@
 namespace xGrz\Dhl24\Api\Actions;
 
 use xGrz\Dhl24\Exceptions\DHL24Exception;
+use xGrz\Dhl24\Facades\Config;
 use xGrz\Dhl24\Interfaces\DHLApiCallableInterface;
 use xGrz\Dhl24\Services\ConfigService;
 
@@ -61,7 +62,9 @@ abstract class BaseApiAction implements DHLApiCallableInterface
         $payloadData = [];
         $publicProps = (new \ReflectionClass($this))->getProperties(\ReflectionProperty::IS_PUBLIC);
         foreach ($publicProps as $prop) {
-            $payloadData[$prop->getName()] = $prop->getValue($this);
+            $prop->getName() !== 'authData'
+                ? $payloadData[$prop->getName()] = $prop->getValue($this)
+                : $payloadData['authData'] = Config::getAuth();
         }
         $payloadData = json_decode(json_encode($payloadData), true);
         return self::addPayloadWrapper($payloadData);
