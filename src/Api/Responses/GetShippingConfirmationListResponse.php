@@ -34,6 +34,11 @@ class GetShippingConfirmationListResponse
         return $this;
     }
 
+    public function getFilename(): string
+    {
+        return $this->filename;
+    }
+
     public function download(bool $shouldBeStored = false): Response
     {
         if ($shouldBeStored) self::store();
