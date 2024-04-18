@@ -4,7 +4,7 @@ namespace xGrz\Dhl24\Api\Actions;
 
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 
-class DHL_GetVersion extends BaseApiAction
+class GetVersion extends BaseApiAction
 {
 
     /**

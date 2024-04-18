@@ -40,7 +40,6 @@ abstract class BaseApiAction implements DHLApiCallableInterface
     private function guessServiceName()
     {
         return str((new \ReflectionClass($this))->getShortName())
-            ->whenStartsWith('DHL', fn($serviceName) => str($serviceName)->replaceFirst('DHL', ''))
             ->camel();
     }
 

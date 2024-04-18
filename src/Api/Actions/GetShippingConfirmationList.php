@@ -7,7 +7,7 @@ use xGrz\Dhl24\Api\Structs\AuthData;
 use xGrz\Dhl24\Enums\ShippingConfirmationType;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 
-class DHL_GetShippingConfirmationList extends BaseApiAction
+class GetShippingConfirmationList extends BaseApiAction
 {
     protected ?string $serviceName = 'getPnp';
     protected ?string $dataWrapper = 'pnpRequest';

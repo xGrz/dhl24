@@ -7,7 +7,7 @@ use xGrz\Dhl24\Api\Responses\GetMyShipmentsResponse;
 use xGrz\Dhl24\Api\Structs\AuthData;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 
-class DHL_GetMyShipments extends BaseApiAction
+class GetMyShipments extends BaseApiAction
 {
     public AuthData $authData;
     public string $createdFrom;
