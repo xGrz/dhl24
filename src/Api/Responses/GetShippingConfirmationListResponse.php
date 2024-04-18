@@ -2,14 +2,17 @@
 
 namespace xGrz\Dhl24\Api\Responses;
 
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use xGrz\Dhl24\Facades\Config;
 
 class GetShippingConfirmationListResponse
 {
     private ?string $filename = null;
     private ?string $content = null;
     private ?string $mimeType = null;
+
+    protected bool $fileStored = false;
 
     public function __construct(object $result)
     {
@@ -18,30 +21,30 @@ class GetShippingConfirmationListResponse
         $this->mimeType = $result->getPnpResult->fileMimeType;
     }
 
-
-    public function store(): bool
+    public function isFileStored(): bool
     {
-        return Storage::disk(self::getDisk())
-            // tutaj jest zjebane bo nie ma / pomiedzy direcory a filename
-            ->put(self::getFileDirectory() . $this->filename, self::getContent());
+        return Storage::disk(Config::getDiskForConfirmations())
+            ->fileExists(Config::getDirectoryForConfirmations() . $this->filename);
     }
 
-    public function download(): BinaryFileResponse
+    public function store(): static
     {
-        return response()
-            ->download(self::getFileDirectory() . $this->filename, [
+        Storage::disk(Config::getDiskForConfirmations())
+            ->put(Config::getDirectoryForConfirmations() . $this->filename, self::getContent());
+        return $this;
+    }
+
+    public function download(bool $shouldBeStored = false): Response
+    {
+        if ($shouldBeStored) self::store();
+        return response(
+            self::getContent(),
+            200,
+            [
                 'Content-Type' => $this->mimeType,
-            ]);
-    }
-
-    private function getDisk()
-    {
-        return config('dhl24.shipping-confirmations.disk', 'local');
-    }
-
-    private function getFileDirectory()
-    {
-        return config('dhl24.shipping-confirmations.directory', 'dhl/shipping-confirmations');
+                'Content-Disposition' => 'attachment; filename="' . $this->filename . '"',
+            ]
+        );
     }
 
     private function getContent(): string

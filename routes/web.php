@@ -10,7 +10,7 @@ Route::middleware(['web'])
             dd(
 //                DHL_GetVersion::make()->call(),
 //                DHL_GetMyShipments::make(now()->subDays(90), now())->call(),
-                DHL_GetShippingConfirmationList::make(now()->subDays())->call(),
+                  DHL_GetShippingConfirmationList::make(now()->subDays())->call()->isFileStored(),
             );
         });
     });

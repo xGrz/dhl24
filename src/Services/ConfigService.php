@@ -19,4 +19,43 @@ class ConfigService
     {
         return new AuthData();
     }
+
+    public function getDiskForConfirmations(): string
+    {
+        return config('dhl24.shipping-confirmations.disk', 'local');
+    }
+
+    public function getDirectoryForConfirmations(): string
+    {
+        return self::normalizeDirectoryPath(
+            config(
+                'dhl24.shipping-confirmations.directory',
+                'dhl/shipping-confirmations'
+            )
+        );
+    }
+
+    public function getDiskForShippingLabels(): string
+    {
+        return config('dhl24.labels.disk', 'local');
+    }
+
+    public function getDirectoryForLabels(): string
+    {
+        return self::normalizeDirectoryPath(
+            config(
+                'dhl24.labels.directory',
+                'dhl/shipping-confirmations'
+            )
+        );
+    }
+
+    private static function normalizeDirectoryPath(string $path): string
+    {
+        return str($path)
+            ->replaceStart('/', '')
+            ->replaceEnd('/', '')
+            ->append('/');
+    }
+
 }

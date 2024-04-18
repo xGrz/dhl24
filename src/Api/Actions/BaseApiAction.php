@@ -24,7 +24,6 @@ abstract class BaseApiAction implements DHLApiCallableInterface
     {
         $serviceName = $this->serviceName();
         $responseClassName = $this->responseClassName();
-        // dd($serviceName, $responseClassName, self::getPayload());
         try {
             $result = (new ConfigService())->connection()->$serviceName(self::getPayload());
             return new $responseClassName($result);
