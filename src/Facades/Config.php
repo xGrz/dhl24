@@ -8,6 +8,8 @@ use xGrz\Dhl24\Services\ConfigService;
 /**
  * @method static getDirectoryForConfirmations()
  * @method static getDiskForConfirmations()
+ * @method static getApiPassword()
+ * @method static getApiUsername()
  */
 class Config extends Facade
 {

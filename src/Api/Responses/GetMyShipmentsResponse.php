@@ -10,7 +10,7 @@ class GetMyShipmentsResponse
 
     public function __construct(object $result)
     {
-        $this->items = collect($result->getMyShipmentsResult->item);
+        $this->items = collect($result->getMyShipmentsResult?->item ?? []);
     }
 
 

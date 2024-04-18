@@ -12,12 +12,21 @@ class ConfigService
      */
     public function connection(): SoapClient
     {
-        return new SoapClient(env('DHL24_URL'));
+        return new SoapClient(config('dhl24.auth.wsdl'));
     }
 
-    public static function getAuth(): AuthData
+    public function getAuth(): AuthData
     {
         return new AuthData();
+    }
+
+    public function getApiUsername(): string
+    {
+        return config('dhl24.auth.username');
+    }
+    public function getApiPassword(): string
+    {
+        return config('dhl24.auth.password');
     }
 
     public function getDiskForConfirmations(): string

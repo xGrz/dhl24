@@ -2,13 +2,15 @@
 
 namespace xGrz\Dhl24\Api\Structs;
 
+use xGrz\Dhl24\Facades\Config;
+
 class AuthData
 {
-    public $username = '';
-    public $password = '';
+    public string $username = '';
+    public string $password = '';
 
     public function __construct() {
-        $this->username = env('DHL24_USER');
-        $this->password = env('DHL24_PASSWORD');
+        $this->username = Config::getApiUsername();
+        $this->password = Config::getApiPassword();
     }
 }

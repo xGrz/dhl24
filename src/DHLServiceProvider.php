@@ -3,6 +3,7 @@
 namespace xGrz\Dhl24;
 
 use Illuminate\Support\ServiceProvider;
+use xGrz\PayU\Services\ConfigService;
 
 class DHLServiceProvider extends ServiceProvider
 {
@@ -13,6 +14,7 @@ class DHLServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        self::setupPackageConfig();
         self::setupMigrations();
         self::setupWebRouting();
         self::setupTranslations();
@@ -36,5 +38,18 @@ class DHLServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'dhl');
     }
 
+    private function setupPackageConfig(): void
+    {
+        $this->app->singleton(ConfigService::class, fn() => new ConfigService());
 
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__ . '/../config/config.php' => config_path('dhl24.php'),
+            ], 'dhl24-config');
+            $this->publishes([
+                __DIR__ . '/../lang' => $this->app->langPath('vendor/dhl24')
+            ], 'dhl24-lang');
+        }
+
+    }
 }
