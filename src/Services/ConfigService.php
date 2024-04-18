@@ -4,6 +4,8 @@ namespace xGrz\Dhl24\Services;
 
 use SoapClient;
 use xGrz\Dhl24\Api\Structs\AuthData;
+use xGrz\Dhl24\Enums\LabelType;
+use xGrz\Dhl24\Exceptions\DHL24Exception;
 
 class ConfigService
 {
@@ -44,7 +46,7 @@ class ConfigService
         );
     }
 
-    public function getDiskForShippingLabels(): string
+    public function getDiskForLabels(): string
     {
         return config('dhl24.labels.disk', 'local');
     }
@@ -59,6 +61,17 @@ class ConfigService
         );
     }
 
+    /**
+     * @throws DHL24Exception
+     */
+    public function getDefaultLabelType(): LabelType
+    {
+        $labelTypeName = config('dhl24.labels.defaultType', LabelType::LP->name);
+        return LabelType::findByName($labelTypeName);
+    }
+
+
+
     private static function normalizeDirectoryPath(string $path): string
     {
         return str($path)
@@ -66,5 +79,7 @@ class ConfigService
             ->replaceEnd('/', '')
             ->append('/');
     }
+
+
 
 }

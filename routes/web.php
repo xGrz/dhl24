@@ -1,8 +1,6 @@
 <?php
 
-use xGrz\Dhl24\Api\Actions\GetMyShipments;
-use xGrz\Dhl24\Api\Actions\GetShippingConfirmationList;
-use xGrz\Dhl24\Api\Actions\GetVersion;
+use xGrz\Dhl24\Api\Actions\GetLabel;
 
 Route::middleware(['web'])
     ->prefix('dhl')
@@ -10,9 +8,9 @@ Route::middleware(['web'])
     ->group(function () {
         Route::get('/', function () {
             dd(
-                GetVersion::make()->call(),
-                GetMyShipments::make(now()->subDays(90), now())->call(),
-                GetShippingConfirmationList::make(now()->subDays())->call()->isFileStored(),
+                GetLabel::make("27563594371")->call()->store(),
+                GetLabel::make("27571475525", 27582550740)->call()->store()
             );
         });
     });
+

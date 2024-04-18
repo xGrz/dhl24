@@ -11,6 +11,7 @@ use xGrz\Dhl24\Services\ConfigService;
  * @method static getApiPassword()
  * @method static getApiUsername()
  * @method static getAuth()
+ * @method static getDefaultLabelType()
  */
 class Config extends Facade
 {

@@ -67,6 +67,7 @@ abstract class BaseApiAction implements DHLApiCallableInterface
                 : $payloadData['authData'] = Config::getAuth();
         }
         $payloadData = json_decode(json_encode($payloadData), true);
+        // dd($payloadData);
         return self::addPayloadWrapper($payloadData);
     }
 

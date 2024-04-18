@@ -1,5 +1,7 @@
 <?php
 
+use xGrz\Dhl24\Enums\LabelType;
+
 return [
     'shipping-confirmation' => [
         'disk' => 'local',
@@ -9,7 +11,7 @@ return [
     'labels' => [
         'disk' => 'local',
         'directory' => 'dhl/shipment-labels',
-        'defaultType' => ''
+        'defaultType' => LabelType::BLP->name,
     ],
     'auth' => [
         'wsdl' => env('DHL24_WSDL'),

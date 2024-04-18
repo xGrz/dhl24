@@ -5,14 +5,13 @@ namespace xGrz\Dhl24\Api\Responses;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use xGrz\Dhl24\Facades\Config;
+use xGrz\Dhl24\Interfaces\InteractsWithStorage;
 
-class GetShippingConfirmationListResponse
+class GetShippingConfirmationListResponse implements InteractsWithStorage
 {
     private ?string $filename = null;
     private ?string $content = null;
     private ?string $mimeType = null;
-
-    protected bool $fileStored = false;
 
     public function __construct(object $result)
     {
