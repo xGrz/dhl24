@@ -2,45 +2,83 @@
 
 namespace xGrz\Dhl24\Api\Structs\Shipment;
 
+use xGrz\Dhl24\Enums\AddressType;
+
 class ReceiverAddress extends ShipperAddress
 {
     public string $addressType = 'C';
     public string $country = 'PL';
-    public ?string $isPackstation = null;
-    public ?string $isPostfiliale = null;
+    public bool $isPackstation = false;
+    public bool $isPostfiliale = false;
     public ?string $postnummer = null;
 
 
-    public function setAddressType(string $addressType): ReceiverAddress
+    public function setAddressType(AddressType $type): ReceiverAddress
     {
-        $this->addressType = $addressType;
+        $this->addressType = $type->value;
         return $this;
     }
 
-    public function setCountry(string $country): ReceiverAddress
+    public function setCountryCode(string $code): ReceiverAddress
     {
-        $this->country = $country;
+        $this->country = $code;
         return $this;
     }
 
-    public function setPackStation(?string $packstation): ReceiverAddress
+    public function setPostalCode(string $postalCode): static
     {
-        $this->isPackstation = $packstation;
+        $this->postalCode = $postalCode;
         return $this;
     }
 
-    public function setPostfiliale(?string $postfiliale): ReceiverAddress
+    public function setCity(string $city): static
     {
-        $this->isPostfiliale = $postfiliale;
+        $this->isPackstation = false;
+        $this->isPostfiliale = false;
+        $this->city = $city;
         return $this;
     }
 
-    public function setPostnummer(?string $postnummer): ReceiverAddress
+    public function setStreet(string $street): static
     {
-        $this->postnummer = $postnummer;
+        $this->isPackstation = false;
+        $this->isPostfiliale = false;
+        $this->street = $street;
         return $this;
     }
 
+    public function setParcelStationDelivery(string $parcelStationId): ReceiverAddress
+    {
+        self::resetAddress();
+        $this->houseNumber = $parcelStationId;
+        $this->isPackstation = true;
+        return $this;
+    }
+
+    public function setParcelShopDelivery(string $parcelShopId): ReceiverAddress
+    {
+        self::resetAddress();
+        $this->houseNumber = $parcelShopId;
+        $this->isPostfiliale = true;
+        return $this;
+    }
+
+    public function setPostNumber(?string $postNumber): ReceiverAddress
+    {
+        $this->postnummer = $postNumber;
+        return $this;
+    }
+
+    private function resetAddress(): void
+    {
+        $this->isPostfiliale = false;
+        $this->isPackstation = false;
+        $this->postalCode = null;
+        $this->street = null;
+        $this->city = null;
+        $this->houseNumber = '';
+        $this->postnummer = null;
+    }
 
 
 }

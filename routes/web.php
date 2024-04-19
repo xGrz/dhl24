@@ -1,7 +1,7 @@
 <?php
 
-use xGrz\Dhl24\Api\Structs\Shipment\PaymentData;
-use xGrz\Dhl24\Api\Structs\Shipment\ServiceDefinition;
+use xGrz\Dhl24\Api\Structs\Shipment;
+use xGrz\Dhl24\Enums\ShipmentItemType;
 use xGrz\Dhl24\Enums\ShipmentType;
 
 
@@ -10,16 +10,34 @@ Route::middleware(['web'])
     ->name('dhl24')
     ->group(function () {
         Route::get('/', function () {
-            $paymentData = new PaymentData();
-            $serviceDefinition = new ServiceDefinition(ShipmentType::DOMESTIC12);
+            $shipment = new Shipment(ShipmentType::DOMESTIC);
+            $shipment->shipper
+                ->setName('ACME Corp LTD.')
+                ->setPostalCode('03-200')
+                ->setCity('Warszawa')
+                ->setStreet('Bonaparte')
+                ->setHouseNumber('200', 20)
+                ->setContactPerson('John Doe')
+                ->setContactPhone('500600800')
+                ->setContactEmail('john@doe.com')
+            ;
+            $shipment->receiver
+                ->setName('ACME Corp LTD.')
+                ->setPostalCode('33-200')
+                ->setCity('Kraków')
+                ->setStreet('Zakopiańska')
+                ->setHouseNumber('2')
+                ->setContactPerson('Johnny Balboa')
+                ->setContactPhone('400400400')
+                ->setContactEmail('johnnybalboa@doe.com');
+
+            $shipment->addItem()->setDiamentions(30,30, 30, 3);
+            $shipment->addItem(ShipmentItemType::ENVELOPE);
+            $shipment->setShipmentContent('Elektronika');
+            $shipment->setReference('FZ/0020/2024');
+
             dump(
-//                $paymentData,
-            $serviceDefinition->setInsurance(320),
-                $serviceDefinition->setCollectOnDelivery(320, 'FA/0201/2014'),
-                $serviceDefinition->setInsurance(399),
-                $serviceDefinition->setCollectOnDelivery(399, 'FA/0202/2014'),
-                $serviceDefinition->setInsurance(302),
-                $serviceDefinition->setCollectOnDelivery(502, 'FA/0203/2014'),
+                $shipment->toArray()
             );
         });
     });

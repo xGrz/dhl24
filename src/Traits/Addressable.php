@@ -5,7 +5,7 @@ namespace xGrz\Dhl24\Traits;
 trait Addressable
 {
 
-    private function fullCityBuilder(string $city, string|int $postalCode): string
+    protected function fullCityBuilder(string $city, string|int $postalCode): string
     {
         return join(' ', [
             self::postalCodeFormatter($postalCode),
@@ -13,7 +13,7 @@ trait Addressable
         ]);
     }
 
-    private function fullStreetBuilder(string $streetName, string|int $houseNumber = null, string|int $apartmentNumber = null): string
+    protected function fullStreetBuilder(string $streetName, string|int $houseNumber = null, string|int $apartmentNumber = null): string
     {
         return join(' ', [
             $this->street,
@@ -21,14 +21,14 @@ trait Addressable
         ]);
     }
 
-    private function houseNumberWithApartmentFormatter(?string $houseNumber = null, ?string $apartmentNumber = null): string
+    protected function houseNumberWithApartmentFormatter(?string $houseNumber = null, ?string $apartmentNumber = null): string
     {
         return empty($apartmentNumber)
         ? $houseNumber
         : join('/', [$houseNumber, $apartmentNumber]);
     }
 
-    private function postalCodeFormatter(string|int $postCode): string
+    protected function postalCodeFormatter(string|int $postCode): string
     {
         if (!is_numeric($postCode)) return $postCode;
         if (strlen($postCode) !== 5) return $postCode;
@@ -39,7 +39,7 @@ trait Addressable
         ]);
     }
 
-    private function postalCodeToNumber(string $postCode): string
+    protected function postalCodeToNumber(string $postCode): string
     {
         $postCode = trim($postCode);
         $formatted = (string) preg_replace('/[^0-9]/', '', $postCode);
