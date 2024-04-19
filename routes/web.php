@@ -1,21 +1,25 @@
 <?php
 
-use xGrz\Dhl24\Api\Actions\GetNearestServicePoints;
-use xGrz\Dhl24\Enums\ServicePointType;
+use xGrz\Dhl24\Api\Structs\Shipment\PaymentData;
+use xGrz\Dhl24\Api\Structs\Shipment\ServiceDefinition;
+use xGrz\Dhl24\Enums\ShipmentType;
 
-ini_set('memory_limit', '-1');
 
 Route::middleware(['web'])
     ->prefix('dhl')
     ->name('dhl24')
     ->group(function () {
         Route::get('/', function () {
-            $point = GetNearestServicePoints::make('03-986', 2)->call();
+            $paymentData = new PaymentData();
+            $serviceDefinition = new ServiceDefinition(ShipmentType::DOMESTIC12);
             dump(
-                $point->getPointsByType(ServicePointType::PARCEL_STATION, 5),
-                $point->getPointsByType(ServicePointType::PARCEL_SHOP, 10),
-                $point->getPoints()->count(),
-
+//                $paymentData,
+            $serviceDefinition->setInsurance(320),
+                $serviceDefinition->setCollectOnDelivery(320, 'FA/0201/2014'),
+                $serviceDefinition->setInsurance(399),
+                $serviceDefinition->setCollectOnDelivery(399, 'FA/0202/2014'),
+                $serviceDefinition->setInsurance(302),
+                $serviceDefinition->setCollectOnDelivery(502, 'FA/0203/2014'),
             );
         });
     });

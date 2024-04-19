@@ -22,6 +22,11 @@ class ConfigService
         return new AuthData();
     }
 
+    public function getSapNumber(): string
+    {
+        return config('dhl24.auth.sap');
+    }
+
     public function getApiUsername(): string
     {
         return config('dhl24.auth.username');
@@ -68,6 +73,21 @@ class ConfigService
     {
         $labelTypeName = config('dhl24.labels.defaultType', LabelType::LP->name);
         return LabelType::findByName($labelTypeName);
+    }
+
+    public function getShipmentInsuranceValueRounding(): int
+    {
+        return config('dhl24.shipment-insurance.insurance_value_round_up', 0);
+    }
+
+    public function shouldUseIntelligentCostSaver(): bool
+    {
+        return config('dhl24.shipment-insurance.intelligent_cost_saver', false);
+    }
+
+    public function getIntelligentCostSaverMaxValue(): int
+    {
+        return config('dhl24.shipment-insurance.intelligent_cost_saver_max_value', 0);
     }
 
 

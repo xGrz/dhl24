@@ -12,9 +12,13 @@ use xGrz\Dhl24\Services\ConfigService;
  * @method static getApiUsername()
  * @method static getAuth()
  * @method static getDefaultLabelType()
+ * @method static getSapNumber()
+ * @method static shouldUseIntelligentCostSaver()
+ * @method static getIntelligentCostSaverMaxValue()
  */
 class Config extends Facade
 {
+
 
     protected static function getFacadeAccessor(): string
     {
