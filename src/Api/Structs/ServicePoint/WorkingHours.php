@@ -1,8 +1,8 @@
 <?php
 
-namespace xGrz\Dhl24\Api\Structs;
+namespace xGrz\Dhl24\Api\Structs\ServicePoint;
 
-class ParcelPointWorkingHours
+class WorkingHours
 {
     public array $monday = [
         'open' => null,

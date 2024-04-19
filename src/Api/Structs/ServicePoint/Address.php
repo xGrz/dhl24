@@ -1,11 +1,11 @@
 <?php
 
-namespace xGrz\Dhl24\Api\Structs;
+namespace xGrz\Dhl24\Api\Structs\ServicePoint;
 
 use xGrz\Dhl24\Interfaces\WithCombinedAddress;
 use xGrz\Dhl24\Traits\Addressable;
 
-class ParcelPointAddress implements WithCombinedAddress
+class Address implements WithCombinedAddress
 {
     use Addressable;
 

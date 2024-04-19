@@ -3,14 +3,15 @@
 namespace xGrz\Dhl24\Api\Responses;
 
 use Illuminate\Support\Collection;
-use xGrz\Dhl24\Api\Structs\ParcelShopPoint;
-use xGrz\Dhl24\Api\Structs\ParcelStationPoint;
-use xGrz\Dhl24\Api\Structs\ServiceStationPoint;
+use xGrz\Dhl24\Api\Structs\ServicePointInfo;
+use xGrz\Dhl24\Enums\ServicePointType;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 
 class GetNearestServicePointsResponse
 {
     private Collection $points;
+
+    private array $pointsByType = [];
 
     /**
      * @throws DHL24Exception
@@ -20,14 +21,21 @@ class GetNearestServicePointsResponse
         $this->points = new Collection();
         $points = $result->getNearestServicepointsResult->points->item;
         foreach ($points as $point) {
-            $className = match ($point->type) {
-                'PARCELSHOP' => ParcelShopPoint::class,
-                'SERVICEPOINT' => ServiceStationPoint::class,
-                'PARCELSTATION' => ParcelStationPoint::class,
-                default => throw new DHL24Exception('Invalid Parcel point: [' . $point->type . '] for ' . $point->name),
-            };
-            $this->points->push(new $className($point));
+            $this->points->push(new ServicePointInfo($point));
         }
+    }
+
+    public function getPointsByType(ServicePointType $pointType, ?int $maxResultCount = null): Collection
+    {
+        if (array_key_exists($pointType->name, $this->pointsByType)) {
+            $points = collect($this->pointsByType[$pointType->name]);
+        } else {
+            $this->pointsByType[$pointType->name] = $this->points->filter(function (ServicePointInfo $point) use ($pointType) {
+                return $point->type === $pointType;
+            });
+            $points = $this->pointsByType[$pointType->name];
+        }
+        return $maxResultCount ? $points->take($maxResultCount) : $points;
 
     }
 
@@ -43,7 +51,6 @@ class GetNearestServicePointsResponse
     {
         return json_decode(json_encode($this->points->toArray()), true);
     }
-
 
 
 }
