@@ -15,22 +15,37 @@ trait Addressable
 
     private function fullStreetBuilder(string $streetName, string|int $houseNumber = null, string|int $apartmentNumber = null): string
     {
-        $fullStreet = join(' ', [
+        return join(' ', [
             $this->street,
-            $this->houseNumber,
+            self::houseNumberWithApartmentFormatter($houseNumber, $apartmentNumber),
         ]);
-        if (!empty($apartmentNumber)) $fullStreet = $fullStreet . '/' . $apartmentNumber;
-
-        return $fullStreet;
     }
 
-    private function postalCodeFormatter(string $postCode): string
+    private function houseNumberWithApartmentFormatter(?string $houseNumber = null, ?string $apartmentNumber = null): string
     {
-        // todo: protection for invalid postcode
+        return empty($apartmentNumber)
+        ? $houseNumber
+        : join('/', [$houseNumber, $apartmentNumber]);
+    }
+
+    private function postalCodeFormatter(string|int $postCode): string
+    {
+        if (!is_numeric($postCode)) return $postCode;
+        if (strlen($postCode) !== 5) return $postCode;
+
         return join('-', [
             str($postCode)->substr(0, 2),
             str($postCode)->substr(2, 3),
         ]);
+    }
+
+    private function postalCodeToNumber(string $postCode): string
+    {
+        $postCode = trim($postCode);
+        $formatted = (string) preg_replace('/[^0-9]/', '', $postCode);
+        return strlen($formatted) === 5
+            ? $formatted
+            : $postCode;
     }
 
 }
