@@ -5,7 +5,8 @@ use xGrz\Dhl24\Enums\ShipmentItemType;
 use xGrz\Dhl24\Facades\DHL24;
 use xGrz\Dhl24\Wizard\ShipmentWizard;
 
-function array_to_xml($data, $xml = null) {
+function array_to_xml($data, $xml = null)
+{
     if ($xml === null) {
         $xml = new SimpleXMLElement('<?xml version="1.0"?><root></root>');
     }
@@ -26,9 +27,16 @@ Route::middleware(['web'])
     ->name('dhl24')
     ->group(function () {
         Route::get('/', function () {
+//
+//            $d = DHLShipment::with(['courier_booking'])->find(4);
+//            $b = DHLCourierBooking::with(['shipments'])->first();
+//            dd($d->toArray(), $b->toArray());
+
+            $faker = Faker\Factory::create('pl_PL');
+
             $wizard = new ShipmentWizard();
             $wizard->shipper()
-                ->setName('ACME Corp LTD.')
+                ->setName('ACME Corporation LTD.')
                 ->setPostalCode('03200')
                 ->setCity('Warszawa')
                 ->setStreet('Bonaparte')
@@ -37,19 +45,20 @@ Route::middleware(['web'])
                 ->setContactPhone('500600800')
                 ->setContactEmail('john@doe.com');
             $wizard->receiver()
-                ->setName('Microsoft Corp LTD.')
-                ->setPostalCode('02777')
-                ->setCity('Kraków')
-                ->setStreet('Zakopiańska')
-                ->setHouseNumber('2')
-                ->setContactPerson('Johnny Balboa')
-                ->setContactPhone('400400400')
-                ->setContactEmail('johnnybalboa@doe.com');
-            $wizard->services()->setInsurance(400);
+                ->setName($faker->boolean('70') ? $faker->company() : $faker->firstNameMale() . ' ' . $faker->lastName())
+                ->setPostalCode($faker->postcode)
+                ->setCity($faker->city)
+                ->setStreet($faker->streetName)
+                ->setHouseNumber($faker->buildingNumber)
+                ->setContactPerson($faker->firstNameMale() . ' ' . $faker->lastName())
+                ->setContactPhone($faker->phoneNumber())
+                ->setContactEmail($faker->safeEmail());
+            $wizard->services()->setInsurance(rand(30000, 240000) / 100);
+            $wizard->services()->setCollectOnDelivery(rand(30000, 240000) / 100);
             $wizard->addItem(ShipmentItemType::ENVELOPE);
-            $wizard->addItem(ShipmentItemType::PACKAGE, 1, 40, 35, 30, 12);
+            $wizard->addItem(ShipmentItemType::PACKAGE, rand(1, 2), rand(30, 60), rand(20, 30), rand(10, 40), rand(1, 30));
 
-            dd($wizard->toArray());
+            dd($wizard->store());
 
 //            return response(array_to_xml($wizard->toArray()), 200, [
 //                "Content-Type" => 'Content-Type: text/xml;'
@@ -60,7 +69,7 @@ Route::middleware(['web'])
                 DHL24::getPriceOptions($wizard),
                 DHL24::getOptions($wizard),
 
-        );
+            );
         });
     });
 
