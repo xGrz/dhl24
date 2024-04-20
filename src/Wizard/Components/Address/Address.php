@@ -1,12 +1,14 @@
 <?php
 
-namespace xGrz\Dhl24\Api\Structs\Shipment\Address;
+namespace xGrz\Dhl24\Wizard\Components\Address;
 
 use xGrz\Dhl24\Traits\Addressable;
+use xGrz\Dhl24\Traits\Arrayable;
 
-abstract class BaseAddress
+abstract class Address
 {
     use Addressable;
+    use Arrayable;
 
     public ?string $name = null;
     public ?string $postalCode = null;

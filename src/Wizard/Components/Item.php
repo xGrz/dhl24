@@ -1,6 +1,6 @@
 <?php
 
-namespace xGrz\Dhl24\Api\Structs\Shipment;
+namespace xGrz\Dhl24\Wizard\Components;
 
 use xGrz\Dhl24\Enums\ShipmentItemType;
 
@@ -38,6 +38,36 @@ class Item
     public function setEuroReturn(): Item
     {
         $this->euroReturn = true;
+        return $this;
+    }
+
+    public function setQuantity(int $quantity = 1): Item
+    {
+        $this->quantity = $quantity;
+        return $this;
+    }
+
+    public function setWidth(int $width): Item
+    {
+        $this->width = $width;
+        return $this;
+    }
+
+    public function setHeight(int $height): Item
+    {
+        $this->height = $height;
+        return $this;
+    }
+
+    public function setLength(int $length): Item
+    {
+        $this->length = $length;
+        return $this;
+    }
+
+    public function setWeight(float $weight): Item
+    {
+        $this->weight = $weight;
         return $this;
     }
 }

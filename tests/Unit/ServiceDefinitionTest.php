@@ -1,8 +1,8 @@
 <?php
 
 use Tests\TestCase;
-use xGrz\Dhl24\Api\Structs\Shipment\ServiceDefinition;
 use xGrz\Dhl24\Enums\ShipmentType;
+use xGrz\Dhl24\Wizard\Components\ServiceDefinition;
 
 class ServiceDefinitionTest extends TestCase
 {

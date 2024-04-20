@@ -57,7 +57,7 @@ abstract class BaseApiAction implements DHLApiCallableInterface
         return '\\' . $responseNamespace . '\\' . ucfirst(self::guessServiceName()) . 'Response';
     }
 
-    private function getPayload(): array
+    protected function getPayload(): array
     {
         $payloadData = [];
         $publicProps = (new \ReflectionClass($this))->getProperties(\ReflectionProperty::IS_PUBLIC);

@@ -1,10 +1,10 @@
 <?php
 
-namespace xGrz\Dhl24\Api\Structs\Shipment;
+namespace xGrz\Dhl24\Wizard\Components\Address;
 
 use xGrz\Dhl24\Enums\AddressType;
 
-class ReceiverAddress extends ShipperAddress
+class ReceiverAddress extends Address
 {
     public string $addressType = 'C';
     public string $country = 'PL';

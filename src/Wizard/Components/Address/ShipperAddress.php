@@ -1,10 +1,8 @@
 <?php
 
-namespace xGrz\Dhl24\Api\Structs\Shipment;
+namespace xGrz\Dhl24\Wizard\Components\Address;
 
-use xGrz\Dhl24\Api\Structs\Shipment\Address\BaseAddress;
-
-class ShipperAddress extends BaseAddress
+class ShipperAddress extends Address
 {
     public function setPostalCode(string $postalCode): static
     {

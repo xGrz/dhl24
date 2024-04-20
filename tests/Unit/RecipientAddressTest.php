@@ -1,7 +1,7 @@
 <?php
 
 use Tests\TestCase;
-use xGrz\Dhl24\Api\Structs\Shipment\ReceiverAddress;
+use xGrz\Dhl24\Wizard\Components\Address\ReceiverAddress;
 
 class RecipientAddressTest extends TestCase
 {

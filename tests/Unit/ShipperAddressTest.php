@@ -1,7 +1,7 @@
 <?php
 
 use Tests\TestCase;
-use xGrz\Dhl24\Api\Structs\Shipment\ShipperAddress;
+use xGrz\Dhl24\Wizard\Components\Address\ShipperAddress;
 
 class ShipperAddressTest extends TestCase
 {
@@ -34,7 +34,7 @@ class ShipperAddressTest extends TestCase
         $this->assertEquals('01200', $this->shipperAddress->postalCode);
     }
 
-    public function test_set_city():void
+    public function test_set_city(): void
     {
         $this->shipperAddress->setCity('Warsaw');
 

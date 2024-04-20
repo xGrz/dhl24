@@ -1,12 +1,15 @@
 <?php
 
-namespace xGrz\Dhl24\Api\Structs\Shipment;
+namespace xGrz\Dhl24\Wizard\Components;
 
 use xGrz\Dhl24\Enums\ShipmentType;
 use xGrz\Dhl24\Facades\Config;
+use xGrz\Dhl24\Traits\Arrayable;
 
 class ServiceDefinition
 {
+    use Arrayable;
+
     public string $product;
     public bool $deliveryEvening = false;
     public bool $deliveryOnSaturday = false;
