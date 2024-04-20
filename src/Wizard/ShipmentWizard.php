@@ -76,7 +76,7 @@ class ShipmentWizard
         return $this->receiver()->postalCode;
     }
 
-    public function store(): static
+    public function getModel(): DHLShipment
     {
         $shipmentData = $this->toArray();
         $shipmentData['piece_list'] = $shipmentData['pieceList'];
@@ -88,7 +88,12 @@ class ShipmentWizard
             ? $this->shipment->service->collectOnDeliveryValue
             : null;
 
-        $dhlShipment->save();
+        return $dhlShipment;
+    }
+
+    public function store(): static
+    {
+        self::getModel()->save();
         return $this;
     }
 
