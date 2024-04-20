@@ -25,17 +25,16 @@ trait Arrayable
         return $dataCollector;
     }
 
-    private function makeArray(): array
+    private function makeArray(mixed $source = null): array
     {
+        if (!$source) $source = $this;
         $output = [];
-        foreach ($this as $key => $value) {
+        foreach ($source as $key => $value) {
             if (is_object($value)) {
                 self::convertObjectToArray($key, $value, $output);
             } else {
                 self::removeNullValues($key, $value, $output);
             }
-
-
         }
         return $output;
     }

@@ -7,6 +7,8 @@ use xGrz\Dhl24\Enums\ShipmentType;
 use xGrz\Dhl24\Wizard\Components\Address\ReceiverAddress;
 use xGrz\Dhl24\Wizard\Components\Address\ShipperAddress;
 use xGrz\Dhl24\Wizard\Components\Item;
+use xGrz\Dhl24\Wizard\Components\PaymentData;
+use xGrz\Dhl24\Wizard\Components\PieceList;
 use xGrz\Dhl24\Wizard\Components\ServiceDefinition;
 use xGrz\Dhl24\Wizard\Components\Shipment;
 
@@ -20,6 +22,8 @@ class ShipmentWizard
         $this->shipment->shipper = new ShipperAddress();
         $this->shipment->receiver = new ReceiverAddress();
         $this->shipment->service = new ServiceDefinition($shipmentType);
+        $this->shipment->pieceList = new PieceList();
+        $this->shipment->payment = new PaymentData();
     }
 
     public function shipper(): ShipperAddress
@@ -40,27 +44,36 @@ class ShipmentWizard
     public function addItem(
         ShipmentItemType $type = ShipmentItemType::PACKAGE,
         int              $quantity = 1,
-        ?int              $width = null,
-        ?int              $height = null,
-        ?int              $length = null,
-        ?float            $weight = null,
-        bool $isNonStandard = null,
-        bool $euroReturn = null
+        ?int             $width = null,
+        ?int             $height = null,
+        ?int             $length = null,
+        ?float           $weight = null,
+        bool             $isNonStandard = null,
+        bool             $euroReturn = null
     ): Item
     {
         $item = new Item($type);
         $item->setQuantity($quantity);
-        if(!empty($width)) $item->setWidth($width);
-        if(!empty($height)) $item->setHeight($height);
-        if(!empty($length)) $item->setLength($length);
-        if(!empty($weight)) $item->setWeight($weight);
-        if($isNonStandard) $item->setNonStandard();
-        if($euroReturn) $item->setEuroReturn();
+        if (!empty($width)) $item->setWidth($width);
+        if (!empty($height)) $item->setHeight($height);
+        if (!empty($length)) $item->setLength($length);
+        if (!empty($weight)) $item->setWeight($weight);
+        if ($isNonStandard) $item->setNonStandard();
+        if ($euroReturn) $item->setEuroReturn();
 
-        $this->shipment->pieceList[] = $item;
+        $this->shipment->pieceList->add($item);
         return $item;
     }
 
+    public function getShipmentDate(): string
+    {
+        return $this->shipment->shipmentDate;
+    }
+
+    public function getDestinationPostCode(): string
+    {
+        return $this->receiver()->postalCode;
+    }
 
     public function toArray(): array
     {

@@ -1,12 +1,15 @@
 <?php
 
-namespace xGrz\Dhl24\Api\Structs\Shipment;
+namespace xGrz\Dhl24\Wizard\Components;
 
 use xGrz\Dhl24\Enums\PayerType;
 use xGrz\Dhl24\Facades\Config;
+use xGrz\Dhl24\Traits\Arrayable;
 
 class PaymentData
 {
+    use Arrayable;
+
     public string $paymentMethod = 'BANK_TRANSFER';
     public string $payerType;
     public ?string $accountNumber = null;

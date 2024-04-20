@@ -13,8 +13,9 @@ class Shipment
 
     public ShipperAddress $shipper;
     public ReceiverAddress $receiver;
-    public array $pieceList = [];
+    public PieceList $pieceList;
     public ServiceDefinition $service;
+    public PaymentData $payment;
     public string $shipmentDate;
     public bool $skipRestrictionCheck = false;
     public ?string $comment = null;

@@ -34,6 +34,12 @@ class ServiceDefinition
         $this->product = $shipmentType->value;
     }
 
+    public function setShipmentType(ShipmentType $shipmentType): static
+    {
+        $this->product = $shipmentType->value;
+        return $this;
+    }
+
     public function setCollectOnDelivery(int|float $amount, ?string $reference = null): static
     {
         $this->collectOnDelivery = true;

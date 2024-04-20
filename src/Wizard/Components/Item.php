@@ -3,9 +3,12 @@
 namespace xGrz\Dhl24\Wizard\Components;
 
 use xGrz\Dhl24\Enums\ShipmentItemType;
+use xGrz\Dhl24\Traits\Arrayable;
 
 class Item
 {
+    use Arrayable;
+
     public string $type;
     public ?int $width = null;
     public ?int $height = null;

@@ -5,16 +5,15 @@ namespace xGrz\Dhl24\Api\Actions;
 use xGrz\Dhl24\Api\Structs\AuthData;
 use xGrz\Dhl24\Wizard\ShipmentWizard;
 
-class CreateShipment extends BaseApiAction
+class GetPrice extends BaseApiAction
 {
-    protected ?string $serviceName = 'createShipments';
 
     public AuthData $authData;
-    public array $shipments = [];
+    public array $shipment;
 
     public function __construct(ShipmentWizard $shipment)
     {
-        $this->shipments[] = $shipment->toArray();
+        $this->shipment = $shipment->toArray();
     }
 
     public function debug()
