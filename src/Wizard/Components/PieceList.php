@@ -17,6 +17,11 @@ class PieceList
         return $this;
     }
 
+    public function getCount(): int
+    {
+        return count($this->listing);
+    }
+
     public function toArray(): array
     {
         return self::makeArray($this->listing);
