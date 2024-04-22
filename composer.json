@@ -30,7 +30,8 @@
         "php": "^8.1",
         "ext-soap": "*",
         "laravel/framework": "^10.0",
-        "xgrz/quick-blade-panel": "dev-main"
+        "xgrz/quick-blade-panel": "dev-main",
+        "livewire/livewire": "^3.4"
     },
     "config": {
         "allow-plugins": {
