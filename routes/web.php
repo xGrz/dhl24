@@ -1,6 +1,6 @@
 <?php
 
-use xGrz\Dhl24\Http\Controllers\CourierBookings;
+use xGrz\Dhl24\Http\Controllers\CourierBookingsController;
 use xGrz\Dhl24\Http\Controllers\ShipmentsController;
 
 function array_to_xml($data, $xml = null)
@@ -28,6 +28,6 @@ Route::middleware(['web'])
             return to_route('dhl24.shipments.index');
         });
         Route::resource('/shipments', ShipmentsController::class);
-        Route::resource('/bookings', CourierBookings::class);
+        Route::resource('/bookings', CourierBookingsController::class);
     });
 
