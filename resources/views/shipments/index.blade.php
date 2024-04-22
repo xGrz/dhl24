@@ -3,7 +3,9 @@
 @section('content')
     <x-p::pagination.info :source="$shipments"/>
     <x-p::paper class="bg-slate-800">
-        <x-p::paper-title title="Shipment list"/>
+        <x-p::paper-title title="Shipment list">
+            <x-p::buttonlink href="{{ route('dhl24.shipments.create') }}" color="success">Create</x-p::buttonlink>
+        </x-p::paper-title>
         @if($shipments)
             <x-p::table>
                 <x-p::table.head>
