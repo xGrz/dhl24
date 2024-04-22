@@ -16,7 +16,7 @@ return new class extends Migration
             $table->dateTime('pickup_from');
             $table->dateTime('pickup_to');
             $table->string('additional_info', 50)->nullable();
-            $table->string('orderId')->nullable();
+            $table->string('order_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

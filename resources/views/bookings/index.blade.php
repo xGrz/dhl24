@@ -17,7 +17,7 @@
                 <x-p::table.body>
                     @foreach($bookings as $booking)
                         <x-p::table.row>
-                            <x-p::table.cell>{{ $booking->orderId }}</x-p::table.cell>
+                            <x-p::table.cell>{{ $booking->order_id }}</x-p::table.cell>
                             <x-p::table.cell>{{ $booking->pickup_from }}</x-p::table.cell>
                             <x-p::table.cell>{{ $booking->pickup_to }}</x-p::table.cell>
                             <x-p::table.cell>{{ $booking->additional_info }}</x-p::table.cell>
