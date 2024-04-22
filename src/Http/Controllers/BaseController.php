@@ -13,7 +13,7 @@ class BaseController extends Controller
         View::share('qbp_useTailwind', true);
         View::share('qbp_useAlpine', false);
         View::share('qbp_navigationTemplate', 'p::navigation.container');
-        View::share('qbp_navigationItems', false);
+        View::share('qbp_navigationItems', 'dhl::layout.navigation-items');
         View::share('qbp_footerTemplate', 'p::footer.content');
     }
 
