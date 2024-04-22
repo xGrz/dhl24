@@ -1,49 +1,48 @@
-@extends('dhl::app')
+@extends('p::app')
 
 @section('content')
-    <x-payu::pagination.info :source="$shipments"/>
-    <x-dhl::paper class="bg-slate-800">
-        <x-dhl::paper-title title="Shipment list"/>
+    <x-p::pagination.info :source="$shipments"/>
+    <x-p::paper class="bg-slate-800">
+        <x-p::paper-title title="Shipment list"/>
         @if($shipments)
-            <x-dhl::table>
-                <x-dhl::table.thead>
-                    <x-dhl::table.row>
-                        <x-dhl::table.header>Shipment number</x-dhl::table.header>
-                        <x-dhl::table.header>Sender</x-dhl::table.header>
-                        <x-dhl::table.header>Receiver</x-dhl::table.header>
-                        <x-dhl::table.header>Items</x-dhl::table.header>
-                        <x-dhl::table.header>Content</x-dhl::table.header>
-                        <x-dhl::table.header>COD</x-dhl::table.header>
-                    </x-dhl::table.row>
-                </x-dhl::table.thead>
-                <tbody>
-                @foreach($shipments as $shipment)
-                    <x-dhl::table.row>
-                        <x-dhl::table.cell>{{ $shipment->shipment_id }}</x-dhl::table.cell>
-                        <x-dhl::table.cell>
-                            {{ $shipment->shipper['name'] }}<br/>
-                            {{ $shipment->shipper['postalCode'] }} {{ $shipment->shipper['city'] }}
-                        </x-dhl::table.cell>
-                        <x-dhl::table.cell>
-                            {{ $shipment->receiver['name'] }}<br/>
-                            {{ $shipment->receiver['postalCode'] }} {{ $shipment->receiver['city'] }}
-                        </x-dhl::table.cell>
-                        <x-dhl::table.cell>{{ $shipment->items }}</x-dhl::table.cell>
-                        <x-dhl::table.cell>{{ $shipment->content }}</x-dhl::table.cell>
-                        <x-dhl::table.cell>{{ $shipment->cod }}</x-dhl::table.cell>
-                    </x-dhl::table.row>
-                @endforeach
-                </tbody>
-            </x-dhl::table>
+            <x-p::table>
+                <x-p::table.head>
+                    <x-p::table.row>
+                        <x-p::table.th>Shipment number</x-p::table.th>
+                        <x-p::table.th>Sender</x-p::table.th>
+                        <x-p::table.th>Receiver</x-p::table.th>
+                        <x-p::table.th>Items</x-p::table.th>
+                        <x-p::table.th>Content</x-p::table.th>
+                        <x-p::table.th>COD</x-p::table.th>
+                    </x-p::table.row>
+                </x-p::table.head>
+                <x-p::table.body>
+                    @foreach($shipments as $shipment)
+                        <x-p::table.row>
+                            <x-p::table.cell>{{ $shipment->shipment_id }}</x-p::table.cell>
+                            <x-p::table.cell>
+                                {{ $shipment->shipper['name'] }}<br/>
+                                {{ $shipment->shipper['postalCode'] }} {{ $shipment->shipper['city'] }}
+                            </x-p::table.cell>
+                            <x-p::table.cell>
+                                {{ $shipment->receiver['name'] }}<br/>
+                                {{ $shipment->receiver['postalCode'] }} {{ $shipment->receiver['city'] }}
+                            </x-p::table.cell>
+                            <x-p::table.cell>{{ $shipment->items }}</x-p::table.cell>
+                            <x-p::table.cell>{{ $shipment->content }}</x-p::table.cell>
+                            <x-p::table.cell>{{ $shipment->cod }}</x-p::table.cell>
+                        </x-p::table.row>
+                    @endforeach
+                </x-p::table.body>
+            </x-p::table.tbody>
 
             <div class="py-3">
-                <x-payu::pagination :source="$shipments"/>
+                <x-p::pagination :source="$shipments"/>
             </div>
         @else
-            <x-payu::not-found message="Transactions for found."/>
+            <x-p::not-found message="Transactions for found."/>
         @endif
 
-
-    </x-dhl::paper>
-    <x-payu::pagination.info :source="$shipments"/>
+    </x-p::paper>
+    <x-p::pagination.info :source="$shipments"/>
 @endsection

@@ -2,10 +2,9 @@
 
 namespace xGrz\Dhl24\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use xGrz\Dhl24\Models\DHLShipment;
 
-class ShipmentsController extends Controller
+class ShipmentsController extends BaseController
 {
     public function index()
     {

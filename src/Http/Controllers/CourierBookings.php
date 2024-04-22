@@ -2,9 +2,8 @@
 
 namespace xGrz\Dhl24\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 
-class CourierBookings extends Controller
+class CourierBookings extends BaseController
 {
     public function index()
     {
