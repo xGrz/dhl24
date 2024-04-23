@@ -27,7 +27,7 @@ class ShipmentList extends Component
 
     public function addPackage(): void
     {
-        $this->items[] = new Package(ShipmentItemType::ENVELOPE);
+        $this->items[] = new Package(ShipmentItemType::PACKAGE);
 
     }
 

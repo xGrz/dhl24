@@ -32,6 +32,9 @@ class ShipmentItem extends Component
         if ($prop === 'item.type') {
             self::setShipmentType(ShipmentItemType::findByName($value));
         }
+        if ($prop === 'item.width' && $value > 100) {
+            $this->item->nonStandard = true;
+        }
     }
 
 

@@ -53,6 +53,6 @@ class Package implements Wireable
         $this->width = in_array('width', $attributes) ? 15 : null;
         $this->height = in_array('height', $attributes) ? 10 : null;
         $this->length = in_array('length', $attributes) ? 5 : null;
-        $this->nonStandard = in_array('nonStandard', $attributes) ? 1 : null;
+        $this->nonStandard = in_array('nonStandard', $attributes) ? false : null;
     }
 }
