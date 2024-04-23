@@ -44,10 +44,12 @@
                     </div>
                 </div>
             </div>
-            @livewire('shipment-list')
             <div class="px-2 py-4">
                 <x-p::button type="submit">Test</x-p::button>
             </div>
         </form>
     </x-p::paper-title>
+
+    @livewire('shipment-list')
+
 @endsection

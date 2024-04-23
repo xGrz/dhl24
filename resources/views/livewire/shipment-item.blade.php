@@ -1,33 +1,43 @@
 <x-p::table.row>
     <x-p::table.cell>{{ $index  +1 }}</x-p::table.cell>
     <x-p::table.cell>
-        <select wire:model="type" wire:change="$refresh">
+        <select wire:model.live.debounce.200ms="item.type">
             @foreach($shipmentTypes as $shipmentType)
                 <option value="{{$shipmentType->name}}">{{$shipmentType->value}}</option>
             @endforeach
         </select>
     </x-p::table.cell>
     <x-p::table.cell>
-        <input type="number" step="1" value="{{$quantity}}"/>
+        <a href="#" wire:click="addQuantity()">
+            <x-p::icons.add-circle class="inline text-green-500 w-6 h-6"/>
+        </a>
     </x-p::table.cell>
     <x-p::table.cell>
-        @if(!is_null($weight))
-            <input type="number" step="1" value="{{$weight}}"/>
-        @endif
-        @if(!is_null($length))
-            <input type="number" step="1" value="{{$length}}"/>
-        @endif
-        @if(!is_null($width))
-            <input type="number" step="1" value="{{$width}}"/>
-        @endif
-        @if(!is_null($height))
-            <input type="number" step="1" value="{{$height}}"/>
+        {{$item->quantity}}
+    </x-p::table.cell>
+    <x-p::table.cell>
+        <a href="#" wire:click="removeQuantity()">
+            <x-p::icons.remove-circle class="inline text-red-500 w-6 h-6"/>
+        </a>
+    </x-p::table.cell>
+    <x-p::table.cell>
+        @if($item->weight)
+            <input type="number" step="1" value="{{$item->weight}}"/>
         @endif
     </x-p::table.cell>
     <x-p::table.cell>
-        @if(!is_null($nonStandard))
-            <input type="checkbox" value="{{$nonStandard}}"/>
+        @if($item->width)
+            <input type="number" step="1" value="{{$item->width}}"/>
         @endif
+        @if($item->height)
+            <input type="number" step="1" value="{{$item->height}}"/>
+        @endif
+        @if($item->length)
+            <input type="number" step="1" value="{{$item->length}}"/>
+        @endif
+    </x-p::table.cell>
+    <x-p::table.cell>
+        <input type="checkbox" @if($item->nonStandard) checked @endif>
     </x-p::table.cell>
     <x-p::table.cell>
         <x-p::button
@@ -35,7 +45,6 @@
             size="small"
             color="danger"
             wire:click="delete"
-{{--            wire:confirm="Are you sure you want to delete this post?"--}}
         >
             Delete {{$index}}
         </x-p::button>
