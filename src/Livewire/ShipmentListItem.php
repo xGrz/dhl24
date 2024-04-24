@@ -7,7 +7,7 @@ use Livewire\Component;
 use xGrz\Dhl24\Enums\ShipmentItemType;
 use xGrz\Dhl24\Livewire\Model\Package;
 
-class ShipmentItem extends Component
+class ShipmentListItem extends Component
 {
     public ?int $index;
     public Package $item;
@@ -20,7 +20,7 @@ class ShipmentItem extends Component
 
     public function render(): View
     {
-        return view('dhl::livewire.shipment-item', [
+        return view('dhl::livewire.shipment-list-item', [
             'index' => $this->index,
             'package' => $this->item,
             'shipmentTypes' => ShipmentItemType::cases()
