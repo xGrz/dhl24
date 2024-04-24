@@ -8,9 +8,9 @@
     @if($items)
         @foreach($items as $key => $item)
             <livewire:shipment-item
-                wire:key="item_{{$key}}"
-                index="{{$key}}"
-                :$item
+                    wire:key="item_{{$key}}"
+                    index="{{$key}}"
+                    :$item
             />
         @endforeach
     @else
@@ -18,7 +18,7 @@
     @endif
 
     <div class="text-center mr-2 mt-3 pt-1 pb-4">
-        <x-p::link type="button" wire:click="addItem()">
+        <x-p::link type="button" wire:click.prevent="addItem()">
             Add package ({{$items_count}})
         </x-p::link>
     </div>
