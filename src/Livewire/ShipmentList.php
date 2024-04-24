@@ -2,20 +2,21 @@
 
 namespace xGrz\Dhl24\Livewire;
 
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use xGrz\Dhl24\Enums\ShipmentItemType;
-use xGrz\Dhl24\Livewire\Model\Package;
 
 class ShipmentList extends Component
 {
 
-    public array $items = [];
+    public Collection $items;
 
     public function mount(): void
     {
-        self::addPackage();
+        $this->items = new Collection();
+        self::addItem();
     }
 
     public function render(): View
@@ -25,10 +26,19 @@ class ShipmentList extends Component
         ]);
     }
 
-    public function addPackage(): void
+    public function addItem(): void
     {
-        $this->items[] = new Package(ShipmentItemType::PACKAGE);
-
+        $attributes = ShipmentItemType::PACKAGE->getAttributes();
+        $package = collect([
+            'type' => ShipmentItemType::PACKAGE->name,
+            'quantity' => 1
+        ]);
+        if (in_array('weight', $attributes)) $package->put('weight', 1);
+        if (in_array('width', $attributes)) $package->put('width', 15);
+        if (in_array('height', $attributes)) $package->put('height', 10);
+        if (in_array('length', $attributes)) $package->put('length', 5);
+        if (in_array('nonStandard', $attributes)) $package->put('nonStandard', false);
+        $this->items->push($package);
     }
 
     #[On('delete-item')]

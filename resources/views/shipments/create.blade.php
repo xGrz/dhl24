@@ -1,11 +1,12 @@
 @extends('p::app')
 
 @section('content')
-    <x-p::paper class="bg-slate-800">
-        <x-p::paper-title title="Create shipment"/>
-        <form method="POST" action="{{route('dhl24.shipments.store')}}">
+    <form method="POST" action="{{route('dhl24.shipments.store')}}">
+        <x-p::paper class="bg-slate-800 pb-4 mb-4">
+            <x-p::paper-title title="Create shipment"/>
+
             @csrf
-            <div class="grid grid-cols-3 gap-2 mx-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mx-2">
                 <div class="col-span-2">
                     <h2>Recipient address:</h2>
                     <div class="grid grid-cols-12 gap-4 mx-2">
@@ -21,15 +22,12 @@
                         <div class="col-span-8">
                             <x-p::input name="recipient[street]" label="Street"/>
                         </div>
-                        <div class="col-span-2">
+                        <div class="col-span-4">
                             <x-p::input name="recipient[house_number]" label="House number"/>
-                        </div>
-                        <div class="col-span-2">
-                            <x-p::input name="recipient[apartment_number]" label="Apartment"/>
                         </div>
                     </div>
                 </div>
-                <div>
+                <div class="col-span-1 md:col-span-2 lg:col-span-1">
                     <h2>Contact</h2>
                     <div class="grid gap-4 mx-2">
                         <div class="col-span-12">
@@ -44,12 +42,14 @@
                     </div>
                 </div>
             </div>
-            <div class="px-2 py-4">
-                <x-p::button type="submit">Test</x-p::button>
-            </div>
-        </form>
-    </x-p::paper-title>
 
-    @livewire('shipment-list')
+        </x-p::paper-title>
 
+        @livewire('shipment-list')
+
+        <div class="px-2 py-4 text-center">
+            <x-p::button type="submit">Utwórz przesyłkę</x-p::button>
+        </div>
+
+    </form>
 @endsection
