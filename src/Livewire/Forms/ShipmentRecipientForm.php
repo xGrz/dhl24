@@ -4,17 +4,26 @@ namespace xGrz\Dhl24\Livewire\Forms;
 
 use Livewire\Attributes\Validate;
 use Livewire\Form;
+use xGrz\Dhl24\Http\Requests\StoreShipmentRequest;
 
 class ShipmentRecipientForm extends Form
 {
-    #[Validate('required|string|max:60')]
+    #[Validate]
     public string $name = '';
-    #[Validate('required|string|max:10')]
+    #[Validate]
     public string $postalCode = '';
-    #[Validate('required|string|max:17')]
+    #[Validate]
     public string $city = '';
-    #[Validate('required|string|max:35')]
+    #[Validate]
     public string $street = '';
-    #[Validate('required|string|max:10')]
+    #[Validate]
     public string $houseNumber = '';
+
+
+    public function rules(): array
+    {
+        return (new StoreShipmentRequest())->getRulesFor('recipient');
+    }
+
 }
+

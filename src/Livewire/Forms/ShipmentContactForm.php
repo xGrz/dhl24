@@ -4,13 +4,20 @@ namespace xGrz\Dhl24\Livewire\Forms;
 
 use Livewire\Attributes\Validate;
 use Livewire\Form;
+use xGrz\Dhl24\Http\Requests\StoreShipmentRequest;
 
 class ShipmentContactForm extends Form
 {
-    #[Validate('nullable|string|max:60')]
+    #[Validate]
     public string $name = '';
-    #[Validate('nullable|string|max:20')]
+    #[Validate]
     public string $phone = '';
-    #[Validate('required|email|max:60')]
+    #[Validate]
     public string $email = '';
+
+    public function rules(): array
+    {
+        return (new StoreShipmentRequest())->getRulesFor('contact');
+    }
+
 }
