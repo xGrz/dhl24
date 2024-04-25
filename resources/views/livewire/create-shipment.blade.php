@@ -6,7 +6,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mx-2">
             <div class="col-span-2">
                 <h2>Recipient address:</h2>
-                <div class="grid grid-cols-12 gap-4 mx-2">
+                <div class="grid grid-cols-12 gap-x-4 gap-y-1 mx-2">
                     <div class="col-span-12">
                         <x-dhl::input label="Recipient full name" model="recipient.name" />
                     </div>
@@ -26,7 +26,7 @@
             </div>
             <div class="col-span-1 md:col-span-2 lg:col-span-1">
                 <h2>Contact</h2>
-                <div class="grid gap-4 mx-2">
+                <div class="grid gap-x-4 gap-y-1 mx-2">
                     <div class="col-span-12">
                         <x-dhl::input label="Contact name" model="contact.name" lazy />
                     </div>
