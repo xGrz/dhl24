@@ -31,7 +31,7 @@
         "ext-soap": "*",
         "laravel/framework": "^10.0",
         "xgrz/quick-blade-panel": "dev-main",
-        "livewire/livewire": "^3.4"
+        "livewire/livewire": "^3.0"
     },
     "config": {
         "allow-plugins": {

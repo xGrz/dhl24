@@ -7,9 +7,14 @@ use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use xGrz\Dhl24\Enums\ShipmentItemType;
+use xGrz\Dhl24\Livewire\Forms\ShipmentContactForm;
+use xGrz\Dhl24\Livewire\Forms\ShipmentRecipientForm;
 
-class ShipmentList extends Component
+class CreateShipment extends Component
 {
+
+    public ShipmentRecipientForm $recipient;
+    public ShipmentContactForm $contact;
 
     public Collection $items;
 
@@ -21,9 +26,14 @@ class ShipmentList extends Component
 
     public function render(): View
     {
-        return view('dhl::livewire.shipment-list', [
-            'items_count' => count($this->items),
-        ]);
+        return view('dhl::livewire.create-shipment');
+    }
+
+    public function createPackage()
+    {
+        $this->recipient->validate();
+        $this->contact->validate();
+        dd($this);
     }
 
     public function addItem(): void
@@ -44,6 +54,7 @@ class ShipmentList extends Component
     #[On('delete-item')]
     public function removePackage(int $index): void
     {
+        if ($this->items->count() < 2) return;
         unset($this->items[$index]);
     }
 

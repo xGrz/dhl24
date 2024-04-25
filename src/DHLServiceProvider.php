@@ -4,7 +4,7 @@ namespace xGrz\Dhl24;
 
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
-use xGrz\Dhl24\Livewire\ShipmentList;
+use xGrz\Dhl24\Livewire\CreateShipment;
 use xGrz\Dhl24\Livewire\ShipmentListItem;
 use xGrz\PayU\Services\ConfigService;
 
@@ -21,7 +21,7 @@ class DHLServiceProvider extends ServiceProvider
         self::setupMigrations();
         self::setupWebRouting();
         self::setupTranslations();
-        Livewire::component('shipment-list', ShipmentList::class);
+        Livewire::component('create-shipment', CreateShipment::class);
         Livewire::component('shipment-item', ShipmentListItem::class);
     }
 
