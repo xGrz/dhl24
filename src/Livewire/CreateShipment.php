@@ -3,6 +3,8 @@
 namespace xGrz\Dhl24\Livewire;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\MessageBag;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -29,11 +31,35 @@ class CreateShipment extends Component
         return view('dhl::livewire.create-shipment');
     }
 
+    public function formValidation(): bool
+    {
+        $errors = [];
+        try {
+            $this->recipient->validate();
+        } catch (ValidationException $exception) {
+            foreach ($exception->validator->getMessageBag()->getMessages() as $key => $message)
+                $errors[$key] = $message;
+        }
+        try {
+            $this->contact->validate();
+        } catch (ValidationException $exception) {
+            foreach ($exception->validator->getMessageBag()->getMessages() as $key => $message)
+                $errors[$key] = $message;
+        }
+        foreach ($this->items as $item) {
+            dd($item);
+        }
+
+        if (count($errors)) {
+            $this->setErrorBag(new MessageBag($errors));
+            return false;
+        }
+        return true;
+    }
+
     public function createPackage()
     {
-        $this->recipient->validate();
-        $this->contact->validate();
-        dd($this);
+        if (!$this->formValidation()) return;
     }
 
     public function addItem(): void

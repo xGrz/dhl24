@@ -11,6 +11,6 @@ class ShipmentContactForm extends Form
     public string $name = '';
     #[Validate('nullable|string|max:20')]
     public string $phone = '';
-    #[Validate('nullable|email|max:60')]
+    #[Validate('required|email|max:60')]
     public string $email = '';
 }
