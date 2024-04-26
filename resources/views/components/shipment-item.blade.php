@@ -18,7 +18,7 @@
     <div class="col-span-1 lg:order-1 flex flex-1 place-items-center justify-end">
         <button
             type="button"
-            wire:click="delete"
+            wire:click="removePackage({{$id}})"
             class="block p-1 bg-red-500 hover:bg-red-700 text-white rounded-md text-center"
         >
             <x-p::icons.close class="w-8 h-8"/>
@@ -44,16 +44,14 @@
             <x-dhl::diamentions label="Length" model="items.{{$id}}.length"/>
         @endif
     </div>
-    <div class="col-span-8 order-2">
+    <div class="col-span-4 order-2">
         @if(isset($item['nonStandard']))
             <x-dhl::non-standard
                 label="Non standard"
                 model="items.{{$id}}.nonStandard"
-                shouldBeNonStandard="items.{{$id}}.shouldBeNonStandard"
+                value="{{$item['nonStandard']}}"
+                shouldBeNonStandard="{{$item['shouldBeNonStandard'] ?? false}}"
             />
         @endif
     </div>
-
-    {{--    <input wire:model.live.debounce.200ms="items.{{$id}}.quantity"/>--}}
-    {{--    @error("items.$id.quantity")<span class="text-red-500">Błąd</span> @else no-err @enderror--}}
 </section>

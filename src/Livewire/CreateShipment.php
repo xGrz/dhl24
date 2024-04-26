@@ -3,7 +3,6 @@
 namespace xGrz\Dhl24\Livewire;
 
 use Illuminate\View\View;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use xGrz\Dhl24\Enums\ShipmentItemType;
@@ -62,20 +61,32 @@ class CreateShipment extends Component
         if (in_array('width', $attributes)) $item['width'] = $type->getDefaultWidth();
         if (in_array('height', $attributes)) $item['height'] = $type->getDefaultHeight();
         if (in_array('length', $attributes)) $item['length'] = $type->getDefaultLength();
-        if (in_array('nonStandard', $attributes)) $item['nonStandard'] = false;
+        if (in_array('nonStandard', $attributes)) {
+            $item['nonStandard'] = false;
+            $item['shouldBeNonStandard'] = false;
+        }
         return $item;
     }
 
-    public function updatedItems(mixed $value, string $arrayKey)
+    public function updatedItems(mixed $value, string $arrayKey): void
     {
         [$key, $prop] = explode('.', $arrayKey);
         if ($prop === 'type') {
             $this->items[$key] = self::changeShipmentType(ShipmentItemType::findByName($value));
         }
+        self::shouldBeNonStandard($this->items[$key]);
         $this->validate();
     }
 
-    #[On('delete-item')]
+    private function shouldBeNonStandard(array &$item): void
+    {
+        $shouldBeNonStandard = false;
+        if (isset($item['width']) && $item['width'] > 120) $shouldBeNonStandard = true;
+        if (isset($item['height']) && $item['height'] > 120) $shouldBeNonStandard = true;
+        if (isset($item['length']) && $item['length'] > 120) $shouldBeNonStandard = true;
+        $item['shouldBeNonStandard'] = $shouldBeNonStandard;
+    }
+
     public function removePackage(int $index): void
     {
         if (count($this->items) < 2) return;

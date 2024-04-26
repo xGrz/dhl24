@@ -37,7 +37,7 @@ enum ShipmentItemType: string
     {
         return match ($this) {
             self::PACKAGE => 15,
-            self::PALLET => 100,
+            self::PALLET => 80,
             default => null
         };
     }
@@ -46,7 +46,7 @@ enum ShipmentItemType: string
     {
         return match ($this) {
             self::PACKAGE => 15,
-            self::PALLET => 100,
+            self::PALLET => 60,
             default => null
         };
     }
@@ -59,4 +59,5 @@ enum ShipmentItemType: string
             default => null
         };
     }
+
 }
