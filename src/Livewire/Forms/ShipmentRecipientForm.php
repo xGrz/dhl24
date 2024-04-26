@@ -9,15 +9,15 @@ use xGrz\Dhl24\Http\Requests\StoreShipmentRequest;
 class ShipmentRecipientForm extends Form
 {
     #[Validate]
-    public string $name = '';
+    public string $name = 'Tester Testowski';
     #[Validate]
-    public string $postalCode = '';
+    public string $postalCode = '02-777';
     #[Validate]
-    public string $city = '';
+    public string $city = 'Warszawa';
     #[Validate]
-    public string $street = '';
+    public string $street = 'Wąwozowa';
     #[Validate]
-    public string $houseNumber = '';
+    public string $houseNumber = '20';
 
 
     public function rules(): array

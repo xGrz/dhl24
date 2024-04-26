@@ -2,7 +2,6 @@
 
 namespace xGrz\Dhl24\Livewire;
 
-use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -33,7 +32,7 @@ class ShipmentListItem extends Component
 
     public bool $shouldBeNonStandard = false;
 
-    public function mount(Collection $item, int $index): void
+    public function mount(array $item, int $index): void
     {
         $this->index = $index;
         foreach ($item as $key => $value) {
@@ -76,6 +75,11 @@ class ShipmentListItem extends Component
             $this->shouldBeNonStandard = $propertyValue > 100;
         }
 
+    }
+
+    public function updated()
+    {
+        $this->dispatch('update-item', $this->index, $this);
     }
 
     private function setValue(string $prop, mixed $defaultValue): static

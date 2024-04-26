@@ -50,10 +50,13 @@
                 </button>
             </x-p::paper-title>
 
-            @if($packages->items)
-                @foreach($packages->items as $key => $item)
-                    <div wire:key="item_{{$key}}">
-                        <x-dhl::shipment-item id="{{$key}}" wire:key="package_{{$key}}" :$errors/>
+            @if($items)
+                @foreach($items as $key => $item)
+                    <div wire:key="items_{{$key}}">
+                        <x-dhl::shipment-item id="{{$key}}" :$shipmentTypes :$item />
+{{--                        <input wire:model.live="items.{{$key}}.quantity" value="{{$item['quantity']}}" />--}}
+{{--                        @error("items.$key.quantity") błąd @else no-blad @enderror--}}
+{{--                    <livewire:shipment-item :$item wire:key="item_{{$key}}" index="{{$key}}"/>--}}
                     </div>
                 @endforeach
             @else

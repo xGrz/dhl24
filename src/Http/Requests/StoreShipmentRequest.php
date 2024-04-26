@@ -23,11 +23,11 @@ class StoreShipmentRequest extends FormRequest
 
             'items' => ['required', 'array'],
             'items.*.type' => ['nullable', 'string'],
-            'items.*.quantity' => ['required', 'integer', 'min:1'],
-            'items.*.weight' => ['nullable', 'integer', 'min:1'],
-            'items.*.length' => ['nullable', 'integer', 'min:1'],
-            'items.*.width' => ['nullable', 'integer', 'min:1'],
-            'items.*.height' => ['nullable', 'integer', 'min:1'],
+            'items.*.quantity' => ['required', 'integer', 'min:1', 'max:99'],
+            'items.*.weight' => ['nullable', 'integer', 'min:1', 'max:1000'],
+            'items.*.length' => ['nullable', 'integer', 'min:1', 'max:1000'],
+            'items.*.width' => ['nullable', 'integer', 'min:1', 'max:1000'],
+            'items.*.height' => ['nullable', 'integer', 'min:1', 'max:1000'],
             'items.*.nonStandard' => ['nullable', 'boolean'],
         ];
     }

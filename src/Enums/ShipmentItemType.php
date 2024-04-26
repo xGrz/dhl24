@@ -23,4 +23,40 @@ enum ShipmentItemType: string
         }
         return null;
     }
+
+    public function getDefaultWeight(): ?int
+    {
+        return match ($this) {
+            self::PACKAGE => 1,
+            self::PALLET => 100,
+            default => null
+        };
+    }
+
+    public function getDefaultWidth(): ?int
+    {
+        return match ($this) {
+            self::PACKAGE => 15,
+            self::PALLET => 100,
+            default => null
+        };
+    }
+
+    public function getDefaultHeight(): ?int
+    {
+        return match ($this) {
+            self::PACKAGE => 15,
+            self::PALLET => 100,
+            default => null
+        };
+    }
+
+    public function getDefaultLength(): ?int
+    {
+        return match ($this) {
+            self::PACKAGE => 5,
+            self::PALLET => 100,
+            default => null
+        };
+    }
 }

@@ -5,8 +5,8 @@
                 type="checkbox"
                 value="1"
                 class="sr-only peer"
-                wire:model.live.debounce.150ms="nonStandard"
-                @if($value) checked @endif
+                wire:model.live.debounce.150ms="{{$model}}"
+                @if($model) checked @endif
             >
             <div
                 class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800
@@ -14,7 +14,7 @@
                 after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5
                 after:h-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600">
             </div>
-            <span class="ms-3 text-sm font-medium uppercase @if(!$shouldBeNonStandard || $value) text-slate-500 @else text-orange-500 @endif font-bold">{{$label}}</span>
+{{--            <span class="ms-3 text-sm font-medium uppercase @if(!$shouldBeNonStandard || $value) text-slate-500 @else text-orange-500 @endif font-bold">{{$label}}</span>--}}
         </label>
     </div>
 </div>
