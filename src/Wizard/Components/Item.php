@@ -50,25 +50,25 @@ class Item
         return $this;
     }
 
-    public function setWidth(int $width): Item
+    public function setWidth(?int $width): Item
     {
         $this->width = $width;
         return $this;
     }
 
-    public function setHeight(int $height): Item
+    public function setHeight(?int $height): Item
     {
         $this->height = $height;
         return $this;
     }
 
-    public function setLength(int $length): Item
+    public function setLength(?int $length): Item
     {
         $this->length = $length;
         return $this;
     }
 
-    public function setWeight(float $weight): Item
+    public function setWeight(?float $weight): Item
     {
         $this->weight = $weight;
         return $this;
