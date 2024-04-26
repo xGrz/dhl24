@@ -4,7 +4,6 @@
     @if ($label)
         <small class="@error($model) text-rose-600 @else text-gray-500 @enderror">{{$label}}</small>
     @endif
-    {{$model}}
     <input
         @if($lazy)
             wire:model.lazy="{{$model}}"
