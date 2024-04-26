@@ -28,7 +28,7 @@ class StoreShipmentRequest extends FormRequest
             'items.*.length' => ['nullable', 'integer', 'min:1'],
             'items.*.width' => ['nullable', 'integer', 'min:1'],
             'items.*.height' => ['nullable', 'integer', 'min:1'],
-            'items.*.nonStandard' => ['nullable', 'string'],
+            'items.*.nonStandard' => ['nullable', 'boolean'],
         ];
     }
 
@@ -37,16 +37,39 @@ class StoreShipmentRequest extends FormRequest
         return true;
     }
 
-    public function getRulesFor(string $prop)
+    public function getRulesForRecipient(): array
     {
-        $rules = collect($this->rules())
-            ->filter(function ($value, $key) use ($prop) {
-                return str($key)->startsWith($prop . '.');
-            })
+        return collect($this->rules())
+            ->filter(fn($value, $key) => str($key)->startsWith('recipient.'))
             ->undot()
-            ->get($prop)
-            ;
+            ->get('recipient');
+    }
 
-        return $rules['*'] ?? $rules;
+    public function getRulesForContact(): array
+    {
+        return collect($this->rules())
+            ->filter(fn($value, $key) => str($key)->startsWith('contact.'))
+            ->undot()
+            ->get('contact');
+    }
+
+    public function getRulesForItems(): array
+    {
+        return collect($this->rules())
+            ->filter(fn($value, $key) => str($key)->startsWith('items'))
+            ->toArray();
+    }
+
+    public function getRulesForItem()
+    {
+        $itemRules = [];
+        collect($this->rules())
+            ->filter(fn($value, $key) => str($key)->startsWith('items.'))
+            ->map(function ($item, $key) use (&$itemRules) {
+                $newKey = str_replace('items.*.', '', $key);
+                $itemRules[$newKey] = $item;
+            })
+            ->toArray();
+        return $itemRules;
     }
 }

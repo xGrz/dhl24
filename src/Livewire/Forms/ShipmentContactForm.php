@@ -17,7 +17,8 @@ class ShipmentContactForm extends Form
 
     public function rules(): array
     {
-        return (new StoreShipmentRequest())->getRulesFor('contact');
+        return (new StoreShipmentRequest())->getRulesForContact();
     }
+
 
 }

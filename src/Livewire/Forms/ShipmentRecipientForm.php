@@ -22,7 +22,7 @@ class ShipmentRecipientForm extends Form
 
     public function rules(): array
     {
-        return (new StoreShipmentRequest())->getRulesFor('recipient');
+        return (new StoreShipmentRequest())->getRulesForRecipient();
     }
 
 }
