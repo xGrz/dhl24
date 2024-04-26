@@ -11,7 +11,7 @@ class ShipmentRecipientForm extends Form
     #[Validate]
     public string $name = 'Tester Testowski';
     #[Validate]
-    public string $postalCode = '02-777';
+    public string $postalCode = '02777';
     #[Validate]
     public string $city = 'Warszawa';
     #[Validate]

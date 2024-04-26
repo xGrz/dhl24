@@ -6,9 +6,12 @@ use Illuminate\View\View;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use xGrz\Dhl24\Enums\ShipmentItemType;
+use xGrz\Dhl24\Enums\ShipmentType;
+use xGrz\Dhl24\Facades\DHL24;
 use xGrz\Dhl24\Http\Requests\StoreShipmentRequest;
 use xGrz\Dhl24\Livewire\Forms\ShipmentContactForm;
 use xGrz\Dhl24\Livewire\Forms\ShipmentRecipientForm;
+use xGrz\Dhl24\Wizard\ShipmentWizard;
 
 class CreateShipment extends Component
 {
@@ -36,10 +39,40 @@ class CreateShipment extends Component
         ]);
     }
 
-    public function createPackage()
+    public function createPackage(): void
     {
         $this->validate();
-        dd($this->items);
+        $wizard = new ShipmentWizard(ShipmentType::DOMESTIC);
+        $wizard->shipper()
+            ->setName('BRAMSTAL')
+            ->setStreet('Sęczkowa')
+            ->setHouseNumber('96')
+            ->setPostalCode('03986')
+            ->setCity('Warszawa')
+            ->setContactEmail('biuro@bramstal.pl')
+            ->setContactPhone('501335555');
+        $wizard->receiver()
+            ->setName($this->recipient->name)
+            ->setStreet($this->recipient->street)
+            ->setHouseNumber($this->recipient->houseNumber)
+            ->setPostalCode($this->recipient->postalCode)
+            ->setCity($this->recipient->city)
+            ->setContactEmail($this->contact->email ?? null)
+            ->setContactPhone($this->contact->phone ?? null);
+
+        foreach ($this->items as $item) {
+            $wizard
+                ->addItem(ShipmentItemType::findByName($item['type']))
+                ->setQuantity($item['quantity'])
+                ->setWeight($item['weight'] ?? null)
+                ->setWidth($item['width'] ?? null)
+                ->setHeight($item['height'] ?? null)
+                ->setLength($item['length'] ?? null)//->setNonStandard($item['nonStandard'] ?? false)
+            ;
+
+        }
+        // dd($wizard->toArray());
+        dd(DHL24::getPriceOptions($wizard));
     }
 
     public function addItem(): void
