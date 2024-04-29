@@ -1,6 +1,9 @@
 <?php
 
 use xGrz\Dhl24\Http\Controllers\CourierBookingsController;
+use xGrz\Dhl24\Http\Controllers\SettingsContentsController;
+use xGrz\Dhl24\Http\Controllers\SettingsController;
+use xGrz\Dhl24\Http\Controllers\SettingsCostCentersController;
 use xGrz\Dhl24\Http\Controllers\ShipmentsController;
 
 
@@ -13,5 +16,8 @@ Route::middleware(['web'])
         });
         Route::resource('/shipments', ShipmentsController::class);
         Route::resource('/bookings', CourierBookingsController::class);
+        Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::resource('/settings/costCenters', SettingsCostCentersController::class);
+        Route::resource('/settings/contents', SettingsContentsController::class);
     });
 
