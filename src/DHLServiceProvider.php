@@ -7,6 +7,10 @@ use Livewire\Livewire;
 use xGrz\Dhl24\Livewire\CreateShipment;
 use xGrz\Dhl24\Livewire\ShipmentListItem;
 use xGrz\Dhl24\Livewire\ShipmentServices;
+use xGrz\Dhl24\Livewire\ShippingContents;
+use xGrz\Dhl24\Livewire\ShippingCostCenterDelete;
+use xGrz\Dhl24\Livewire\ShippingCostCenterEdit;
+use xGrz\Dhl24\Livewire\ShippingCostsCenter;
 use xGrz\PayU\Services\ConfigService;
 
 class DHLServiceProvider extends ServiceProvider
@@ -25,6 +29,10 @@ class DHLServiceProvider extends ServiceProvider
         Livewire::component('create-shipment', CreateShipment::class);
         Livewire::component('shipment-item', ShipmentListItem::class);
         Livewire::component('shipment-services', ShipmentServices::class);
+        Livewire::component('shipping-costs-center', ShippingCostsCenter::class);
+        Livewire::component('shipping-contents', ShippingContents::class);
+        Livewire::component('shipping-cost-center-edit', ShippingCostCenterEdit::class);
+        Livewire::component('shipping-cost-center-delete', ShippingCostCenterDelete::class);
     }
 
     private function setupMigrations(): void
