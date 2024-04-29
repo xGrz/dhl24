@@ -34,7 +34,7 @@ class CreateShipment extends Component
 
     public function render(): View
     {
-        return view('dhl::livewire.create-shipment', [
+        return view('dhl::shipments.livewire.create-shipment', [
             'shipmentTypes' => ShipmentItemType::cases()
         ]);
     }

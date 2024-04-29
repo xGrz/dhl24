@@ -56,7 +56,7 @@ class ShipmentServices extends Component
 
     public function render(): View
     {
-        return view('dhl::livewire.shipment-services');
+        return view('dhl::shipments.livewire.shipment-services');
     }
 
     private function getCostCenters(): void
