@@ -22,38 +22,32 @@
         @endif
     </section>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-2">
-
-        <section id="value">
-            <x-p-textinput label="{{__('dhl::shipment.services.value')}}" type="number" model="value" class="text-right" v="{{$value}}"/>
-        </section>
-        <section id="cod">
-            <x-p-textinput label="{{__('dhl::shipment.services.cod')}}" type="float" model="cod" class="text-right" v="{{$value}}"/>
-        </section>
-        <section id="reference">
-            <x-p::input label="{{__('dhl::shipment.services.reference')}}"/>
-        </section>
-        <section id="pdi">
-            <x-p::switch label="{{__('dhl::shipment.services.pdi')}}" model="pdi" value="{{$pdi}}"/>
-        </section>
-        <section id="rod">
-            <x-p::switch label="{{__('dhl::shipment.services.rod')}}" model="rod" value="{{$rod}}"/>
-        </section>
-        <section id="owl">
-            <x-p::switch label="{{__('dhl::shipment.services.owl')}}" model="owl" value="{{$owl}}"/>
-        </section>
-        <section id="content">
-            <x-p-textinput label="{{__('dhl::shipment.services.content')}}" model="content" :suggestions="$contentSuggestions"/>
-        </section>
-        <section id="comment">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4">
+        <div>
+            <x-p-textinput label="{{__('dhl::shipment.services.content')}}" model="content"
+                           :suggestions="$contentSuggestions"/>
+            <section id="mpk">
+                <x-p::select label="{{__('dhl::shipment.services.costsCenter')}}" model="costCenterName">
+                    @foreach($costsCenter as $costCenterName)
+                        <option value="{{$costCenterName}}">{{$costCenterName}}</option>
+                    @endforeach
+                </x-p::select>
+            </section>
             <x-p-textinput label="{{__('dhl::shipment.services.comment')}}"/>
-        </section>
-        <section id="mpk">
-            <x-p::select label="{{__('dhl::shipment.services.costsCenter')}}" model="costCenterName">
-                @foreach($costsCenter as $costCenterName)
-                    <option value="{{$costCenterName}}">{{$costCenterName}}</option>
-                @endforeach
-            </x-p::select>
-        </section>
+        </div>
+        <div>
+            <x-p-textinput label="{{__('dhl::shipment.services.value')}}" type="number" model="value" class="text-right"
+                           v="{{$value}}"/>
+
+            <x-p-textinput label="{{__('dhl::shipment.services.cod')}}" type="float" model="cod" class="text-right"
+                           v="{{$value}}"/>
+            <x-p::input label="{{__('dhl::shipment.services.reference')}}"/>
+        </div>
+        <div>
+            <div class="text-sm">Usługi dodatkowe</div>
+            <x-p::switch label="{{__('dhl::shipment.services.pdi')}}" model="pdi" value="{{$pdi}}"/>
+            <x-p::switch label="{{__('dhl::shipment.services.rod')}}" model="rod" value="{{$rod}}"/>
+            <x-p::switch label="{{__('dhl::shipment.services.owl')}}" model="owl" value="{{$owl}}"/>
+        </div>
     </div>
 </section>

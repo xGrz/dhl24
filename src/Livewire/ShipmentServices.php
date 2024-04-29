@@ -83,6 +83,5 @@ class ShipmentServices extends Component
             ->toArray();
     }
 
-    // TODO: add validation for value
 
 }
