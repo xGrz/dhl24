@@ -1,13 +1,13 @@
 <?php
 
-namespace xGrz\Dhl24\Livewire;
+namespace xGrz\Dhl24\Livewire\Settings\CostsCenter;
 
 use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use xGrz\Dhl24\Models\DHLCostCenter;
 
-class ShippingCostsCenter extends Component
+class CostCenterListing extends Component
 {
     public $costCenters = null;
 
@@ -18,7 +18,7 @@ class ShippingCostsCenter extends Component
 
     public function render(): View
     {
-        return view('dhl::settings.livewire.shipping-costs-center');
+        return view('dhl::settings.livewire.costs-center.costs-center-listing');
     }
 
     public function delete($itemId): void

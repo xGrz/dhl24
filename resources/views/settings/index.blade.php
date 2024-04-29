@@ -1,6 +1,6 @@
 @extends('p::app')
 
 @section('content')
-    @livewire('shipping-costs-center')
-    @livewire('shipping-contents')
+    @livewire('costs-center-listing')
+{{--    @livewire('shipping-contents')--}}
 @endsection

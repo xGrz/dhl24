@@ -3,7 +3,7 @@
         <x-p::paper-title title="Cost centers">
             <x-p::button
                 color="success"
-                wire:click="$dispatch('openModal', {component: 'shipping-cost-center-modal'})"
+                wire:click="$dispatch('openModal', {component: 'cost-center-create'})"
             >
                 Add
             </x-p::button>
@@ -28,7 +28,7 @@
                                 <x-p::button
                                     type="button"
                                     size="small"
-                                    wire:click="$dispatch('openModal', {component: 'shipping-cost-center-edit', arguments: { costCenter: {{$center}} } })"
+                                    wire:click="$dispatch('openModal', {component: 'cost-center-edit', arguments: { costCenter: {{$center}} } })"
                                 >
                                     Edit
                                 </x-p::button>
@@ -36,7 +36,7 @@
                                 <x-p::button
                                     color="danger"
                                     size="small"
-                                    wire:click="$dispatch('openModal', {component: 'shipping-cost-center-delete', arguments: { costCenter: {{$center}} } })"
+                                    wire:click="$dispatch('openModal', {component: 'cost-center-delete', arguments: { costCenter: {{$center}} } })"
                                 >
                                     Delete
                                 </x-p::button>

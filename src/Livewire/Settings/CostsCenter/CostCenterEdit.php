@@ -1,12 +1,12 @@
 <?php
 
-namespace xGrz\Dhl24\Livewire;
+namespace xGrz\Dhl24\Livewire\Settings\CostsCenter;
 
 use Illuminate\View\View;
 use LivewireUI\Modal\ModalComponent;
 use xGrz\Dhl24\Models\DHLCostCenter;
 
-class ShippingCostCenterEdit extends ModalComponent
+class CostCenterEdit extends ModalComponent
 {
     public Forms\ShippingCostCenterForm $form;
 
@@ -20,21 +20,19 @@ class ShippingCostCenterEdit extends ModalComponent
     public function render(): View
     {
         return view('dhl::settings.livewire.shipping-cost-center-edit', [
-            'title' => $this->form->costCenter->exists
-                ? 'Edit ' . $this->form->costCenter->name
-                : 'Add cost center',
-            'action' => $this->form->costCenter->exists
-                ? 'Save changes'
-                : 'Create cost center',
+            'title' => 'Edit ' . $this->form->costCenter->name,
         ]);
     }
 
-    public function save()
+    public function update(): void
     {
-        // $this->validate();
-        $this->form->store();
+        $this->validate();
+        $this->form->costCenter->update([
+            'name' => $this->form->name,
+        ]);
         $this->closeModal();
         $this->dispatch('refresh-cost-centers-list');
     }
+
 
 }
