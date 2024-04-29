@@ -53,10 +53,7 @@
             @if($items)
                 @foreach($items as $key => $item)
                     <div wire:key="items_{{$key}}">
-                        <x-dhl::shipment-item id="{{$key}}" :$shipmentTypes :$item />
-{{--                        <input wire:model.live="items.{{$key}}.quantity" value="{{$item['quantity']}}" />--}}
-{{--                        @error("items.$key.quantity") błąd @else no-blad @enderror--}}
-{{--                    <livewire:shipment-item :$item wire:key="item_{{$key}}" index="{{$key}}"/>--}}
+                        <x-dhl::shipment-item id="{{$key}}" :$shipmentTypes :$item/>
                     </div>
                 @endforeach
             @else
@@ -69,6 +66,13 @@
                 </x-p::link>
             </div>
 
+        </x-p::paper>
+
+        <x-p::paper class="bg-slate-800">
+            <x-p::paper-title title="Services"/>
+            <div class="p-2">
+                @livewire('shipment-services', ['postalCode' => $recipient->postalCode])
+            </div>
         </x-p::paper>
 
 

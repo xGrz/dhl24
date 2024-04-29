@@ -2,8 +2,13 @@
 
 namespace xGrz\Dhl24\Enums;
 
-enum ShipmentItemType: string
+use xGrz\Dhl24\Interfaces\WithLabel;
+use xGrz\Dhl24\Traits\HasLabel;
+
+enum ShipmentItemType: string implements WithLabel
 {
+    use HasLabel;
+
     case ENVELOPE = 'envelope';
     case PACKAGE = 'package';
     case PALLET = 'pallet';
@@ -42,7 +47,7 @@ enum ShipmentItemType: string
         };
     }
 
-    public function getDefaultHeight(): ?int
+    public function getDefaultLength(): ?int
     {
         return match ($this) {
             self::PACKAGE => 15,
@@ -51,7 +56,7 @@ enum ShipmentItemType: string
         };
     }
 
-    public function getDefaultLength(): ?int
+    public function getDefaultHeight(): ?int
     {
         return match ($this) {
             self::PACKAGE => 5,
@@ -60,4 +65,9 @@ enum ShipmentItemType: string
         };
     }
 
+
+    public function getLangKey(): string
+    {
+        return 'shipment.type';
+    }
 }

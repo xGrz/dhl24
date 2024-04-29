@@ -80,9 +80,39 @@ class CreateShipment extends Component
         $this->items[] = self::getItemDefinition(ShipmentItemType::PACKAGE);
     }
 
+    public function updatedRecipientPostalCode($value): void
+    {
+        $this->dispatch('postalCode-updated', $value);
+    }
+
     public function changeShipmentType(ShipmentItemType $type): array
     {
         return self::getItemDefinition($type);
+    }
+
+    public function updatedItems(mixed $value, string $arrayKey): void
+    {
+        [$key, $prop] = explode('.', $arrayKey);
+        if ($prop === 'type') {
+            $this->items[$key] = self::changeShipmentType(ShipmentItemType::findByName($value));
+        }
+        self::shouldBeNonStandard($this->items[$key]);
+        $this->validate();
+    }
+
+    public function removePackage(int $index): void
+    {
+        if (count($this->items) < 2) return;
+        unset($this->items[$index]);
+    }
+
+    private function shouldBeNonStandard(array &$item): void
+    {
+        $shouldBeNonStandard = false;
+        if (isset($item['width']) && $item['width'] > 120) $shouldBeNonStandard = true;
+        if (isset($item['height']) && $item['height'] > 120) $shouldBeNonStandard = true;
+        if (isset($item['length']) && $item['length'] > 120) $shouldBeNonStandard = true;
+        $item['shouldBeNonStandard'] = $shouldBeNonStandard;
     }
 
     private function getItemDefinition(ShipmentItemType $type): array
@@ -99,31 +129,6 @@ class CreateShipment extends Component
             $item['shouldBeNonStandard'] = false;
         }
         return $item;
-    }
-
-    public function updatedItems(mixed $value, string $arrayKey): void
-    {
-        [$key, $prop] = explode('.', $arrayKey);
-        if ($prop === 'type') {
-            $this->items[$key] = self::changeShipmentType(ShipmentItemType::findByName($value));
-        }
-        self::shouldBeNonStandard($this->items[$key]);
-        $this->validate();
-    }
-
-    private function shouldBeNonStandard(array &$item): void
-    {
-        $shouldBeNonStandard = false;
-        if (isset($item['width']) && $item['width'] > 120) $shouldBeNonStandard = true;
-        if (isset($item['height']) && $item['height'] > 120) $shouldBeNonStandard = true;
-        if (isset($item['length']) && $item['length'] > 120) $shouldBeNonStandard = true;
-        $item['shouldBeNonStandard'] = $shouldBeNonStandard;
-    }
-
-    public function removePackage(int $index): void
-    {
-        if (count($this->items) < 2) return;
-        unset($this->items[$index]);
     }
 
 }

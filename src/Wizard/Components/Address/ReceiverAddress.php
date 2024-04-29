@@ -27,7 +27,9 @@ class ReceiverAddress extends Address
 
     public function setPostalCode(string $postalCode): static
     {
-        $this->postalCode = $postalCode;
+        $this->postalCode = $this->country === 'PL'
+            ? $this->postalCodeToNumber($postalCode)
+            : $postalCode;
         return $this;
     }
 
