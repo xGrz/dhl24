@@ -15,7 +15,7 @@ class CostCenterCreate extends ModalComponent
 
     public function render(): View
     {
-        return view('dhl::settings.livewire.shipping-cost-center-create');
+        return view('dhl::settings.livewire.costs-center.cost-center-create');
     }
 
     public function store(): void
@@ -32,8 +32,7 @@ class CostCenterCreate extends ModalComponent
             'name' => [
                 'required',
                 'string',
-                'unique:dhl_cost_centers,name',
-                Rule::unique('dhl_costs_center', 'name')->whereNull('deleted_at')
+                Rule::unique('dhl_cost_centers', 'name')->whereNull('deleted_at')
             ],
         ];
     }

@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('dhl_contents', function (Blueprint $table) {
             $table->id();
-            $table->string('content');
+            $table->string('name');
+            $table->boolean('is_default')->default(false);
             $table->timestamps();
         });
     }

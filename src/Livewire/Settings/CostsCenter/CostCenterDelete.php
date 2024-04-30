@@ -19,7 +19,7 @@ class CostCenterDelete extends ModalComponent
 
     public function render(): View
     {
-        return view('dhl::settings.livewire.shipping-cost-center-delete');
+        return view('dhl::settings.livewire.costs-center.cost-center-delete');
     }
 
     public function deleteConfirmed(): void
