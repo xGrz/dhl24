@@ -25,6 +25,11 @@
                                 @endif
                             </x-p::table.cell>
                             <x-p::table.cell class="text-right">
+                                @if(!$center->is_default)
+                                <a href="#" wire:click.prevent="setAsDefault({{$center->id}})">
+                                    Star
+                                </a>
+                                @endif
                                 <x-p::button
                                     type="button"
                                     size="small"

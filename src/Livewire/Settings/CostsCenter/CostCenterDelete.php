@@ -8,13 +8,11 @@ use xGrz\Dhl24\Models\DHLCostCenter;
 
 class CostCenterDelete extends ModalComponent
 {
-    public Forms\ShippingCostCenterForm $form;
+    public ?DHLCostCenter $costCenter = null;
 
     public function mount(DHLCostCenter $costCenter = null): void
     {
-        if ($costCenter->exists()) {
-            $this->form->setCostCenter($costCenter);
-        }
+            $this->costCenter = $costCenter;
     }
 
     public function render(): View
@@ -24,15 +22,15 @@ class CostCenterDelete extends ModalComponent
 
     public function deleteConfirmed(): void
     {
-        $this->form->costCenter->delete();
+        $this->costCenter->delete();
         $this->closeModal();
-        $this->dispatch('refresh-cost-centers-list');
+        session()->flash('success', 'Cost center has been deleted.');
+        $this->redirect(route('dhl24.costCenters.index'));
     }
 
     public function cancel(): void
     {
         $this->closeModal();
-        // $this->dispatch('refresh-cost-centers-list');
     }
 
 }

@@ -23,7 +23,8 @@ class CostCenterCreate extends ModalComponent
         $this->validate();
         DHLCostCenter::create(['name' => $this->name]);
         $this->closeModal();
-        $this->dispatch('refresh-cost-centers-list');
+        session()->flash('success', 'Cost Center has been created successfully.');
+        $this->redirect(route('dhl24.costCenters.index'));
     }
 
     public function rules(): array

@@ -35,5 +35,12 @@ class CostCenterListing extends Component
             ->get();
     }
 
+    public function setAsDefault($itemId): void
+    {
+        DHLCostCenter::find($itemId)->update(['is_default' => true]);
+        $this->dispatch('refresh-cost-centers-list');
+    }
+
+
 
 }

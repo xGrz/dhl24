@@ -34,7 +34,8 @@ class CostCenterEdit extends ModalComponent
             'name' => $this->name,
         ]);
         $this->closeModal();
-        $this->dispatch('refresh-cost-centers-list');
+        session()->flash('success', 'Cost center has been updated.');
+        $this->redirect(route('dhl24.settings.costs-center.index'));
     }
 
     public function rules(): array
