@@ -19,16 +19,21 @@
                         <x-p::table.row wire:key="costCenter_{{$center->id}}">
                             <x-p::table.cell>
                                 @if($center->is_default)
-                                    <strong>{{ $center->name }}</strong>
+                                    <strong class="text-slate-300">{{ $center->name }}</strong>
                                 @else
                                     {{ $center->name }}
                                 @endif
                             </x-p::table.cell>
                             <x-p::table.cell class="text-right">
-                                @if(!$center->is_default)
-                                <a href="#" wire:click.prevent="setAsDefault({{$center->id}})">
-                                    Star
-                                </a>
+                                @if($center->is_default)
+                                    <button type="button" class="text-yellow-500" disabled>
+                                        <x-p::icons.star-full class="w-5 h-5"/>
+                                    </button>
+                                @else
+                                    <button href="#" wire:click.prevent="setAsDefault({{$center->id}})"
+                                       class="text-slate-500 hover:text-yellow-500 transition-all">
+                                        <x-p::icons.star class="w-5 h-5"/>
+                                    </button>
                                 @endif
                                 <x-p::button
                                     type="button"

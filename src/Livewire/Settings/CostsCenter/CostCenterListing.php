@@ -37,10 +37,11 @@ class CostCenterListing extends Component
 
     public function setAsDefault($itemId): void
     {
-        DHLCostCenter::find($itemId)->update(['is_default' => true]);
-        $this->dispatch('refresh-cost-centers-list');
+        $this->costCenters->find($itemId)->update(['is_default' => true]);
+        $name = $this->costCenters->find($itemId)->name;
+        session()->flash('info', "Default cost center has been changed to $name.");
+        $this->redirectRoute('dhl24.costCenters.index');
     }
-
 
 
 }
