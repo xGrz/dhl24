@@ -12,7 +12,7 @@ class SettingsContentsController extends BaseController
         return view('dhl::settings.index', [
             'title' => 'Settings',
             'costCenters' => DHLCostCenter::orderBy('is_default', 'desc')->orderBy('name')->get(),
-            'contents' => DHLContentSuggestion::orderBy('content')->get()
+            'contents' => DHLContentSuggestion::orderBy('name')->get()
         ]);
     }
 

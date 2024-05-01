@@ -2,5 +2,5 @@
 
 @section('content')
     @livewire('costs-center-listing')
-{{--    @livewire('shipping-contents')--}}
+    @livewire('contents-listing')
 @endsection

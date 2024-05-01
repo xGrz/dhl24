@@ -5,13 +5,16 @@ namespace xGrz\Dhl24;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use xGrz\Dhl24\Livewire\CreateShipment;
+use xGrz\Dhl24\Livewire\Settings\Contents\ContentCreate;
+use xGrz\Dhl24\Livewire\Settings\Contents\ContentDelete;
+use xGrz\Dhl24\Livewire\Settings\Contents\ContentEdit;
+use xGrz\Dhl24\Livewire\Settings\Contents\ContentsListing;
 use xGrz\Dhl24\Livewire\Settings\CostsCenter\CostCenterCreate;
 use xGrz\Dhl24\Livewire\Settings\CostsCenter\CostCenterDelete;
 use xGrz\Dhl24\Livewire\Settings\CostsCenter\CostCenterEdit;
 use xGrz\Dhl24\Livewire\Settings\CostsCenter\CostCenterListing;
 use xGrz\Dhl24\Livewire\ShipmentListItem;
 use xGrz\Dhl24\Livewire\ShipmentServices;
-use xGrz\Dhl24\Livewire\ShippingContents;
 use xGrz\PayU\Services\ConfigService;
 
 class DHLServiceProvider extends ServiceProvider
@@ -34,7 +37,10 @@ class DHLServiceProvider extends ServiceProvider
         Livewire::component('cost-center-create', CostCenterCreate::class);
         Livewire::component('cost-center-edit', CostCenterEdit::class);
         Livewire::component('cost-center-delete', CostCenterDelete::class);
-        Livewire::component('shipping-contents', ShippingContents::class);
+        Livewire::component('contents-listing', ContentsListing::class);
+        Livewire::component('content-create', ContentCreate::class);
+        Livewire::component('content-edit', ContentEdit::class);
+        Livewire::component('content-delete', ContentDelete::class);
     }
 
     private function setupMigrations(): void
