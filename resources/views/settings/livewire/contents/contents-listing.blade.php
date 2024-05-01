@@ -39,17 +39,17 @@
                                 <x-p::button
                                     type="button"
                                     size="small"
-                                    wire:click="$dispatch('openModal', {component: 'content-edit', arguments: { content: {{$content}} } })"
+                                    wire:click.prevent="$dispatch('openModal', {component: 'content-edit', arguments: { contentSuggestion: {{$content}} } })"
                                 >
                                     Edit
                                 </x-p::button>
-                                <x-p::buttonlink
-                                    href="{{route('dhl24.contents.destroy', $content->id)}}"
+                                <x-p::button
+                                    wire:click.prevent="$dispatch('openModal', {component: 'content-delete', arguments: { contentSuggestion: {{$content}} } })"
                                     color="danger"
                                     size="small"
                                 >
                                     Delete
-                                </x-p::buttonlink>
+                                </x-p::button>
                             </x-p::table.cell>
                         </x-p::table.row>
                     @endforeach
