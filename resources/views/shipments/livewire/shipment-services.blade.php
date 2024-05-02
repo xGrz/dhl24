@@ -12,10 +12,9 @@
                             @if(!$isAvailable) disabled @endif
 
                         />
-                        <spam @if(!$isAvailable) class="text-slate-600" @endif>
+                        <span @if(!$isAvailable) class="text-slate-600" @endif>
                             {{$serviceName}}
-                        </spam>
-
+                        </span>
                     </label>
                 @endif
             @endforeach
@@ -24,8 +23,11 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4">
         <div>
-            <x-p-textinput label="{{__('dhl::shipment.services.content')}}" model="content"
-                           :suggestions="$contentSuggestions"/>
+            <x-p-textinput
+                label="{{__('dhl::shipment.services.content')}}"
+                wire:model.live.debounce="content"
+                :suggestions="$contentSuggestions"
+            />
             <section id="mpk">
                 <x-p::select label="{{__('dhl::shipment.services.costsCenter')}}" model="costCenterName">
                     @foreach($costsCenter as $costCenterName)
@@ -33,14 +35,16 @@
                     @endforeach
                 </x-p::select>
             </section>
-            <x-p-textinput label="{{__('dhl::shipment.services.comment')}}"/>
+            <x-p-textinput label="{{__('dhl::shipment.services.comment')}}" wire:model.live.debounce="comment"/>
         </div>
         <div>
-            <x-p-textinput label="{{__('dhl::shipment.services.value')}}" type="number" model="value" class="text-right"
-                           v="{{$value}}"/>
-
-            <x-p-textinput label="{{__('dhl::shipment.services.cod')}}" type="float" model="cod" class="text-right"
-                           v="{{$value}}"/>
+            <x-p-textinput
+                label="{{__('dhl::shipment.services.value')}}"
+                type="float"
+                wire:model.live.debounce="value"
+                class="text-right"
+            />
+            <x-p-textinput label="{{__('dhl::shipment.services.cod')}}" type="float" wire:model.live.debounce="cod" class="text-right"/>
             <x-p::input label="{{__('dhl::shipment.services.reference')}}"/>
         </div>
         <div>

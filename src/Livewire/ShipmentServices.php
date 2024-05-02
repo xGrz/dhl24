@@ -6,6 +6,7 @@ use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use xGrz\Dhl24\Facades\DHL24;
+use xGrz\Dhl24\Helpers\Money;
 use xGrz\Dhl24\Models\DHLContentSuggestion;
 use xGrz\Dhl24\Models\DHLCostCenter;
 
@@ -18,12 +19,12 @@ class ShipmentServices extends Component
     public array $contentSuggestions = [];
     public string $deliveryService;
     public string $costCenterName = '';
-    public string $content = 'Elektronika';
+    public string $content = '';
     public bool $pdi = false;
     public bool $rod = false;
     public bool $owl = false;
-    public string $value = '56';
-    public string $cod = '200';
+    public string $value = '';
+    public string $cod = '';
 
     public function mount(string|null $postalCode): void
     {
@@ -54,6 +55,15 @@ class ShipmentServices extends Component
         }
     }
 
+    public function updatedCod($codAmount)
+    {
+        $shipmentValue = Money::isValid($this->value) ? Money::from($this->value)->toNumber() : 0;
+        $codValue = Money::isValid($codAmount) ? Money::from($codAmount)->toNumber() : 0;
+        if (($codValue > $shipmentValue) && $codValue) {
+            $this->value = Money::from($codValue)->format(',', ' ');
+        }
+    }
+
     public function render(): View
     {
         return view('dhl::shipments.livewire.shipment-services');
@@ -66,21 +76,23 @@ class ShipmentServices extends Component
             ->orderBy('is_default', 'desc')
             ->orderBy('name')
             ->get()
-            ->map(function ($costName) {
-                return $costName->name;
-            })
+            ->map(fn($costName) => $costName->name)
             ->toArray();
         $this->costCenterName = $this->costsCenter[0] ?? '';
     }
 
     private function getContentSuggestions(): void
     {
-        $this->contentSuggestions = DHLContentSuggestion::orderBy('content')
-            ->get()
-            ->map(function ($contentSuggestion) {
-                return $contentSuggestion->content;
-            })
+        $suggestions = DHLContentSuggestion::orderBy('name')->get();
+
+        $this->contentSuggestions = $suggestions
+            ->map(fn($contentSuggestion) => $contentSuggestion->name)
             ->toArray();
+
+        $this->content = $suggestions
+            ->filter(fn($suggestion) => $suggestion->is_default)
+            ->first()
+            ?->name ?? '';
     }
 
 
