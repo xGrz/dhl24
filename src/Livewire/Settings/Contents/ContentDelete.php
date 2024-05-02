@@ -23,10 +23,10 @@ class ContentDelete extends ModalComponent
 
     public function deleteConfirmed(): void
     {
-        $this->content->delete();
         $this->closeModal();
+        $this->content->delete();
         session()->flash('success', 'Content suggestion has been deleted.');
-        $this->redirect(route('dhl24.settings.index'));
+        $this->redirectRoute('dhl24.settings.contents.index');
     }
 
     public function cancel(): void

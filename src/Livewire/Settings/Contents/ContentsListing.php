@@ -11,7 +11,7 @@ class ContentsListing extends Component
 
     public $contents;
 
-    public function mount()
+    public function mount(): void
     {
         $this->contents = DHLContentSuggestion::orderBy('name')->get();
     }
@@ -24,14 +24,14 @@ class ContentsListing extends Component
     public function setAsDefault(int $itemId): void
     {
         $this->contents->find($itemId)->update(['is_default' => true]);
-        session()->flash('success', 'Default content set.');
-        $this->redirectRoute('dhl24.contents.index');
+        session()->flash('success', 'Default content has been set.');
+        $this->redirectRoute('dhl24.settings.contents.index');
     }
 
     public function removeDefault(int $itemId): void
     {
         $this->contents->find($itemId)->update(['is_default' => false]);
-        session()->flash('info', 'Default content removed.');
-        $this->redirectRoute('dhl24.contents.index');
+        session()->flash('info', 'Default content has been removed.');
+        $this->redirectRoute('dhl24.settings.contents.index');
     }
 }

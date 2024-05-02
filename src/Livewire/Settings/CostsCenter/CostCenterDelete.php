@@ -22,10 +22,10 @@ class CostCenterDelete extends ModalComponent
 
     public function deleteConfirmed(): void
     {
-        $this->costCenter->delete();
         $this->closeModal();
-        session()->flash('success', 'Cost center has been deleted.');
-        $this->redirect(route('dhl24.costCenters.index'));
+        $this->costCenter->delete();
+        session()->flash('success', 'Cost center has been deleted successfully.');
+        $this->redirectRoute('dhl24.settings.costCenters.index');
     }
 
     public function cancel(): void

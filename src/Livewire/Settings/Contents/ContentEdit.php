@@ -27,12 +27,12 @@ class ContentEdit extends ModalComponent
     public function update(): void
     {
         $this->validate();
+        $this->closeModal();
         $this->content->update([
             'name' => $this->name,
         ]);
-        $this->closeModal();
         session()->flash('success', 'Suggestion has been updated.');
-        $this->redirectRoute('dhl24.settings.index');
+        $this->redirectRoute('dhl24.settings.contents.index');
     }
 
     public function rules(): array

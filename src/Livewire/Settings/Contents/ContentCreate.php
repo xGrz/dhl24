@@ -21,10 +21,10 @@ class ContentCreate extends ModalComponent
     public function store(): void
     {
         $this->validate();
-        DHLContentSuggestion::create(['name' => $this->name]);
         $this->closeModal();
+        DHLContentSuggestion::create(['name' => $this->name]);
         session()->flash('success', 'Content suggestion has been added successfully.');
-        $this->redirectRoute('dhl24.settings.index');
+        $this->redirectRoute('dhl24.settings.contents.index');
 
     }
 
