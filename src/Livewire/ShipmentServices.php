@@ -20,6 +20,7 @@ class ShipmentServices extends Component
     public string $deliveryService;
     public string $costCenterName = '';
     public string $content = '';
+    public string $comment = '';
     public bool $pdi = false;
     public bool $rod = false;
     public bool $owl = false;

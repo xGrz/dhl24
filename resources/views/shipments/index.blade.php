@@ -1,50 +1,51 @@
 @extends('p::app')
 
 @section('content')
-    <x-p::pagination.info :source="$shipments"/>
-    <x-p::paper class="bg-slate-800">
-        <x-p::paper-title title="Shipment list">
-            <x-p::buttonlink href="{{ route('dhl24.shipments.create') }}" color="success">Create</x-p::buttonlink>
-        </x-p::paper-title>
+    <x-p-pagination :source="$shipments"/>
+    <x-p-paper>
+        <x-slot:title>Shipment list</x-slot:title>
+        <x-slot:actions>
+            <x-p-button href="{{ route('dhl24.shipments.create') }}" color="success">Create</x-p-button>
+        </x-slot:actions>
         @if($shipments)
-            <x-p::table>
-                <x-p::table.head>
-                    <x-p::table.row>
-                        <x-p::table.th>Shipment number</x-p::table.th>
-                        <x-p::table.th>Sender</x-p::table.th>
-                        <x-p::table.th>Receiver</x-p::table.th>
-                        <x-p::table.th>Items</x-p::table.th>
-                        <x-p::table.th>Content</x-p::table.th>
-                        <x-p::table.th>COD</x-p::table.th>
-                    </x-p::table.row>
-                </x-p::table.head>
-                <x-p::table.body>
+            <x-p-table>
+                <x-p-thead>
+                    <x-p-tr>
+                        <x-p-th>Shipment number</x-p-th>
+                        <x-p-th>Sender</x-p-th>
+                        <x-p-th>Receiver</x-p-th>
+                        <x-p-th>Items</x-p-th>
+                        <x-p-th>Content</x-p-th>
+                        <x-p-th>COD</x-p-th>
+                    </x-p-tr>
+                </x-p-thead>
+                <x-p-tbody>
                     @foreach($shipments as $shipment)
-                        <x-p::table.row>
-                            <x-p::table.cell>{{ $shipment->shipment_id }}</x-p::table.cell>
-                            <x-p::table.cell>
+                        <x-p-tr>
+                            <x-p-td>{{ $shipment->shipment_id }}</x-p-td>
+                            <x-p-td>
                                 {{ $shipment->shipper['name'] }}<br/>
                                 {{ $shipment->shipper['postalCode'] }} {{ $shipment->shipper['city'] }}
-                            </x-p::table.cell>
-                            <x-p::table.cell>
+                            </x-p-td>
+                            <x-p-td>
                                 {{ $shipment->receiver['name'] }}<br/>
                                 {{ $shipment->receiver['postalCode'] }} {{ $shipment->receiver['city'] }}
-                            </x-p::table.cell>
-                            <x-p::table.cell>{{ $shipment->items }}</x-p::table.cell>
-                            <x-p::table.cell>{{ $shipment->content }}</x-p::table.cell>
-                            <x-p::table.cell>{{ $shipment->cod }}</x-p::table.cell>
-                        </x-p::table.row>
+                            </x-p-td>
+                            <x-p-td center>{{ $shipment->items }}</x-p-td>
+                            <x-p-td>{{ $shipment->content }}</x-p-td>
+                            <x-p-td right>{{ $shipment->cod }}</x-p-td>
+                        </x-p-tr>
                     @endforeach
-                </x-p::table.body>
-            </x-p::table.tbody>
+                </x-p-tbody>
+            </x-p-table>
 
             <div class="py-3">
-                <x-p::pagination :source="$shipments"/>
+                <x-p-pagination :source="$shipments"/>
             </div>
         @else
-            <x-p::not-found message="Transactions for found."/>
+            <x-p-not-found message="Transactions for found."/>
         @endif
 
-    </x-p::paper>
-    <x-p::pagination.info :source="$shipments"/>
+    </x-p-paper>
+    <x-p-pagination :source="$shipments"/>
 @endsection

@@ -3,7 +3,9 @@
 @section('content')
     <x-p::pagination.info :source="$bookings"/>
     <x-p::paper class="bg-slate-800">
-        <x-p::paper-title title="Item list"/>
+        <x-p::paper-title title="Item list">
+            <x-p::button color="success">New courier booking</x-p::button>
+        </x-p::paper-title>
         @if($bookings)
             <x-p::table>
                 <x-p::table.head>

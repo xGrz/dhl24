@@ -1,8 +1,8 @@
 <div>
     <form wire:submit="createPackage">
         {{-- ADDRESS --}}
-        <x-p::paper class="bg-slate-800 mb-4">
-            <x-p::paper-title title="Create shipment"/>
+        <x-p-paper class="mb-4">
+            <x-slot:title>Create shipment</x-slot:title>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mx-2">
                 <div class="col-span-2">
                     <h2>Recipient address:</h2>
@@ -40,16 +40,17 @@
                 </div>
             </div>
 
-        </x-p::paper>
+        </x-p-paper>
 
         {{-- ITEMS --}}
-        <x-p::paper class="bg-slate-800 mb-4">
-            <x-p::paper-title title="Packages">
+        <x-p-paper class="mb-4">
+            <x-slot:title>Packages</x-slot:title>
+            <x-slot:actions>
                 <button type="button" class="text-green-500" wire:click="addItem()">
                     <x-p::icons.add-circle/>
                 </button>
-            </x-p::paper-title>
 
+            </x-slot:actions>
             @if($items)
                 @foreach($items as $key => $item)
                     <div wire:key="items_{{$key}}">
@@ -57,28 +58,28 @@
                     </div>
                 @endforeach
             @else
-                <x-p::not-found message="Packages not found"/>
+                <x-p-not-found message="Packages not found"/>
             @endif
 
             <div class="text-center mr-2 mt-3 pt-1 pb-4">
-                <x-p::link type="button" wire:click.prevent="addItem()">
+                <x-p-button type="button" wire:click.prevent="addItem()">
                     Add package
-                </x-p::link>
+                </x-p-button>
             </div>
 
-        </x-p::paper>
+        </x-p-paper>
 
-        <x-p::paper class="bg-slate-800">
-            <x-p::paper-title title="Services"/>
+        <x-p-paper>
+            <x-slot:title>Services</x-slot:title>
             <div class="p-2">
                 @livewire('shipment-services', ['postalCode' => $recipient->postalCode])
             </div>
-        </x-p::paper>
+        </x-p-paper>
 
 
         {{-- SUBMIT --}}
         <div class="px-2 py-4 text-center">
-            <x-p::button type="submit">Utwórz przesyłkę</x-p::button>
+            <x-p-button type="submit">Utwórz przesyłkę</x-p-button>
         </div>
     </form>
 </div>
