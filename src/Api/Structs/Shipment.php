@@ -7,8 +7,8 @@ use xGrz\Dhl24\Api\Structs\Shipment\Item;
 use xGrz\Dhl24\Api\Structs\Shipment\ReceiverAddress;
 use xGrz\Dhl24\Api\Structs\Shipment\ServiceDefinition;
 use xGrz\Dhl24\Api\Structs\Shipment\ShipperAddress;
+use xGrz\Dhl24\Enums\DomesticShipmentType;
 use xGrz\Dhl24\Enums\ShipmentItemType;
-use xGrz\Dhl24\Enums\ShipmentType;
 
 class Shipment
 {
@@ -22,7 +22,7 @@ class Shipment
     public string $content;
     public ?string $reference = null;
 
-    public function __construct(ShipmentType $shipmentType)
+    public function __construct(DomesticShipmentType $shipmentType)
     {
         $this->shipper = new ShipperAddress();
         $this->receiver = new ReceiverAddress();

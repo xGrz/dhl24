@@ -6,7 +6,6 @@ use Illuminate\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use xGrz\Dhl24\Facades\DHL24;
-use xGrz\Dhl24\Helpers\Money;
 use xGrz\Dhl24\Models\DHLContentSuggestion;
 use xGrz\Dhl24\Models\DHLCostCenter;
 
@@ -53,15 +52,6 @@ class ShipmentServices extends Component
         } catch (\Exception $e) {
             // dd($e->getMessage());
             $this->services = [];
-        }
-    }
-
-    public function updatedCod($codAmount)
-    {
-        $shipmentValue = Money::isValid($this->value) ? Money::from($this->value)->toNumber() : 0;
-        $codValue = Money::isValid($codAmount) ? Money::from($codAmount)->toNumber() : 0;
-        if (($codValue > $shipmentValue) && $codValue) {
-            $this->value = Money::from($codValue)->format(',', ' ');
         }
     }
 

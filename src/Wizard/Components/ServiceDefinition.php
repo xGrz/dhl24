@@ -2,7 +2,7 @@
 
 namespace xGrz\Dhl24\Wizard\Components;
 
-use xGrz\Dhl24\Enums\ShipmentType;
+use xGrz\Dhl24\Enums\DomesticShipmentType;
 use xGrz\Dhl24\Facades\Config;
 use xGrz\Dhl24\Traits\Arrayable;
 
@@ -29,12 +29,12 @@ class ServiceDefinition
     public bool $preaviso = false;
 
 
-    public function __construct(ShipmentType $shipmentType)
+    public function __construct(DomesticShipmentType $shipmentType)
     {
         $this->product = $shipmentType->value;
     }
 
-    public function setShipmentType(ShipmentType $shipmentType): static
+    public function setShipmentType(DomesticShipmentType $shipmentType): static
     {
         $this->product = $shipmentType->value;
         return $this;

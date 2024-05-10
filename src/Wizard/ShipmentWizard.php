@@ -2,8 +2,8 @@
 
 namespace xGrz\Dhl24\Wizard;
 
+use xGrz\Dhl24\Enums\DomesticShipmentType;
 use xGrz\Dhl24\Enums\ShipmentItemType;
-use xGrz\Dhl24\Enums\ShipmentType;
 use xGrz\Dhl24\Models\DHLShipment;
 use xGrz\Dhl24\Wizard\Components\Address\ReceiverAddress;
 use xGrz\Dhl24\Wizard\Components\Address\ShipperAddress;
@@ -17,7 +17,7 @@ class ShipmentWizard
 {
     private Shipment $shipment;
 
-    public function __construct(ShipmentType $shipmentType = ShipmentType::DOMESTIC)
+    public function __construct(DomesticShipmentType $shipmentType = DomesticShipmentType::DOMESTIC)
     {
         $this->shipment = new Shipment();
         $this->shipment->shipper = new ShipperAddress();

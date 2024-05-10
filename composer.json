@@ -27,7 +27,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": "^8.1",
+        "php": "^8.2",
         "ext-soap": "*",
         "laravel/framework": "^10.0",
         "xgrz/qbp": "dev-main",

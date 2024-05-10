@@ -69,10 +69,55 @@
 
         </x-p-paper>
 
-        <x-p-paper>
+        {{-- SERVICES --}}
+        <x-p-paper class="mb-4">
             <x-slot:title>Services</x-slot:title>
-            <div class="p-2">
-                @livewire('shipment-services', ['postalCode' => $recipient->postalCode])
+            <x-p-select wire:model.live="services.deliveryService" label="Rodzaj przesyłki">
+                @foreach($deliveryTypes as $type)
+                    <option value="{{$type['symbol']}}">{{$type['label']}}</option>
+                @endforeach
+            </x-p-select>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4">
+                <div>
+                    <x-p-input
+                        label="{{__('dhl::shipment.services.content')}}"
+                        wire:model.live.debounce="services.content"
+                        :suggestions="$services->contentSuggestions"
+                    />
+                    <x-p-select label="{{__('dhl::shipment.services.costsCenter')}}"
+                                wire:model="services.costCenterName">
+                        @foreach($services->costsCenter as $costCenterName)
+                            <option value="{{$costCenterName}}">{{$costCenterName}}</option>
+                        @endforeach
+                    </x-p-select>
+                    <x-p-input label="{{__('dhl::shipment.services.comment')}}"
+                               wire:model.live.debounce="services.comment"/>
+                </div>
+                <div>
+                    <x-p-input
+                        label="{{__('dhl::shipment.services.value')}}"
+                        type="float"
+                        wire:model.live.debounce="services.value"
+                        class="text-right"
+                    />
+                    <x-p-input
+                        label="{{__('dhl::shipment.services.cod')}}"
+                        type="float"
+                        wire:model.live.debounce="services.cod"
+                        class="text-right"
+                    />
+                    <x-p-input
+                        label="{{__('dhl::shipment.services.reference')}}"
+                        wire:model.live="services.references"
+                    />
+                </div>
+                <div>
+                    <div class="text-sm">Usługi dodatkowe</div>
+                    <x-p-checkbox as-switch label="{{__('dhl::shipment.services.pdi') }}" wire:model.live="services.pdi"/>
+                    <x-p-checkbox as-switch label="{{__('dhl::shipment.services.rod')}}" wire:model.live="services.rod"/>
+                    <x-p-checkbox as-switch label="{{__('dhl::shipment.services.owl')}}" wire:model.live="services.owl"/>
+                </div>
             </div>
         </x-p-paper>
 

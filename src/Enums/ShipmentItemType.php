@@ -65,7 +65,6 @@ enum ShipmentItemType: string implements WithLabel
         };
     }
 
-
     public function getLangKey(): string
     {
         return 'shipment.type';

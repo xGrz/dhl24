@@ -1,7 +1,7 @@
 <?php
 
 use Tests\TestCase;
-use xGrz\Dhl24\Enums\ShipmentType;
+use xGrz\Dhl24\Enums\DomesticShipmentType;
 use xGrz\Dhl24\Wizard\Components\ServiceDefinition;
 
 class ServiceDefinitionTest extends TestCase
@@ -15,7 +15,7 @@ class ServiceDefinitionTest extends TestCase
         Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
         Config::set('dhl24.shipment-insurance.insurance_value_round_up', 0);
 
-        $this->serviceDefinition = new ServiceDefinition(ShipmentType::DOMESTIC12);
+        $this->serviceDefinition = new ServiceDefinition(DomesticShipmentType::DOMESTIC12);
     }
 
     public function test_is_insurance_not_set_by_default(): void

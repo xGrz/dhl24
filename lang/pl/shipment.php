@@ -36,5 +36,12 @@ return [
         'value' => 'Wartość',
         'costsCenter' => 'Miejsce powstania kosztu',
         'comment' => 'Informacje'
+    ],
+    'service' => [
+        'DOMESTIC' => 'Paczka krajowa',
+        'PREMIUM' => 'Paczka premium',
+        'DOMESTIC09' => 'Doręczenie do 9:00',
+        'DOMESTIC12' => 'Doręczenie do 12:00',
+        'EVENING_DELIVERY' => 'Doręczenie wieczorem'
     ]
 ];

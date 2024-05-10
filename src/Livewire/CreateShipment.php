@@ -5,12 +5,14 @@ namespace xGrz\Dhl24\Livewire;
 use Illuminate\View\View;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use xGrz\Dhl24\Enums\DomesticShipmentType;
 use xGrz\Dhl24\Enums\ShipmentItemType;
-use xGrz\Dhl24\Enums\ShipmentType;
 use xGrz\Dhl24\Facades\DHL24;
+use xGrz\Dhl24\Helpers\Money;
 use xGrz\Dhl24\Http\Requests\StoreShipmentRequest;
 use xGrz\Dhl24\Livewire\Forms\ShipmentContactForm;
 use xGrz\Dhl24\Livewire\Forms\ShipmentRecipientForm;
+use xGrz\Dhl24\Livewire\Forms\ShippingServices;
 use xGrz\Dhl24\Wizard\ShipmentWizard;
 
 class CreateShipment extends Component
@@ -18,13 +20,17 @@ class CreateShipment extends Component
     public ShipmentRecipientForm $recipient;
     public ShipmentContactForm $contact;
 
+    public ShippingServices $services;
+
+
     #[Validate]
     public array $items = [];
 
     public function mount(): void
     {
         self::addItem();
-        // self::addItem();
+        $this->services->getContentSuggestions();
+        $this->services->getCostCenters();
     }
 
     public function rules(): array
@@ -35,14 +41,15 @@ class CreateShipment extends Component
     public function render(): View
     {
         return view('dhl::shipments.livewire.create-shipment', [
-            'shipmentTypes' => ShipmentItemType::cases()
+            'shipmentTypes' => ShipmentItemType::cases(),
+            'deliveryTypes' =>  DomesticShipmentType::getOptions(),
         ]);
     }
 
     public function createPackage(): void
     {
         $this->validate();
-        $wizard = new ShipmentWizard(ShipmentType::DOMESTIC);
+        $wizard = new ShipmentWizard(DomesticShipmentType::DOMESTIC);
         $wizard->shipper()
             ->setName('BRAMSTAL')
             ->setStreet('Sęczkowa')
@@ -71,7 +78,15 @@ class CreateShipment extends Component
             ;
 
         }
-        // dd($wizard->toArray());
+        $wizard->services()
+            ->setShipmentType(DomesticShipmentType::tryFrom($this->services->deliveryService))
+            ->setCollectOnDelivery( $this->services->getCod())
+            ->setSelfCollect($this->services->owl)
+            ->setInsurance( $this->services->getValue())
+            ->setPreDeliveryInformation($this->services->pdi)
+            ->setReturnOnDelivery($this->services->rod);
+
+        dd($wizard->toArray(), DHL24::createShipment($wizard));
         dd(DHL24::getPriceOptions($wizard));
     }
 
@@ -80,9 +95,11 @@ class CreateShipment extends Component
         $this->items[] = self::getItemDefinition(ShipmentItemType::PACKAGE);
     }
 
-    public function updatedRecipientPostalCode($value): void
+    public function updatedRecipientPostalCode(): void
     {
-        $this->dispatch('postalCode-updated', $value);
+        strlen($this->recipient->postalCode) > 4
+            ? self::getServicesForPostalCode()
+            : $this->services = [];
     }
 
     public function changeShipmentType(ShipmentItemType $type): array
@@ -130,5 +147,15 @@ class CreateShipment extends Component
         }
         return $item;
     }
+
+    public function updatedServicesCod($codAmount)
+    {
+        $shipmentValue = Money::isValid($this->services->value) ? Money::from($this->services->value)->toNumber() : 0;
+        $codValue = Money::isValid($codAmount) ? Money::from($codAmount)->toNumber() : 0;
+        if (($codValue > $shipmentValue) && $codValue) {
+            $this->services->value = Money::from($codValue)->format(',', ' ');
+        }
+    }
+
 
 }

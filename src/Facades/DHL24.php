@@ -9,7 +9,7 @@ use xGrz\Dhl24\Api\Actions\GetPostalCodeServices;
 use xGrz\Dhl24\Api\Actions\GetPrice;
 use xGrz\Dhl24\Api\Actions\GetShippingConfirmationList;
 use xGrz\Dhl24\Api\Actions\GetVersion;
-use xGrz\Dhl24\Enums\ShipmentType;
+use xGrz\Dhl24\Enums\DomesticShipmentType;
 use xGrz\Dhl24\Enums\ShippingConfirmationType;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Wizard\ShipmentWizard;
@@ -82,25 +82,25 @@ class DHL24 extends Facade
         ];
 
         try {
-            $shipment->services()->setShipmentType(ShipmentType::DOMESTIC);
+            $shipment->services()->setShipmentType(DomesticShipmentType::DOMESTIC);
             $options['PACKAGE'] = (new GetPrice($shipment))->call()->getPrice();
         } catch (DHL24Exception $e) {
         }
 
         try {
-            $shipment->services()->setShipmentType(ShipmentType::DOMESTIC09);
+            $shipment->services()->setShipmentType(DomesticShipmentType::DOMESTIC09);
             $options['PACKAGE09'] = (new GetPrice($shipment))->call()->getPrice();
         } catch (DHL24Exception $e) {
         }
 
         try {
-            $shipment->services()->setShipmentType(ShipmentType::DOMESTIC12);
+            $shipment->services()->setShipmentType(DomesticShipmentType::DOMESTIC12);
             $options['PACKAGE12'] = (new GetPrice($shipment))->call()->getPrice();
         } catch (DHL24Exception $e) {
         }
 
         try {
-            $shipment->services()->setShipmentType(ShipmentType::EVENING_DELIVERY);
+            $shipment->services()->setShipmentType(DomesticShipmentType::EVENING_DELIVERY);
             $options['PACKAGE_EVENING'] = (new GetPrice($shipment))->call()->getPrice();
         } catch (DHL24Exception $e) {
         }
@@ -115,5 +115,17 @@ class DHL24 extends Facade
             Carbon::parse($shipment->getShipmentDate()),
 
         );
+    }
+
+    public static function getDeliveryOptions(string $postalCode, Carbon $shipmentDate = null)
+    {
+        if (!$shipmentDate) $shipmentDate = now()->addDays(3);
+        return GetPostalCodeServices::make($postalCode, $shipmentDate)->call();
+
+    }
+
+    public static function createShipment(ShipmentWizard $shipment)
+    {
+
     }
 }
