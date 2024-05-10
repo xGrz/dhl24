@@ -2,6 +2,7 @@
 
 namespace xGrz\Dhl24\Wizard;
 
+use Illuminate\Support\Carbon;
 use xGrz\Dhl24\Enums\DomesticShipmentType;
 use xGrz\Dhl24\Enums\ShipmentItemType;
 use xGrz\Dhl24\Models\DHLShipment;
@@ -66,9 +67,22 @@ class ShipmentWizard
         return $item;
     }
 
+
+    public function setShipmentDate(Carbon $date = null): static
+    {
+        $this->shipment->setShipmentDate($date);
+        return $this;
+    }
+
     public function getShipmentDate(): string
     {
         return $this->shipment->shipmentDate;
+    }
+
+    public function setContent(string $content): static
+    {
+        $this->shipment->setShipmentContent($content);
+        return $this;
     }
 
     public function getDestinationPostCode(): string

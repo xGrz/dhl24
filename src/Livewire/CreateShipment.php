@@ -86,7 +86,13 @@ class CreateShipment extends Component
             ->setPreDeliveryInformation($this->services->pdi)
             ->setReturnOnDelivery($this->services->rod);
 
-        dd($wizard->toArray(), DHL24::createShipment($wizard));
+        $wizard->setContent($this->services->content);
+        $wizard->setShipmentDate(now()->addDays(3));
+
+        dd(
+            $wizard->toArray(),
+            DHL24::createShipment($wizard)
+        );
         dd(DHL24::getPriceOptions($wizard));
     }
 

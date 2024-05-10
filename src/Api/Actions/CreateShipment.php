@@ -17,8 +17,13 @@ class CreateShipment extends BaseApiAction
         $this->shipments[] = $shipment->toArray();
     }
 
-    public function debug()
+    public function debug(): array
     {
         return $this->getPayload();
+    }
+
+    public static function make(ShipmentWizard $wizard)
+    {
+        return new self($wizard);
     }
 }

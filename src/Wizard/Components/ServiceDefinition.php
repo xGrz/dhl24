@@ -40,8 +40,13 @@ class ServiceDefinition
         return $this;
     }
 
-    public function setCollectOnDelivery(int|float $amount, ?string $reference = null): static
+    public function setCollectOnDelivery(int|float|null $amount, ?string $reference = null): static
     {
+        if (!$amount) {
+            $this->collectOnDelivery = false;
+            $this->collectOnDeliveryValue = null;
+            return $this;
+        }
         $this->collectOnDelivery = true;
         $this->collectOnDeliveryValue = round($amount, 2);
         $this->collectOnDeliveryReference = $reference;
@@ -50,8 +55,13 @@ class ServiceDefinition
         return $this;
     }
 
-    public function setInsurance(int|float $amount): static
+    public function setInsurance(int|float|null $amount): static
     {
+        if (!$amount) {
+            $this->insurance = false;
+            $this->insuranceValue = null;
+            return $this;
+        }
         $amount = self::updateInsuranceValueWithCodValue($amount);
         $amount = self::useIntelligentCostSaver($amount);
         if ($amount) {

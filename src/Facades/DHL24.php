@@ -4,6 +4,7 @@ namespace xGrz\Dhl24\Facades;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
+use xGrz\Dhl24\Api\Actions\CreateShipment;
 use xGrz\Dhl24\Api\Actions\GetMyShipments;
 use xGrz\Dhl24\Api\Actions\GetPostalCodeServices;
 use xGrz\Dhl24\Api\Actions\GetPrice;
@@ -126,6 +127,6 @@ class DHL24 extends Facade
 
     public static function createShipment(ShipmentWizard $shipment)
     {
-
+        CreateShipment::make($shipment)->call();
     }
 }
