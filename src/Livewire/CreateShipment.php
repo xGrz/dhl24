@@ -105,7 +105,7 @@ class CreateShipment extends Component
     {
         strlen($this->recipient->postalCode) > 4
             ? self::getServicesForPostalCode()
-            : $this->services = [];
+            : $this->services->services = [];
     }
 
     public function changeShipmentType(ShipmentItemType $type): array
