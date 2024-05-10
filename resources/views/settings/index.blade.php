@@ -11,6 +11,4 @@
             Shipping content suggestions
         </a>
     </div>
-    {{--    @livewire('costs-center-listing')--}}
-    {{--    @livewire('contents-listing')--}}
 @endsection
