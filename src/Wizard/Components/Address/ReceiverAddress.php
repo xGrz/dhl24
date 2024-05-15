@@ -2,7 +2,7 @@
 
 namespace xGrz\Dhl24\Wizard\Components\Address;
 
-use xGrz\Dhl24\Enums\AddressType;
+use xGrz\Dhl24\Enums\DHLAddressType;
 
 class ReceiverAddress extends Address
 {
@@ -13,7 +13,7 @@ class ReceiverAddress extends Address
     public ?string $postnummer = null;
 
 
-    public function setAddressType(AddressType $type): ReceiverAddress
+    public function setAddressType(DHLAddressType $type): ReceiverAddress
     {
         $this->addressType = $type->value;
         return $this;

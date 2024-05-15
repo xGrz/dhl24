@@ -2,6 +2,7 @@
 
 namespace xGrz\Dhl24;
 
+
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use xGrz\Dhl24\Livewire\CreateShipment;
@@ -15,21 +16,24 @@ use xGrz\Dhl24\Livewire\Settings\CostsCenter\CostCenterEdit;
 use xGrz\Dhl24\Livewire\Settings\CostsCenter\CostCenterListing;
 use xGrz\Dhl24\Livewire\ShipmentListItem;
 use xGrz\Dhl24\Livewire\ShipmentServices;
+use xGrz\Dhl24\Providers\EventServiceProvider;
 use xGrz\PayU\Services\ConfigService;
 
 class DHLServiceProvider extends ServiceProvider
 {
 
+
     public function register(): void
     {
+        $this->app->register(EventServiceProvider::class);
     }
-
     public function boot(): void
     {
         self::setupPackageConfig();
         self::setupMigrations();
         self::setupWebRouting();
         self::setupTranslations();
+
         Livewire::component('create-shipment', CreateShipment::class);
         Livewire::component('shipment-item', ShipmentListItem::class);
         Livewire::component('shipment-services', ShipmentServices::class);

@@ -11,12 +11,12 @@ return new class extends Migration
         Schema::create('dhl_shipment_types', function (Blueprint $table) {
             $table->id();
             $table->string('symbol', 20);
-            $table->string('quantity')->default(1);
-            $table->string('weight')->nullable();
-            $table->string('width')->nullable();
-            $table->string('height')->nullable();
-            $table->string('length')->nullable();
-            $table->boolean('nonStandard')->nullable()->default(false);
+            $table->string('quantity',3)->default(1);
+            $table->string('weight',4)->nullable();
+            $table->string('width', 3)->nullable();
+            $table->string('height', 3)->nullable();
+            $table->string('length', 3)->nullable();
+            $table->boolean('non_standard')->nullable()->default(false);
             $table->softDeletes();
             $table->timestamps();
         });

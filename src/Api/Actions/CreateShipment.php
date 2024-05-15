@@ -2,7 +2,9 @@
 
 namespace xGrz\Dhl24\Api\Actions;
 
+use JetBrains\PhpStorm\NoReturn;
 use xGrz\Dhl24\Api\Structs\AuthData;
+use xGrz\Dhl24\Models\DHLShipment;
 use xGrz\Dhl24\Wizard\ShipmentWizard;
 
 class CreateShipment extends BaseApiAction
@@ -12,9 +14,10 @@ class CreateShipment extends BaseApiAction
     public AuthData $authData;
     public array $shipments = [];
 
-    public function __construct(ShipmentWizard $shipment)
+    #[NoReturn]
+    public function __construct(DHLShipment|ShipmentWizard $shipment)
     {
-        $this->shipments[] = $shipment->toArray();
+        $this->shipments[] = $shipment->getPayload();
     }
 
     public function debug(): array
@@ -22,8 +25,8 @@ class CreateShipment extends BaseApiAction
         return $this->getPayload();
     }
 
-    public static function make(ShipmentWizard $wizard)
+    public static function make(DHLShipment $shipment): CreateShipment
     {
-        return new self($wizard);
+        return new self($shipment);
     }
 }

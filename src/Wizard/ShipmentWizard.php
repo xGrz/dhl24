@@ -2,119 +2,193 @@
 
 namespace xGrz\Dhl24\Wizard;
 
-use Illuminate\Support\Carbon;
+use xGrz\Dhl24\Enums\DHLAddressType;
 use xGrz\Dhl24\Enums\DomesticShipmentType;
-use xGrz\Dhl24\Enums\ShipmentItemType;
+use xGrz\Dhl24\Facades\DHL24;
+use xGrz\Dhl24\Models\DHLCostCenter;
+use xGrz\Dhl24\Models\DHLItem;
 use xGrz\Dhl24\Models\DHLShipment;
-use xGrz\Dhl24\Wizard\Components\Address\ReceiverAddress;
-use xGrz\Dhl24\Wizard\Components\Address\ShipperAddress;
-use xGrz\Dhl24\Wizard\Components\Item;
-use xGrz\Dhl24\Wizard\Components\PaymentData;
-use xGrz\Dhl24\Wizard\Components\PieceList;
-use xGrz\Dhl24\Wizard\Components\ServiceDefinition;
-use xGrz\Dhl24\Wizard\Components\Shipment;
 
 class ShipmentWizard
 {
-    private Shipment $shipment;
+    private DHLShipment $shipment;
 
-    public function __construct(DomesticShipmentType $shipmentType = DomesticShipmentType::DOMESTIC)
+    public function __construct(?DHLShipment $shipment = null)
     {
-        $this->shipment = new Shipment();
-        $this->shipment->shipper = new ShipperAddress();
-        $this->shipment->receiver = new ReceiverAddress();
-        $this->shipment->service = new ServiceDefinition($shipmentType);
-        $this->shipment->pieceList = new PieceList();
-        $this->shipment->payment = new PaymentData();
-    }
-
-    public function shipper(): ShipperAddress
-    {
-        return $this->shipment->shipper;
-    }
-
-    public function receiver(): ReceiverAddress
-    {
-        return $this->shipment->receiver;
-    }
-
-    public function services(): ServiceDefinition
-    {
-        return $this->shipment->service;
-    }
-
-    public function addItem(
-        ShipmentItemType $type = ShipmentItemType::PACKAGE,
-        int              $quantity = 1,
-        ?int             $width = null,
-        ?int             $height = null,
-        ?int             $length = null,
-        ?float           $weight = null,
-        bool             $isNonStandard = null,
-        bool             $euroReturn = null
-    ): Item
-    {
-        $item = new Item($type);
-        $item->setQuantity($quantity);
-        if (!empty($width)) $item->setWidth($width);
-        if (!empty($height)) $item->setHeight($height);
-        if (!empty($length)) $item->setLength($length);
-        if (!empty($weight)) $item->setWeight($weight);
-        if ($isNonStandard) $item->setNonStandard();
-        if ($euroReturn) $item->setEuroReturn();
-
-        $this->shipment->pieceList->add($item);
-        return $item;
-    }
-
-
-    public function setShipmentDate(Carbon $date = null): static
-    {
-        $this->shipment->setShipmentDate($date);
-        return $this;
-    }
-
-    public function getShipmentDate(): string
-    {
-        return $this->shipment->shipmentDate;
-    }
-
-    public function setContent(string $content): static
-    {
-        $this->shipment->setShipmentContent($content);
-        return $this;
-    }
-
-    public function getDestinationPostCode(): string
-    {
-        return $this->receiver()->postalCode;
-    }
-
-    public function getModel(): DHLShipment
-    {
-        $shipmentData = $this->toArray();
-        $shipmentData['piece_list'] = $shipmentData['pieceList'];
-        unset($shipmentData['pieceList']);
-        $dhlShipment = new DHLShipment();
-        $dhlShipment->fill($shipmentData);
-        $dhlShipment->items = $this->shipment->pieceList->getCount();
-        $dhlShipment->cod = $this->shipment->service->collectOnDelivery
-            ? $this->shipment->service->collectOnDeliveryValue
-            : null;
-
-        return $dhlShipment;
+        $this->shipment = $shipment ?? new DHLShipment();
     }
 
     public function store(): static
     {
-        self::getModel()->save();
+        $this->shipment->save();
         return $this;
     }
 
-    public function toArray(): array
+    public function setShipperName(string $name): static
     {
-        return $this->shipment->toArray();
+        $this->shipment->shipper_name = $name;
+        return $this;
+    }
+
+    public function setShipperPostalCode(string $postalCode): static
+    {
+        $this->shipment->shipper_postal_code = $postalCode;
+        return $this;
+    }
+
+    public function setShipperCity(string $city): static
+    {
+        $this->shipment->shipper_city = $city;
+        return $this;
+    }
+
+    public function setShipperStreet(string $street): static
+    {
+        $this->shipment->shipper_street = $street;
+        return $this;
+    }
+
+    public function setShipperHouseNumber(string $houseNumber): static
+    {
+        $this->shipment->shipper_house_number = $houseNumber;
+        return $this;
+    }
+
+    public function setShipperContactPerson(string $contactPerson): static
+    {
+        $this->shipment->shipper_contact_person = $contactPerson;
+        return $this;
+    }
+
+    public function setShipperContactPhone(string $contactPhone): static
+    {
+        $this->shipment->shipper_contact_phone = $contactPhone;
+        return $this;
+    }
+
+    public function setShipperContactEmail(string $contactEmail): static
+    {
+        $this->shipment->shipper_contact_email = $contactEmail;
+        return $this;
     }
 
 
+    public function setReceiverType(DHLAddressType $addressType): static
+    {
+        $this->shipment->receiver_type = $addressType;
+        return $this;
+    }
+
+    public function setReceiverName(string $name): static
+    {
+        $this->shipment->receiver_name = $name;
+        return $this;
+    }
+
+    public function setReceiverPostalCode(string $postalCode, string $country = 'PL'): static
+    {
+        $this->shipment->receiver_country = $country;
+        $this->shipment->receiver_postal_code = $postalCode;
+        return $this;
+    }
+
+    public function setReceiverCity(string $city): static
+    {
+        $this->shipment->receiver_city = $city;
+        return $this;
+    }
+
+    public function setReceiverStreet(string $street): static
+    {
+        $this->shipment->receiver_street = $street;
+        return $this;
+    }
+
+    public function setReceiverHouseNumber(string $houseNumber): static
+    {
+        $this->shipment->receiver_house_number = $houseNumber;
+        return $this;
+    }
+
+    public function setReceiverContactPerson(string $contactPerson): static
+    {
+        $this->shipment->receiver_contact_person = $contactPerson;
+        return $this;
+    }
+
+    public function setReceiverContactPhone(string $contactPhone): static
+    {
+        $this->shipment->receiver_contact_phone = $contactPhone;
+        return $this;
+    }
+
+    public function setReceiverContactEmail(string $contactEmail): static
+    {
+        $this->shipment->receiver_contact_email = $contactEmail;
+        return $this;
+    }
+
+
+    public function addItem(DHLItem $item): static
+    {
+        $this->shipment->items->add($item);
+        return $this;
+    }
+
+
+    public function setShipmentType(DomesticShipmentType $shipmentType): static
+    {
+        $this->shipment->product = $shipmentType;
+        return $this;
+    }
+
+    public function setCollectOnDelivery(int|float $amount, string $reference = null): static
+    {
+        $this->shipment->collect_on_delivery = $amount;
+        if ($reference) $this->shipment->collect_on_delivery_reference = $reference;
+        if (!$this->shipment->insurance || $this->shipment->insurance < $amount) {
+            $this->shipment->insurance = $amount;
+        }
+        return $this;
+    }
+
+    public function setShipmentValue(int|float $amount): static
+    {
+        if ($this->shipment->collect_on_delivery && $this->shipment->collect_on_delivery > $amount) {
+            $this->shipment->insurance = $this->shipment->collect_on_delivery;
+        } else {
+            $this->shipment->insurance = $amount;
+        }
+        return $this;
+    }
+
+    public function setContent(string $content): static
+    {
+        $this->shipment->content = $content;
+        return $this;
+    }
+
+    public function setCostCenter(DHLCostCenter $costCenter): static
+    {
+        $this->shipment->cost_center()->associate($costCenter);
+        return $this;
+    }
+
+    /**
+     * @return void
+     * @throw DHL24Exception
+     */
+    public function create()
+    {
+        $shipmentId = DHL24::createShipment($this->shipment)?->getShipmentId();
+        $this->shipment->number = $shipmentId;
+        $this->shipment->save();
+        $this->shipment->refresh();
+        return $shipmentId;
+    }
+
+    public function getPayload(): array
+    {
+        return $this->shipment->getPayload();
+    }
 }

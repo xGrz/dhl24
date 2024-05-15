@@ -2,7 +2,7 @@
 
 namespace xGrz\Dhl24\Enums;
 
-enum AddressType: string
+enum DHLAddressType: string
 {
     case BUSINESS = 'B';
     case CONSUMER = 'C';

@@ -13,6 +13,7 @@ use xGrz\Dhl24\Api\Actions\GetVersion;
 use xGrz\Dhl24\Enums\DomesticShipmentType;
 use xGrz\Dhl24\Enums\ShippingConfirmationType;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
+use xGrz\Dhl24\Models\DHLShipment;
 use xGrz\Dhl24\Wizard\ShipmentWizard;
 
 class DHL24 extends Facade
@@ -64,7 +65,7 @@ class DHL24 extends Facade
         return GetPostalCodeServices::make($postCode, $deliveryDate)->call()->delivery($toArray);
     }
 
-    public static function getPrice(ShipmentWizard $shipment)
+    public static function getPrice(ShipmentWizard|DHLShipment $shipment)
     {
         try {
             return (new GetPrice($shipment))->call()->getPrice();
@@ -125,8 +126,8 @@ class DHL24 extends Facade
 
     }
 
-    public static function createShipment(ShipmentWizard $shipment)
+    public static function createShipment(DHLShipment $shipment)
     {
-        CreateShipment::make($shipment)->call();
+        return CreateShipment::make($shipment)->call();
     }
 }

@@ -69,13 +69,14 @@ class CreateShipment extends Component
 
         foreach ($this->items as $item) {
             $wizard
-                ->addItem(ShipmentItemType::findByName($item['type']))
-                ->setQuantity($item['quantity'])
-                ->setWeight($item['weight'] ?? null)
-                ->setWidth($item['width'] ?? null)
-                ->setHeight($item['height'] ?? null)
-                ->setLength($item['length'] ?? null)//->setNonStandard($item['nonStandard'] ?? false)
-            ;
+                ->addItem(ShipmentItemType::findByName(
+                    $item['type']),
+                    $item['quantity'],
+                    $item['width'],
+                    $item['height'],
+                    $item['length'],
+                    $item['weight']
+                );
 
         }
         $wizard->services()
@@ -89,11 +90,13 @@ class CreateShipment extends Component
         $wizard->setContent($this->services->content);
         $wizard->setShipmentDate(now()->addDays(3));
 
-        dd(
-            $wizard->toArray(),
-            DHL24::createShipment($wizard)
-        );
-        dd(DHL24::getPriceOptions($wizard));
+        try {
+            DHL24::createShipment($wizard);
+            $wizard->getModel()->fill(['shipment_id' => 2103821])->save();
+        } catch (\Exception $exception) {
+            dd($exception->getMessage());
+        }
+
     }
 
     public function addItem(): void

@@ -7,7 +7,7 @@ use xGrz\Dhl24\Traits\Arrayable;
 use xGrz\Dhl24\Wizard\Components\Address\ReceiverAddress;
 use xGrz\Dhl24\Wizard\Components\Address\ShipperAddress;
 
-class Shipment
+class ShipmentDraft
 {
     use Arrayable;
 
