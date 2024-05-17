@@ -51,9 +51,14 @@ class ConfigService
         );
     }
 
-    public function getDiskForLabels(): string
+    public function getDiskForLabels(): string|false
     {
         return config('dhl24.labels.disk', 'local');
+    }
+
+    public function shouldStoreLabels(): bool
+    {
+        return self::getDiskForLabels() !== false;
     }
 
     public function getDirectoryForLabels(): string

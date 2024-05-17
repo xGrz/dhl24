@@ -2,42 +2,50 @@
 
 namespace xGrz\Dhl24\Api\Responses;
 
-use Illuminate\Http\Client\Response;
-use xGrz\Dhl24\Api\Structs\Label;
-use xGrz\Dhl24\Exceptions\DHL24Exception;
+use xGrz\Dhl24\Enums\LabelType;
 
 class GetLabelResponse
 {
-    private array $labels = [];
+    private string $shipmentId;
+    private string $labelType;
+    private string $labelName;
+    private string $labelData;
+    private string $labelMime;
 
     public function __construct(object $result)
     {
-        $labels = $result->getLabelsResult->item;
-        if (is_array($labels)) {
-            foreach ($labels as $labelData) {
-                $this->labels[] = new Label($labelData);
-            }
-        } else {
-            $this->labels[] = new Label($labels);
-        }
+        $this->shipmentId = $result->getLabelsResult->item->shipmentId;
+        $this->labelType = $result->getLabelsResult->item->labelType;
+        $this->labelName = $result->getLabelsResult->item->labelName;
+        $this->labelData = $result->getLabelsResult->item->labelData;
+        $this->labelMime = $result->getLabelsResult->item->labelMimeType;
     }
 
-    public function store(): static
+    public function getShipmentNumber(): string
     {
-        foreach ($this->labels as $label) {
-            $label->store();
-        }
-        return $this;
+        return $this->shipmentId;
     }
 
-    /**
-     * @throws DHL24Exception
-     */
-    public function download(bool $shouldBeStored = false): Response
+    public function getType(): LabelType
     {
-        if (count($this->labels) === 1) $this->labels[0]->download($shouldBeStored);
-        throw new DHL24Exception('Download method is available only for single shipmentId.');
+        return LabelType::tryFrom($this->labelType);
     }
 
+    public function getFilename(): string
+    {
+        return $this->labelName;
+    }
+
+    public function getContent($decoded = true): string
+    {
+        return $decoded
+            ? base64_decode($this->labelData)
+            : $this->labelData;
+    }
+
+    public function getMime(): string
+    {
+        return $this->labelMime;
+    }
 
 }

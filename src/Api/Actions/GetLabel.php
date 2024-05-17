@@ -14,11 +14,10 @@ class GetLabel extends BaseApiAction
     public AuthData $authData;
     public array $itemsToPrint = [];
 
-    private function __construct(string|int ...$shipmentNumbers)
+    private function __construct(string|int $shipmentNumber, ?LabelType $labelType = null)
     {
-        foreach ($shipmentNumbers as $shipmentNumber) {
-            $this->itemsToPrint[] = ItemToPrint::make($shipmentNumber);
-        }
+        $this->itemsToPrint[] = ItemToPrint::make($shipmentNumber);
+        if ($labelType) self::setLabelType($labelType);
     }
 
     public function setLabelType(LabelType $labelType): static

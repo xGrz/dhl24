@@ -15,6 +15,7 @@ use xGrz\Dhl24\Services\ConfigService;
  * @method static getSapNumber()
  * @method static shouldUseIntelligentCostSaver()
  * @method static getIntelligentCostSaverMaxValue()
+ * @method static shouldStoreLabels()
  */
 class Config extends Facade
 {

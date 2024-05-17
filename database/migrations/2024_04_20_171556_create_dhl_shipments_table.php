@@ -50,6 +50,7 @@ return new class extends Migration {
             $table->string('reference', 200)->nullable();
 
             $table->double('cost')->nullable();
+            $table->string('label', 30)->nullable();
             $table->foreignId('cost_center_id')->nullable()->references('id')->on('dhl_cost_centers')->nullOnDelete();
             $table->foreignId('courier_booking_id')->nullable()->references('id')->on('dhl_courier_bookings')->nullOnDelete();
             $table->softDeletes();

@@ -12,6 +12,5 @@ class ShipmentCreatedEvent implements ShouldQueue
 
     public function __construct(public DHLShipment $shipment)
     {
-        debug('event');
     }
 }

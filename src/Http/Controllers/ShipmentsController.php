@@ -22,8 +22,17 @@ class ShipmentsController extends BaseController
         ]);
     }
 
+    public function show(DHLShipment $shipment)
+    {
+        return view('dhl::shipments.show', [
+            'title' => 'Shipment',
+            'shipment' => $shipment
+        ]);
+    }
+
     public function store(StoreShipmentRequest $request)
     {
         dd($request->all());
     }
+
 }

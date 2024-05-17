@@ -2,7 +2,9 @@
 
 namespace xGrz\Dhl24\Observers;
 
+use xGrz\Dhl24\Api\Structs\Label;
 use xGrz\Dhl24\Events\ShipmentCreatedEvent;
+use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Models\DHLShipment;
 
 class DHLShipmentObserver
@@ -18,6 +20,15 @@ class DHLShipmentObserver
         self::updateItems($shipment);
     }
 
+    public function deleted(DHLShipment $shipment): void
+    {
+        try {
+            (new Label($shipment))->delete();
+        } catch (DHL24Exception $e) {
+
+        }
+    }
+
     private function updateItems(DHLShipment $shipment): void
     {
         if ($shipment->items) {
@@ -26,4 +37,6 @@ class DHLShipmentObserver
             }
         }
     }
+
+
 }

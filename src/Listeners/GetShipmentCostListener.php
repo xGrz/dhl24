@@ -7,7 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use xGrz\Dhl24\Events\ShipmentCreatedEvent;
 use xGrz\Dhl24\Facades\DHL24;
 
-class GetShipmentCost implements ShouldQueue
+class GetShipmentCostListener implements ShouldQueue
 {
     public function __construct()
     {
