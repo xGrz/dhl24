@@ -39,7 +39,7 @@
                             <x-p-td right>{{ $shipment->collect_on_delivery }}</x-p-td>
                             <x-p-td right>
                                 {{ $shipment->cost }}
-                                <div class="text-xs">{{ $shipment->cost_center->name }}</div>
+                                <div class="text-xs">{{ $shipment->cost_center?->name }}</div>
                             </x-p-td>
                             <x-p-td right>
                                 <x-p-button href="{{ route('dhl24.shipments.label', $shipment->id) }}" size="small">

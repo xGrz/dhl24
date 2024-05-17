@@ -24,6 +24,7 @@ class ShipmentsController extends BaseController
 
     public function show(DHLShipment $shipment)
     {
+        $shipment->loadMissing(['items', 'cost_center', 'courier_booking']);
         return view('dhl::shipments.show', [
             'title' => 'Shipment',
             'shipment' => $shipment

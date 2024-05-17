@@ -30,4 +30,16 @@ class DHLItem extends Model
         return $this->belongsTo(DHLShipment::class);
     }
 
+    public function getWeight(): string
+    {
+        if (!$this->weight) return '';
+        return $this->weight . 'kg';
+    }
+
+    public function getDiamentions(): string
+    {
+        if(!$this->width) return '';
+        return join('x', [$this->width, $this->height, $this->length]) . 'cm';
+    }
+
 }

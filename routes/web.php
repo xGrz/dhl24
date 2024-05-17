@@ -1,7 +1,7 @@
 <?php
 
 use xGrz\Dhl24\Http\Controllers\CourierBookingsController;
-use xGrz\Dhl24\Http\Controllers\DownloadShipmentController;
+use xGrz\Dhl24\Http\Controllers\LabelController;
 use xGrz\Dhl24\Http\Controllers\SettingsContentsController;
 use xGrz\Dhl24\Http\Controllers\SettingsController;
 use xGrz\Dhl24\Http\Controllers\SettingsCostCentersController;
@@ -15,7 +15,7 @@ Route::middleware(['web'])
         Route::get('/', function () {
             return to_route('dhl24.shipments.index');
         });
-        Route::get('/shipments/{shipment}/label', DownloadShipmentController::class)->name('shipments.label');
+        Route::get('/shipments/{shipment}/label', LabelController::class)->name('shipments.label');
         Route::resource('/shipments', ShipmentsController::class);
         Route::resource('/bookings', CourierBookingsController::class);
         Route::prefix('settings')
