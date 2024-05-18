@@ -176,5 +176,10 @@ class DHLShipment extends Model
         return $payment->toArray();
     }
 
+    public function tracking(): HasMany
+    {
+        return $this->hasMany(DHLTackingEvent::class, 'shipment_id', 'id');
+    }
+
 
 }

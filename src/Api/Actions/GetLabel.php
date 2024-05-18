@@ -28,8 +28,8 @@ class GetLabel extends BaseApiAction
         return $this;
     }
 
-    public static function make(string|int ...$shipmentNumbers): self
+    public static function make(string|int $shipmentNumber, ?LabelType $labelType = null): self
     {
-        return new self(...$shipmentNumbers);
+        return new self($shipmentNumber, $labelType);
     }
 }
