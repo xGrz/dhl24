@@ -10,6 +10,7 @@ use xGrz\Dhl24\Models\DHLStatus;
 class GetTrackingResponse
 {
     public DHLShipment $shipment;
+    private array $events = [];
 
     public function __construct(object $result)
     {
@@ -30,14 +31,19 @@ class GetTrackingResponse
             $status = self::findStatus($event->status, $event->description);
             self::setTrackingEvent($event->terminal, Carbon::parse($event->timestamp), $status);
         }
+        // sync this
+
+        $this->shipment->tracking()->sync($this->events);
+        // dd($this->events);
+
     }
 
     private function findStatus(string $statusSymbol, ?string $description = null): DHLStatus
     {
-        return DHLStatus::firstOrCreate(['symbol' => $statusSymbol], [
-            'symbol' => $statusSymbol,
-            'description' => $description
-        ]);
+        return DHLStatus::firstOrCreate(
+            ['symbol' => $statusSymbol],
+            ['description' => $description]
+        );
     }
 
     private function setTrackingEvent(string $terminal, Carbon $eventTimestamp, DHLStatus $status): void
@@ -50,9 +56,7 @@ class GetTrackingResponse
                     && $eventTimestamp->equalTo($trackInfo->event_at);
             });
         if ($hasTracking->isNotEmpty()) return;
-
-        // TODO: nie zapisuje trackingu ze statusem
-
+        $this->events[] = ['status' => $status->symbol, 'terminal' => $terminal, 'event_timestamp' => $eventTimestamp];
     }
 
 }

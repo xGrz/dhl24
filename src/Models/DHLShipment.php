@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
@@ -176,10 +177,12 @@ class DHLShipment extends Model
         return $payment->toArray();
     }
 
-    public function tracking(): HasMany
+    public function tracking(): BelongsToMany
     {
-        return $this->hasMany(DHLTackingEvent::class, 'shipment_id', 'id');
+        return $this->belongsToMany(DHLStatus::class, 'dhl_shipment_tracking', 'shipment_id', 'status')
+            ->withPivot(['terminal', 'event_timestamp'])
+            ->orderByPivot('event_timestamp', 'desc')
+            ;
     }
-
 
 }

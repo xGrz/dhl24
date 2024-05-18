@@ -2,6 +2,7 @@
 
 @section('content')
     <div class="grid gap-2">
+        {{ $shipment->tracking->first()->symbol }}
         <div class="text-right">
             <x-p-button href="{{route('dhl24.shipments.label', $shipment->id)}}">
                 Label
@@ -161,6 +162,20 @@
                 </x-dhl::shipment-detail-chip>
 
             </div>
+        </x-p-paper>
+        <x-p-paper>
+            <x-slot:title>Tracking</x-slot:title>
+            <ol class="relative border-s border-gray-500">
+                @foreach($shipment->tracking as $event)
+                    <li class="mb-4 ms-4">
+                        <div class="absolute w-3 h-3 bg-red-800 rounded-full mt-1.5 -start-1.5 border border-white"></div>
+                        <time class="mb-1 text-sm font-normal leading-none text-gray-400 dark:text-gray-500">{{$event->pivot->event_timestamp}}</time>
+                        <div class="text-lg font-semibold text-white">{{$event->description}}</div>
+                        <p>{{'@'}}{{$event->pivot->terminal}}</p>
+                    </li>
+                @endforeach
+            </ol>
+
         </x-p-paper>
     </div>
 @endsection

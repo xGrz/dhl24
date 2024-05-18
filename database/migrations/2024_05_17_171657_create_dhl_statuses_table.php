@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('dhl_statuses', function (Blueprint $table) {
-            $table->string('symbol')->primary();
+            $table->string('symbol', 10)->primary();
             $table->string('description');
             $table->string('custom_description')->nullable();
             // TODO: type
