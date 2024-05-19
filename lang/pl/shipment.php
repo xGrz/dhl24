@@ -1,6 +1,7 @@
 <?php
 
 use xGrz\Dhl24\Enums\ShipmentItemType;
+use xGrz\Dhl24\Enums\StatusType;
 
 return [
     'type' => [
@@ -43,5 +44,18 @@ return [
         'DOMESTIC09' => 'Doręczenie do 9:00',
         'DOMESTIC12' => 'Doręczenie do 12:00',
         'EVENING_DELIVERY' => 'Doręczenie wieczorem'
-    ]
+    ],
+    'statusType' => [
+        StatusType::NEW->name => 'Utworzona',
+        StatusType::PICKED_UP->name => 'Odebrana przez kuriera',
+        StatusType::ARRIVED->name => 'Przyjęcie w terminalu',
+        StatusType::DEPARTED->name => 'Wyjście z terminala',
+        StatusType::SORTING->name => 'W sortowni',
+        StatusType::OUT_FOR_DELIVERY->name => 'Wydanie do doręczenia',
+        StatusType::HOLD->name => 'Doręczenie wstrzymane',
+        StatusType::FAILED->name => 'Doręczenie nieudane',
+        StatusType::RETURNED->name => 'Zwrot do nadawcy',
+        StatusType::DELIVERED->name => 'Dostarczona',
+
+    ],
 ];

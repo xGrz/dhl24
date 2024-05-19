@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use xGrz\Dhl24\Enums\StatusType;
 
 return new class extends Migration {
     public function up(): void
@@ -11,7 +12,7 @@ return new class extends Migration {
             $table->string('symbol', 10)->primary();
             $table->string('description');
             $table->string('custom_description')->nullable();
-            // TODO: type
+            $table->integer('type')->default(StatusType::NEW);
             $table->timestamps();
         });
     }

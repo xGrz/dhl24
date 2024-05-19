@@ -41,7 +41,6 @@ class DHLShipment extends Model
         return DHLShipmentFactory::new();
     }
 
-
     public function cost_center(): BelongsTo
     {
         return $this->belongsTo(DHLCostCenter::class);
@@ -115,8 +114,7 @@ class DHLShipment extends Model
             )
             ->when($this->comment, fn(Collection $payload) => $payload->put('comment', $this->comment))
             ->put('content', $this->content)
-            ->put('skipRestrictionCheck', true)
-        ;
+            ->put('skipRestrictionCheck', true);
         return $payload->toArray();
     }
 
@@ -181,8 +179,25 @@ class DHLShipment extends Model
     {
         return $this->belongsToMany(DHLStatus::class, 'dhl_shipment_tracking', 'shipment_id', 'status')
             ->withPivot(['terminal', 'event_timestamp'])
-            ->orderByPivot('event_timestamp', 'desc')
+            ->orderByPivot('event_timestamp', 'desc')//->using(DHLTracking::class)
             ;
     }
+
+//    public function latestStatus()
+//    {
+//        return $this->belongsToMany(DHLStatus::class, 'dhl_shipment_tracking', 'shipment_id', 'status')
+//            ->withPivot(['terminal', 'event_timestamp'])
+//            ->orderByPivot('event_timestamp', 'desc')
+//            ->using(DHLTracking::class)
+//            ->take(1)
+//            ;
+//
+//        return $this
+//            ->hasOne(DHLTracking::class, 'shipment_id')
+//            ->orderBy('event_timestamp', 'desc')
+//            ->withPiv
+//            ->join('dhl_statuses', 'dhl_statuses.symbol', '=', 'dhl_shipment_tracking.status');
+//    }
+
 
 }

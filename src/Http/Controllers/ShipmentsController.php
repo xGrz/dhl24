@@ -11,7 +11,7 @@ class ShipmentsController extends BaseController
     {
         return view('dhl::shipments.index', [
             'title' => 'Shipments',
-            'shipments' => DHLShipment::with(['items', 'courier_booking', 'cost_center'])->latest()->paginate()
+            'shipments' => DHLShipment::with(['items', 'courier_booking', 'cost_center', 'tracking'])->latest()->paginate()
         ]);
     }
 

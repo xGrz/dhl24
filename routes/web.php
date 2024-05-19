@@ -5,6 +5,7 @@ use xGrz\Dhl24\Http\Controllers\LabelController;
 use xGrz\Dhl24\Http\Controllers\SettingsContentsController;
 use xGrz\Dhl24\Http\Controllers\SettingsController;
 use xGrz\Dhl24\Http\Controllers\SettingsCostCentersController;
+use xGrz\Dhl24\Http\Controllers\SettingsTrackingEventsController;
 use xGrz\Dhl24\Http\Controllers\ShipmentsController;
 
 
@@ -24,6 +25,7 @@ Route::middleware(['web'])
                 Route::get('/', SettingsController::class)->name('index');
                 Route::get('/costCenters', SettingsCostCentersController::class)->name('costCenters.index');
                 Route::get('/contents', SettingsContentsController::class)->name('contents.index');
+                Route::get('/tracking-events',SettingsTrackingEventsController::class)->name('tracking-events.index');
             });
     });
 

@@ -2,6 +2,7 @@
 
 namespace xGrz\Dhl24\Facades;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
 use xGrz\Dhl24\Api\Actions\CreateShipment;
@@ -129,5 +130,13 @@ class DHL24 extends Facade
     public static function createShipment(DHLShipment $shipment)
     {
         return CreateShipment::make($shipment)->call();
+    }
+
+    public static function getUndeliveredShipments(): Collection
+    {
+        return DHLShipment::whereDoesntHave('tracking', function ($q) {
+            // TODO: change DOR to finished statuses list
+            $q->where('status', 'DOR');
+        })->get();
     }
 }

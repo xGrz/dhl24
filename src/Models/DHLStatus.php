@@ -2,8 +2,10 @@
 
 namespace xGrz\Dhl24\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use xGrz\Dhl24\Enums\StatusType;
 
 class DHLStatus extends Model
 {
@@ -13,7 +15,18 @@ class DHLStatus extends Model
     protected $primaryKey = 'symbol';
     public $incrementing = false;
     protected $guarded = [];
+    protected $casts = [
+        'type' => StatusType::class,
+    ];
 
+    public function scopeOrderByTypes(Builder $q): void
+    {
+        $q->orderBy('type');
+    }
+    public function getDescription(): string
+    {
+        return $this->custom_description ?? $this->description;
+    }
 
     public function shipments(): BelongsToMany
     {

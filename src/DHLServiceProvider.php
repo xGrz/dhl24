@@ -14,6 +14,8 @@ use xGrz\Dhl24\Livewire\Settings\CostsCenter\CostCenterCreate;
 use xGrz\Dhl24\Livewire\Settings\CostsCenter\CostCenterDelete;
 use xGrz\Dhl24\Livewire\Settings\CostsCenter\CostCenterEdit;
 use xGrz\Dhl24\Livewire\Settings\CostsCenter\CostCenterListing;
+use xGrz\Dhl24\Livewire\Settings\TrackingEvents\TrackingEventEdit;
+use xGrz\Dhl24\Livewire\Settings\TrackingEvents\TrackingEventListing;
 use xGrz\Dhl24\Livewire\ShipmentListItem;
 use xGrz\Dhl24\Livewire\ShipmentServices;
 use xGrz\Dhl24\Providers\EventServiceProvider;
@@ -45,6 +47,8 @@ class DHLServiceProvider extends ServiceProvider
         Livewire::component('content-create', ContentCreate::class);
         Livewire::component('content-edit', ContentEdit::class);
         Livewire::component('content-delete', ContentDelete::class);
+        Livewire::component('tracking-events-listing', TrackingEventListing::class);
+        Livewire::component('tracking-event-edit', TrackingEventEdit::class);
     }
 
     private function setupMigrations(): void
