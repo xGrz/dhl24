@@ -4,6 +4,7 @@ namespace xGrz\Dhl24\Models;
 
 use Database\Factories\DHLShipmentFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,6 +40,11 @@ class DHLShipment extends Model
     protected static function newFactory()
     {
         return DHLShipmentFactory::new();
+    }
+
+    public function scopeWithDetails(Builder $query): void
+    {
+        $query->with(['items', 'courier_booking', 'cost_center', 'tracking']);
     }
 
     public function cost_center(): BelongsTo
