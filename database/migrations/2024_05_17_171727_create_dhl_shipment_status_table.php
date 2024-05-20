@@ -14,7 +14,7 @@ return new class extends Migration {
                 ->on('dhl_shipments')
                 ->onDelete('CASCADE');
             $table->string('status', 10);
-            $table->string('terminal', 20);
+            $table->string('terminal', 20)->nullable();
             $table->dateTime('event_timestamp');
         });
 

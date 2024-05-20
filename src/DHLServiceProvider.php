@@ -3,8 +3,10 @@
 namespace xGrz\Dhl24;
 
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
+use xGrz\Dhl24\Jobs\DispatchTrackingJob;
 use xGrz\Dhl24\Livewire\CreateShipment;
 use xGrz\Dhl24\Livewire\Settings\Contents\ContentCreate;
 use xGrz\Dhl24\Livewire\Settings\Contents\ContentDelete;
@@ -29,6 +31,7 @@ class DHLServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
     }
+
     public function boot(): void
     {
         self::setupPackageConfig();
@@ -49,6 +52,12 @@ class DHLServiceProvider extends ServiceProvider
         Livewire::component('content-delete', ContentDelete::class);
         Livewire::component('tracking-events-listing', TrackingEventListing::class);
         Livewire::component('tracking-event-edit', TrackingEventEdit::class);
+
+        $this->app->booted(function () {
+            $schedule = app(Schedule::class);
+            self::setupScheduler($schedule);
+        });
+
     }
 
     private function setupMigrations(): void
@@ -83,4 +92,16 @@ class DHLServiceProvider extends ServiceProvider
         }
 
     }
+
+    private
+    function setupScheduler(Schedule $schedule): void
+    {
+        $schedule
+            ->call(fn() => DispatchTrackingJob::dispatch())
+            ->name('DHL Tracking | Track shipments')
+            ->between('6:00', '22:00')
+            ->everyMinute();
+    }
+
+
 }

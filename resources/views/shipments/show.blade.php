@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="grid gap-2">
-        {{ $shipment->tracking->first()?->getDescription() }}
+        {{$shipment->tracking->first()?->type?->getState()}}
         <div class="text-right">
             <x-p-button href="{{route('dhl24.shipments.label', $shipment->id)}}">
                 Label

@@ -52,10 +52,11 @@ return [
         StatusType::DEPARTED->name => 'Wyjście z terminala',
         StatusType::SORTING->name => 'W sortowni',
         StatusType::OUT_FOR_DELIVERY->name => 'Wydanie do doręczenia',
-        StatusType::HOLD->name => 'Doręczenie wstrzymane',
-        StatusType::FAILED->name => 'Doręczenie nieudane',
+        StatusType::HOLD->name => 'Wstrzymana',
+        StatusType::FAILED->name => 'Nieudane doręczenie',
         StatusType::RETURNED->name => 'Zwrot do nadawcy',
         StatusType::DELIVERED->name => 'Dostarczona',
-
+        StatusType::READY_FOR_PICK_UP->name => 'Czeka na odbiór',
+        StatusType::ERROR->name => 'Nie znaleziono',
     ],
 ];

@@ -25,28 +25,27 @@ class GetTrackingResponse
             ->firstOr(fn() => throw new DHL24Exception('DHL shipment [' . $shipmentId . '] record not found.'));
     }
 
-    private function processEvents($events): void
+    private function processEvents(object|array $events): void
     {
+        if (is_object($events)) $events = [$events];
         foreach ($events as $event) {
             $status = self::findStatus($event->status, $event->description);
-            self::setTrackingEvent($event->terminal, Carbon::parse($event->timestamp), $status);
+            self::setTrackingEvent($event?->terminal, Carbon::parse($event->timestamp), $status);
         }
-        // sync this
 
         $this->shipment->tracking()->sync($this->events);
-        // dd($this->events);
 
     }
 
     private function findStatus(string $statusSymbol, ?string $description = null): DHLStatus
     {
-        return DHLStatus::firstOrCreate(
+        return DHLStatus::updateOrCreate(
             ['symbol' => $statusSymbol],
-            ['description' => $description]
+            ['description' => $description],
         );
     }
 
-    private function setTrackingEvent(string $terminal, Carbon $eventTimestamp, DHLStatus $status): void
+    private function setTrackingEvent(string|null $terminal = null, Carbon $eventTimestamp, DHLStatus $status): void
     {
         $hasTracking = $this->shipment
             ->tracking
