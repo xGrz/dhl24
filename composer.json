@@ -29,10 +29,7 @@
     "require": {
         "php": "^8.2",
         "ext-soap": "*",
-        "laravel/framework": "^10.0",
-        "xgrz/qbp": "dev-main",
-        "livewire/livewire": "^3.0",
-        "wire-elements/modal": "^2.0"
+        "laravel/framework": "^10.0"
     },
     "config": {
         "allow-plugins": {
