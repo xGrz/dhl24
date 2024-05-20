@@ -2,7 +2,7 @@
 
 namespace xGrz\Dhl24\Facades;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
 use xGrz\Dhl24\Api\Actions\CreateShipment;
@@ -14,6 +14,8 @@ use xGrz\Dhl24\Api\Actions\GetVersion;
 use xGrz\Dhl24\Enums\DomesticShipmentType;
 use xGrz\Dhl24\Enums\ShippingConfirmationType;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
+use xGrz\Dhl24\Models\DHLContentSuggestion;
+use xGrz\Dhl24\Models\DHLCostCenter;
 use xGrz\Dhl24\Models\DHLShipment;
 use xGrz\Dhl24\Wizard\ShipmentWizard;
 
@@ -59,6 +61,11 @@ class DHL24 extends Facade
     public static function getPickupServices(string $postCode, Carbon $pickupDate = null, bool $toArray = false)
     {
         return GetPostalCodeServices::make($postCode, $pickupDate)->call()->pickup($toArray);
+    }
+
+    public static function getShipment(int $shipmentId): DHLShipment
+    {
+        return DHLShipment::with(['items', 'cost_center', 'courier_booking', 'tracking'])->findOrFail($shipmentId);
     }
 
     public static function getDeliveryServices(string $postCode, Carbon $deliveryDate = null, bool $toArray = false)
@@ -132,7 +139,26 @@ class DHL24 extends Facade
         return CreateShipment::make($shipment)->call();
     }
 
-    public static function getUndeliveredShipments(): Collection
+    public static function getCostCenters(): array
+    {
+        return DHLCostCenter::query()
+            ->select('name')
+            ->orderBy('is_default', 'desc')
+            ->orderBy('name')
+            ->get()
+            ->map(fn($costName) => $costName->name)
+            ->toArray();
+    }
+
+    public static function getContentSuggestions(): array
+    {
+        return DHLContentSuggestion::orderBy('name')
+            ->get()
+            ->map(fn($contentSuggestion) => $contentSuggestion->name)
+            ->toArray();
+    }
+
+    public static function getUndeliveredShipments(): EloquentCollection
     {
         return DHLShipment::whereDoesntHave('tracking', function ($q) {
             // TODO: change DOR to finished statuses list
