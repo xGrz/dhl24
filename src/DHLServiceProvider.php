@@ -5,7 +5,7 @@ namespace xGrz\Dhl24;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
-use xGrz\Dhl24\Jobs\DispatchTrackingJob;
+use xGrz\Dhl24\Facades\DHL24;
 use xGrz\Dhl24\Providers\EventServiceProvider;
 use xGrz\PayU\Services\ConfigService;
 
@@ -64,10 +64,11 @@ class DHLServiceProvider extends ServiceProvider
     function setupScheduler(Schedule $schedule): void
     {
         $schedule
-            ->call(fn() => DispatchTrackingJob::dispatch())
-            ->name('DHL Tracking | Track shipments')
+            ->call(fn() => DHL24::updateShipmentTracking())
+            ->name('DHL | Shipment tracking')
             ->between('6:00', '22:00')
             ->everyMinute();
+            // ->everyFiveMinutes();
     }
 
 

@@ -2,39 +2,31 @@
 
 namespace xGrz\Dhl24\Api\Responses;
 
-use Carbon\Carbon;
-use xGrz\Dhl24\Exceptions\DHL24Exception;
-use xGrz\Dhl24\Models\DHLShipment;
+use Illuminate\Support\Carbon;
 use xGrz\Dhl24\Models\DHLStatus;
 
 class GetTrackingResponse
 {
-    public DHLShipment $shipment;
+    private string $shipment;
     private array $events = [];
 
     public function __construct(object $result)
     {
-        self::getShipment($result->getTrackAndTraceInfoResult->shipmentId);
+        $this->shipment = $result->getTrackAndTraceInfoResult->shipmentId;
         self::processEvents($result->getTrackAndTraceInfoResult->events->item);
     }
 
-    private function getShipment(string $shipmentId): void
-    {
-        $this->shipment = DHLShipment::with(['tracking'])
-            ->where('number', $shipmentId)
-            ->firstOr(fn() => throw new DHL24Exception('DHL shipment [' . $shipmentId . '] record not found.'));
-    }
 
     private function processEvents(object|array $events): void
     {
         if (is_object($events)) $events = [$events];
         foreach ($events as $event) {
-            $status = self::findStatus($event->status, $event->description);
-            self::setTrackingEvent($event?->terminal, Carbon::parse($event->timestamp), $status);
+            $this->events[] = [
+                'status' => self::findStatus($event->status, $event->description),
+                'terminal' => $event->terminal,
+                'timestamp' => Carbon::parse($event->timestamp)
+            ];
         }
-
-        $this->shipment->tracking()->sync($this->events);
-
     }
 
     private function findStatus(string $statusSymbol, ?string $description = null): DHLStatus
@@ -45,17 +37,14 @@ class GetTrackingResponse
         );
     }
 
-    private function setTrackingEvent(string|null $terminal = null, Carbon $eventTimestamp, DHLStatus $status): void
+
+    public function getShipmentId(): string
     {
-        $hasTracking = $this->shipment
-            ->tracking
-            ->filter(function ($trackInfo) use ($terminal, $eventTimestamp, $status) {
-                return $trackInfo->terminal === $terminal
-                    && $trackInfo->status === $status->symbol
-                    && $eventTimestamp->equalTo($trackInfo->event_at);
-            });
-        if ($hasTracking->isNotEmpty()) return;
-        $this->events[] = ['status' => $status->symbol, 'terminal' => $terminal, 'event_timestamp' => $eventTimestamp];
+        return $this->shipment;
     }
 
+    public function getEvents(): array
+    {
+        return $this->events;
+    }
 }

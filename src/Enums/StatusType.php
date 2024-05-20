@@ -42,12 +42,14 @@ enum StatusType: int implements WithLabel
     {
         if ($this->value === 0) return 'ERROR';
         if ($this->value === 1) return 'PREPARED';
+        if ($this->value === 10) return 'SENT';
         if ($this->value < 90) return 'TRANSPORT';
         if ($this->value === 90) return 'PICK_UP_READY';
         if ($this->value === 100) return 'DELIVERED';
 
         if ($this->value === 210) return 'RETURNED';
         if ($this->value === 220) return 'RETURNED';
-
     }
+
+
 }

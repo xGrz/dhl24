@@ -5,6 +5,7 @@ namespace xGrz\Dhl24\Facades;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
+use xGrz\Dhl24\Actions\DHLShipmentsTrackingAction;
 use xGrz\Dhl24\Api\Actions\CreateShipment;
 use xGrz\Dhl24\Api\Actions\GetMyShipments;
 use xGrz\Dhl24\Api\Actions\GetPostalCodeServices;
@@ -164,5 +165,10 @@ class DHL24 extends Facade
             // TODO: change DOR to finished statuses list
             $q->where('status', 'DOR');
         })->get();
+    }
+
+    public static function updateShipmentTracking(): int
+    {
+        return DHLShipmentsTrackingAction::dispatch();
     }
 }

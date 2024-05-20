@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use xGrz\Dhl24\Api\Actions\GetTracking;
+use xGrz\Dhl24\Actions\DHLShipmentTracking;
 use xGrz\Dhl24\Models\DHLShipment;
 
 class TrackShipmentJob implements ShouldQueue, ShouldBeUnique
@@ -24,7 +24,7 @@ class TrackShipmentJob implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
-        GetTracking::make($this->shipment->number)->call();
+        DHLShipmentTracking::from($this->shipment);
     }
 
     public function uniqueId(): string

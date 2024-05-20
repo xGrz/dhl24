@@ -9,7 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use xGrz\Dhl24\Facades\DHL24;
 
-class DispatchTrackingJob implements ShouldQueue
+class TrackShipmentsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
