@@ -9,19 +9,18 @@ enum StatusType: int implements WithLabel
 {
     use HasLabel;
 
-    case ERROR = 0;
-
-    case NEW = 1;
-    case PICKED_UP = 10;
-    case ARRIVED = 20;
-    case SORTING = 30;
-    case DEPARTED = 40;
-    case OUT_FOR_DELIVERY = 50;
-    case READY_FOR_PICK_UP = 90;
+    case NOT_FOUND = 0;
+    case CREATED = 1;
+    case SENT = 10;
+    case IN_TRANSPORT = 20;
+    case IN_DELIVERY = 40;
+    case HOLD = 30;
+    case WAITING_TO_BE_PICKED_UP = 50;
     case DELIVERED = 100;
-    case HOLD = 200;
-    case FAILED = 210;
-    case RETURNED = 220;
+    case PICKED_UP = 101;
+    case DELIVERY_FAILED = 300;
+    case RETURNED = 400;
+    case ERROR = 500;
 
 
     public function getLangKey(): string
@@ -38,17 +37,21 @@ enum StatusType: int implements WithLabel
         return $options;
     }
 
-    public function getState()
+    public function getStateColor(): string
     {
-        if ($this->value === 0) return 'ERROR';
-        if ($this->value === 1) return 'PREPARED';
-        if ($this->value === 10) return 'SENT';
-        if ($this->value < 90) return 'TRANSPORT';
-        if ($this->value === 90) return 'PICK_UP_READY';
-        if ($this->value === 100) return 'DELIVERED';
-
-        if ($this->value === 210) return 'RETURNED';
-        if ($this->value === 220) return 'RETURNED';
+        return match ($this) {
+            StatusType::NOT_FOUND, StatusType::ERROR => 'text-red-600',
+            StatusType::CREATED => 'text-yellow-200',
+            StatusType::SENT => 'text-green-300',
+            StatusType::IN_TRANSPORT => 'text-indigo-400',
+            StatusType::IN_DELIVERY => 'text-cyan-400',
+            StatusType::HOLD => 'text-amber-600',
+            StatusType::WAITING_TO_BE_PICKED_UP => '',
+            StatusType::DELIVERED, StatusType::PICKED_UP => 'text-green-700',
+            StatusType::DELIVERY_FAILED => 'text-orange-500',
+            StatusType::RETURNED => 'text-red-500',
+            default => 'text-red-200'
+        };
     }
 
 

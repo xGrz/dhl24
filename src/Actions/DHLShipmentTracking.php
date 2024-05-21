@@ -3,6 +3,7 @@
 namespace xGrz\Dhl24\Actions;
 
 use xGrz\Dhl24\Api\Actions\GetTracking;
+use xGrz\Dhl24\Enums\StatusType;
 use xGrz\Dhl24\Events\ShipmentDeliveredEvent;
 use xGrz\Dhl24\Events\ShipmentSentEvent;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
@@ -32,9 +33,9 @@ class DHLShipmentTracking
 
     private function trackingEventDispatcher(DHLStatus $status): void
     {
-        if ($status->type->getState() === 'SENT') {
+        if ($status->type === StatusType::SENT) {
             ShipmentSentEvent::dispatch($this->shipment);
-        } elseif ($status->type->getState() === 'DELIVERED') {
+        } elseif ($status->type === StatusType::DELIVERED || $status->type === StatusType::PICKED_UP) {
             ShipmentDeliveredEvent::dispatch($this->shipment);
         }
     }

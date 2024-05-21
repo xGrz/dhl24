@@ -12,27 +12,29 @@ class DHLStatusSeeder extends Seeder
     {
         $states = [
             'ERR' => [
-                'type' => StatusType::ERROR,
+                'type' => StatusType::NOT_FOUND,
                 'description' => 'Nie znaleziono przesyłki o takim numerze'
             ],
             'EDWP' => [
-                'type' => StatusType::NEW,
+                'type' => StatusType::CREATED,
                 'description' => 'DHL otrzymał dane elektroniczne przesyłki'
             ],
             'DWP' => [
-                'type' => StatusType::PICKED_UP,
+                'type' => StatusType::SENT,
                 'description' => 'przesyłka odebrana od nadawcy'
             ],
+
+
             'SORT' => [
-                'type' => StatusType::SORTING,
+                'type' => StatusType::IN_TRANSPORT,
                 'description' => "przesyłka jest obsługiwana w centrum sortowania"
             ],
             'LP' => [
-                'type' => StatusType::ARRIVED,
+                'type' => StatusType::IN_TRANSPORT,
                 'description' => 'przesyłka dotarła do oddziału'
             ],
             'LK' => [
-                'type' => StatusType::OUT_FOR_DELIVERY,
+                'type' => StatusType::IN_DELIVERY,
                 'description' => 'przesyłka przekazana kurierowi do doręczenia'
             ],
             'DOR' => [
@@ -40,28 +42,28 @@ class DHLStatusSeeder extends Seeder
                 'description' => 'przesyłka doręczona do odbiorcy'
             ],
             'AWI' => [
-                'type' => StatusType::HOLD,
+                'type' => StatusType::DELIVERY_FAILED,
                 'description' => 'próba doręczenia zakończona niepowodzeniem. Odbiorcy nie było w domu w momencie doręczenia przesyłki'
             ],
             'AWI_NSP' => [
-                'type' => StatusType::HOLD,
+                'type' => StatusType::DELIVERY_FAILED,
                 'description' => 'Przesyłka zostanie doręczona do odbiorcy dziś lub w ciągu najbliższych dwóch dni roboczych'
             ],
             'BRG' => [
-                'type' => StatusType::HOLD,
+                'type' => StatusType::DELIVERY_FAILED,
                 'description' => 'doręczenie wstrzymane do czasu uregulowania opłat przez
                 odbiorcę'
             ],
             'SP_DW' => [
-                'type' => StatusType::OUT_FOR_DELIVERY,
+                'type' => StatusType::IN_DELIVERY,
                 'description' => 'Przesyłka w drodze do Punktu DHL POP'
             ],
             'SP_DSP' => [
-                'type' => StatusType::READY_FOR_PICK_UP,
+                'type' => StatusType::WAITING_TO_BE_PICKED_UP,
                 'description' => 'przesyłka oczekuje na odbiór w DHL POP'
             ],
             'SP_DOR' => [
-                'type' => StatusType::DELIVERED,
+                'type' => StatusType::PICKED_UP,
                 'description' => 'przesyłka odebrana przez odbiorcę finalnego z punktu
                 DHL POP'
             ],
@@ -78,7 +80,7 @@ class DHLStatusSeeder extends Seeder
                 'description' => 'przesyłka oczekuje na kolejny cykl doręczenia'
             ],
             'PSHOP' => [
-                'type' => StatusType::HOLD,
+                'type' => StatusType::IN_TRANSPORT,
                 'description' => 'decyzja Odbiorcy: przesyłka będzie oczekiwała na odbiór osobisty w DHL Parcelshop'
             ],
             'ZWW_NSP' => [
@@ -89,7 +91,7 @@ class DHLStatusSeeder extends Seeder
                 'type' => StatusType::ERROR,
                 'description' => 'przesyłka błędnie zaadresowana. Prosimy o kontakt z naszym Działem Obsługi Klienta'],
             'OWL' => [
-                'type' => StatusType::READY_FOR_PICK_UP,
+                'type' => StatusType::WAITING_TO_BE_PICKED_UP,
                 'description' => 'przesyłka oczekuje na odbiór przez klienta w terminalu DHL'],
         ];
 
