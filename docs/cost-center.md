@@ -2,14 +2,6 @@
 
 > Package provides cost center manager. You can divide your shipments by unlimited number of cost centers.
 > DHL invoice attachment divides shipments by those cost centers.
-
-## ADD
-
-```php
-xGrz\Dhl24\Facades\DHL24::addContentSuggestion($name);
-```
-Cost center `name` must be unique across all database rows (including soft deleted). If name exists DHL24Exception will be thrown.
-
 ___
 ## LISTING
 
@@ -38,6 +30,14 @@ xGrz\Dhl24\Facades\DHL24::deletedCostsCenter($withPagination, $paginationName)
 xGrz\Dhl24\Facades\DHL24::allCostCenters($withPagination, $paginationName)
 ```
 `withPagination` and `paginationName` read first paragraph in *Cost center listings* section
+___
+
+## ADD
+
+```php
+xGrz\Dhl24\Facades\DHL24::addContentSuggestion($name);
+```
+Cost center `name` must be unique across all database rows (including soft deleted). If name exists DHL24Exception will be thrown.
 
 ___
 
@@ -59,7 +59,7 @@ xGrz\Dhl24\Facades\DHL24::deleteCostCenter($center)
 `center` - you can provide DHLCostCenter model or id
 
 If your cost center is used by shipments (assigned to shipment) it will be soft deleted to hold your history.
-When cost center is not assigned to any shipment hard delete will be executed.
+When cost center is not assigned to any shipment permanent delete will be executed.
 ___
 
 ## RESTORE
