@@ -1,6 +1,6 @@
 <?php
 
-use xGrz\Dhl24\Enums\LabelType;
+use xGrz\Dhl24\Enums\DHLLabelType;
 
 return [
     'shipment-insurance' => [
@@ -14,15 +14,15 @@ return [
         'intelligent_cost_saver' => true,
         'intelligent_cost_saver_max_value' => 500,
     ],
-    'shipping-confirmation' => [
+    'reports' => [
         'disk' => 'local',
-        'directory' => 'dhl/shipping-confirmations',
+        'directory' => 'dhl/reports',
         'defaultType' => '',
     ],
     'labels' => [
         'disk' => 'local',
         'directory' => 'dhl/shipment-labels',
-        'defaultType' => LabelType::BLP->name,
+        'defaultType' => DHLLabelType::BLP->name,
     ],
     'auth' => [
         'wsdl' => env('DHL24_WSDL'),

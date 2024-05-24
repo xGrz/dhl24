@@ -2,173 +2,153 @@
 
 namespace xGrz\Dhl24\Facades;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Facade;
-use xGrz\Dhl24\Actions\DHLShipmentsTrackingAction;
-use xGrz\Dhl24\Api\Actions\CreateShipment;
-use xGrz\Dhl24\Api\Actions\GetMyShipments;
-use xGrz\Dhl24\Api\Actions\GetPostalCodeServices;
-use xGrz\Dhl24\Api\Actions\GetPrice;
-use xGrz\Dhl24\Api\Actions\GetShippingConfirmationList;
-use xGrz\Dhl24\Api\Actions\GetVersion;
-use xGrz\Dhl24\Enums\DomesticShipmentType;
-use xGrz\Dhl24\Enums\ShippingConfirmationType;
+use Illuminate\Support\Collection;
+use xGrz\Dhl24\Actions\Label;
+use xGrz\Dhl24\Actions\MyShipments;
+use xGrz\Dhl24\Actions\ServicePoints;
+use xGrz\Dhl24\Actions\ShipmentsReport;
+use xGrz\Dhl24\Actions\Version;
+use xGrz\Dhl24\Enums\DHLLabelType;
+use xGrz\Dhl24\Enums\DHLServicePointType;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Models\DHLContentSuggestion;
 use xGrz\Dhl24\Models\DHLCostCenter;
 use xGrz\Dhl24\Models\DHLShipment;
-use xGrz\Dhl24\Wizard\ShipmentWizard;
+use xGrz\Dhl24\Services\DHLContentService;
+use xGrz\Dhl24\Services\DHLCostCenterService;
 
-class DHL24 extends Facade
+class DHL24
 {
 
-    public static function getApiVersion(): string
+    /**
+     * @throws DHL24Exception
+     */
+    public static function apiVersion(): string
     {
-        try {
-            return GetVersion::make()->call()->getVersion();
-        } catch (DHL24Exception $e) {
-            return '';
-        }
+        return (new Version())->get();
     }
 
     /**
      * @throws DHL24Exception
      */
-    public static function getMyShipments(Carbon $from, Carbon $to, int $pageNo = null): array
+    public static function servicePoints(string $postalCode, int $radius = 5, string $country = 'PL', DHLServicePointType $type = null): Collection
     {
-        return GetMyShipments::make($from, $to, $pageNo)->call()->getItems();
+        return (new ServicePoints())
+            ->setPostalCode($postalCode)
+            ->setRadius($radius)
+            ->setCountry($country)
+            ->get($type);
     }
 
-    /**
-     * @throws DHL24Exception
-     */
-    public static function storeShippingConfirmationList(Carbon $date = null, ShippingConfirmationType $type = ShippingConfirmationType::ALL)
+    public static function myShipments(Carbon $from = null, Carbon $to = null, int $page = 1): Collection
     {
-        return GetShippingConfirmationList::make($date, $type)->call()->store()->getFilename();
+        return (new MyShipments())->get($from, $to, $page);
     }
 
-    /**
-     * @throws DHL24Exception
-     */
-    public static function downloadShippingConfirmationListAsPDF(Carbon $date = null, ShippingConfirmationType $type = ShippingConfirmationType::ALL)
+    public static function report(Carbon $date = null, string $type = 'ALL'): ?ShipmentsReport
     {
-        return GetShippingConfirmationList::make($date, $type)->call()->store();
+        return (new ShipmentsReport)
+            ->setDate($date ?? now())
+            ->setType($type)
+            ->get();
     }
 
-    /**
-     * @throws DHL24Exception
-     */
-    public static function getPickupServices(string $postCode, Carbon $pickupDate = null, bool $toArray = false)
+    public static function label(DHLShipment|string|int $shipment = null, DHLLabelType $type = null): ?Label
     {
-        return GetPostalCodeServices::make($postCode, $pickupDate)->call()->pickup($toArray);
+        return (new Label())
+            ->setShipment($shipment)
+            ->setType($type)
+            ->get();
     }
 
-    public static function getShipment(int $shipmentId): DHLShipment
+    public static function contentSuggestions(): array
     {
-        return DHLShipment::with(['items', 'cost_center', 'courier_booking', 'tracking'])->findOrFail($shipmentId);
-    }
-
-    public static function getDeliveryServices(string $postCode, Carbon $deliveryDate = null, bool $toArray = false)
-    {
-        return GetPostalCodeServices::make($postCode, $deliveryDate)->call()->delivery($toArray);
-    }
-
-    public static function getPrice(ShipmentWizard|DHLShipment $shipment)
-    {
-        try {
-            return (new GetPrice($shipment))->call()->getPrice();
-        } catch (DHL24Exception $e) {
-            dump($e->getMessage());
-        }
-    }
-
-    public static function getPriceOptions(ShipmentWizard $shipment): array
-    {
-        $options = [
-            'PACKAGE' => false,
-            'PACKAGE09' => false,
-            'PACKAGE12' => false,
-            'PACKAGE_EVENING' => false,
-        ];
-
-        try {
-            $shipment->services()->setShipmentType(DomesticShipmentType::DOMESTIC);
-            $options['PACKAGE'] = (new GetPrice($shipment))->call()->getPrice();
-        } catch (DHL24Exception $e) {
-        }
-
-        try {
-            $shipment->services()->setShipmentType(DomesticShipmentType::DOMESTIC09);
-            $options['PACKAGE09'] = (new GetPrice($shipment))->call()->getPrice();
-        } catch (DHL24Exception $e) {
-        }
-
-        try {
-            $shipment->services()->setShipmentType(DomesticShipmentType::DOMESTIC12);
-            $options['PACKAGE12'] = (new GetPrice($shipment))->call()->getPrice();
-        } catch (DHL24Exception $e) {
-        }
-
-        try {
-            $shipment->services()->setShipmentType(DomesticShipmentType::EVENING_DELIVERY);
-            $options['PACKAGE_EVENING'] = (new GetPrice($shipment))->call()->getPrice();
-        } catch (DHL24Exception $e) {
-        }
-
-        return $options;
-    }
-
-    public static function getOptions(ShipmentWizard $shipment)
-    {
-        return self::getDeliveryServices(
-            $shipment->getDestinationPostCode(),
-            Carbon::parse($shipment->getShipmentDate()),
-
-        );
-    }
-
-    public static function getDeliveryOptions(string $postalCode, Carbon $shipmentDate = null)
-    {
-        if (!$shipmentDate) $shipmentDate = now()->addDays(3);
-        return GetPostalCodeServices::make($postalCode, $shipmentDate)->call();
-
-    }
-
-    public static function createShipment(DHLShipment $shipment)
-    {
-        return CreateShipment::make($shipment)->call();
-    }
-
-    public static function getCostCenters(): array
-    {
-        return DHLCostCenter::query()
-            ->select('name')
-            ->orderBy('is_default', 'desc')
-            ->orderBy('name')
-            ->get()
-            ->map(fn($costName) => $costName->name)
+        return DHLContentService::getContents()
+            ->map(fn($suggestion) => [
+                'id' => $suggestion->id,
+                'name' => $suggestion->name,
+                'is_default' => $suggestion->is_default
+            ])
             ->toArray();
     }
 
-    public static function getContentSuggestions(): array
+    /**
+     * @throws DHL24Exception
+     */
+    public static function addContentSuggestion(string $name)
     {
-        return DHLContentSuggestion::orderBy('name')
-            ->get()
-            ->map(fn($contentSuggestion) => $contentSuggestion->name)
-            ->toArray();
+        return DHLContentService::add($name);
     }
 
-    public static function getUndeliveredShipments(): EloquentCollection
+    /**
+     * @throws DHL24Exception
+     */
+    public static function renameContentSuggestion(DHLContentSuggestion|int $suggestion, string $name): bool
     {
-        return DHLShipment::whereDoesntHave('tracking', function ($q) {
-            // TODO: change DOR to finished statuses list
-            $q->where('status', 'DOR');
-        })->get();
+        return DHLContentService::rename($suggestion, $name);
     }
 
-    public static function updateShipmentTracking(): int
+    public static function deleteContentSuggestion(DHLContentSuggestion|int $suggestion): ?bool
     {
-        return DHLShipmentsTrackingAction::dispatch();
+        return DHLContentService::delete($suggestion);
     }
+
+    public static function setDefaultContent(DHLContentSuggestion|int $suggestion): ?bool
+    {
+        return DHLContentService::delete($suggestion);
+    }
+
+
+    public static function costsCenter(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
+    {
+        return DHLCostCenterService::getCostCenters($withPagination, $paginationName);
+    }
+    public static function deletedCostsCenter(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
+    {
+        return DHLCostCenterService::getDeletedCostCenters($withPagination, $paginationName);
+    }
+    public static function allCostCenters(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
+    {
+        return DHLCostCenterService::getAllCostCenters($withPagination, $paginationName);
+    }
+    public static function costCenterShipments(DHLCostCenter|int $center, bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
+    {
+        return DHLCostCenterService::getShipmentsByCostCenter($center, $withPagination, $paginationName);
+    }
+
+    /**
+     * @throws DHL24Exception
+     */
+    public static function addCostCenter(string $name)
+    {
+        return DHLCostCenterService::add($name);
+    }
+
+    /**
+     * @throws DHL24Exception
+     */
+    public static function renameCostCenter(DHLCostCenter|int $center, string $name): bool
+    {
+        return DHLCostCenterService::rename($center, $name);
+    }
+
+    public static function deleteCostCenter(DHLCostCenter|int $center): ?bool
+    {
+        return DHLCostCenterService::delete($center);
+    }
+
+    public static function restoreCostCenter(DHLCostCenter|int $center): bool|int
+    {
+        return DHLCostCenterService::restore($center);
+    }
+
+    public static function setDefaultCostCenter(DHLCostCenter|int $center): bool
+    {
+        return DHLCostCenterService::setDefault($center);
+    }
+
+
 }

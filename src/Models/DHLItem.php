@@ -6,7 +6,7 @@ use Database\Factories\DHLItemFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use xGrz\Dhl24\Enums\ShipmentItemType;
+use xGrz\Dhl24\Enums\DHLShipmentItemType;
 
 class DHLItem extends Model
 {
@@ -16,7 +16,7 @@ class DHLItem extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'type' => ShipmentItemType::class,
+        'type' => DHLShipmentItemType::class,
         'non_standard' => 'boolean',
     ];
 
