@@ -39,7 +39,14 @@ class DHLShipment extends Model
     ];
 
     protected $attributes = [
-        'receiver_type' => DHLAddressType::CONSUMER
+        'receiver_type' => DHLAddressType::CONSUMER,
+        'pickup_on_saturday' => false,
+        'delivery_on_saturday' => false,
+        'preaviso' => false,
+        'predelivery_information' => false,
+        'is_packstation' => false,
+        'is_postfiliale' => false,
+        'payer_type' => DHLDomesticShipmentType::DOMESTIC,
     ];
 
     protected static function newFactory()

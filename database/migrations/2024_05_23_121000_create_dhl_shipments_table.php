@@ -36,10 +36,14 @@ return new class extends Migration {
             $table->string('receiver_contact_phone', 20)->nullable();
             $table->string('receiver_contact_email', 60)->nullable();
             $table->string('product', 2)->nullable();
+            $table->boolean('delivery_evening')->default(false);
+            $table->boolean('delivery_on_saturday')->default(false);
+            $table->boolean('pickup_on_saturday')->default(false);
             $table->double('collect_on_delivery')->nullable();
             $table->string('collect_on_delivery_reference', 20)->nullable();
             $table->double('insurance')->nullable();
             $table->boolean('return_on_delivery')->default(false);
+            $table->string('return_on_delivery_reference')->nullable();
             $table->boolean('proof_of_delivery')->default(false);
             $table->boolean('self_collect')->default(false);
             $table->boolean('predelivery_information')->default(false);

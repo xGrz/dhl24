@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use xGrz\Dhl24\Enums\DHLAddressType;
+use xGrz\Dhl24\Enums\DHLDomesticShipmentType;
 use xGrz\Dhl24\Enums\DHLShipmentItemType;
 use xGrz\Dhl24\Facades\DHL24;
 use xGrz\Dhl24\Wizard\DHLShipmentWizard;
@@ -100,52 +101,119 @@ class DHLShipmentTest extends TestCase
 
     public function test_shipment_services_product()
     {
+        $w = DHL24::wizard()->setShipmentType(DHLDomesticShipmentType::PREMIUM);
+        $this->assertEquals('PR', $w->getPayload()['service']['product']);
+        $this->assertArrayNotHasKey('deliveryEvening', $w->getPayload()['service']);
+
+        $w = DHL24::wizard()->setShipmentType(DHLDomesticShipmentType::DOMESTIC09);
+        $this->assertEquals('09', $w->getPayload()['service']['product']);
+        $this->assertArrayNotHasKey('deliveryEvening', $w->getPayload()['service']);
+
+        $w = DHL24::wizard()->setShipmentType(DHLDomesticShipmentType::DOMESTIC12);
+        $this->assertEquals('12', $w->getPayload()['service']['product']);
+        $this->assertArrayNotHasKey('deliveryEvening', $w->getPayload()['service']);
+
+        $w = DHL24::wizard()->setShipmentType(DHLDomesticShipmentType::DOMESTIC);
+        $this->assertEquals('AH', $w->getPayload()['service']['product']);
+        $this->assertArrayNotHasKey('deliveryEvening', $w->getPayload()['service']);
     }
 
     public function test_shipment_services_delivery_evening()
     {
+        $w = DHL24::wizard()->setShipmentType(DHLDomesticShipmentType::EVENING_DELIVERY);
+        $this->assertEquals('DW', $w->getPayload()['service']['product']);
+        $this->assertTrue($w->getPayload()['service']['deliveryEvening']);
     }
 
     public function test_shipment_services_delivery_on_saturday()
     {
+        $w = DHL24::wizard()->setSaturdayDelivery();
+        $this->assertTrue($w->getPayload()['service']['deliveryOnSaturday']);
     }
 
     public function test_shipment_services_pickup_on_saturday()
     {
+        $w = DHL24::wizard()->setSaturdayPickup();
+        $this->assertTrue($w->getPayload()['service']['pickupOnSaturday']);
     }
 
     public function test_shipment_services_collect_on_delivery()
     {
-        // value, reference, form, cod=true
+        $w = DHL24::wizard()->setCollectOnDelivery(200.99, 'INV/188/2024');
+
+        $this->assertTrue($w->getPayload()['service']['collectOnDelivery']);
+        $this->assertEquals('INV/188/2024', $w->getPayload()['service']['collectOnDeliveryReference']);
+        $this->assertEquals(200.99, $w->getPayload()['service']['collectOnDeliveryValue']);
+
+        $this->assertTrue($w->getPayload()['service']['insurance']);
+        $this->assertEquals(200.99, $w->getPayload()['service']['insuranceValue']);
     }
 
     public function test_shipment_services_insurance()
     {
+        $w = DHL24::wizard()->setShipmentValue(1200.99);
+
+        $this->assertTrue($w->getPayload()['service']['insurance']);
+        $this->assertEquals(1200.99, $w->getPayload()['service']['insuranceValue']);
+    }
+
+    public function test_set_insurance_lower_then_cod_should_return_cod_value()
+    {
+        $w = DHL24::wizard()
+            ->setCollectOnDelivery(2020)
+            ->setShipmentValue(1200.99);
+
+        $this->assertTrue($w->getPayload()['service']['collectOnDelivery']);
+        $this->assertTrue($w->getPayload()['service']['insurance']);
+
+        $this->assertEquals(2020, $w->getPayload()['service']['collectOnDeliveryValue']);
+        $this->assertEquals(2020, $w->getPayload()['service']['insuranceValue']);
+    }
+
+    public function test_set_cod_lower_then_insurance_should_return_original_insurance_value()
+    {
+        $w = DHL24::wizard()
+            ->setCollectOnDelivery(202)
+            ->setShipmentValue(1200.99);
+
+        $this->assertTrue($w->getPayload()['service']['collectOnDelivery']);
+        $this->assertTrue($w->getPayload()['service']['insurance']);
+
+        $this->assertEquals(202,$w->getPayload()['service']['collectOnDeliveryValue']);
+        $this->assertEquals(1200.99, $w->getPayload()['service']['insuranceValue']);
     }
 
     public function test_shipment_services_return_on_delivery()
     {
-        // with reference
+        $w = DHL24::wizard()->setReturnOnDelivery('INV/199/2024');
+
+        $this->assertTrue($w->getPayload()['service']['returnOnDelivery']);
+        $this->assertEquals('INV/199/2024', $w->getPayload()['service']['returnOnDeliveryReference']);
     }
 
     public function test_shipment_services_proof_of_delivery()
     {
+        $w = DHL24::wizard()->setProofOfDelivery();
+        $this->assertTrue($w->getPayload()['service']['proofOfDelivery']);
     }
 
     public function test_shipment_services_self_collect()
     {
+        $w = DHL24::wizard()->setSelfCollect();
+        $this->assertTrue($w->getPayload()['service']['selfCollect']);
     }
 
-    public function test_shipment_services_delivery_to_neighbour()
-    {
-    }
 
     public function test_shipment_services_predelivery_information()
     {
+        $w = DHL24::wizard()->setPredeliveryInformation();
+        $this->assertTrue($w->getPayload()['service']['predeliveryInformation']);
     }
 
     public function test_shipment_services_preaviso()
     {
+        $w = DHL24::wizard()->setPreaviso();
+        $this->assertTrue($w->getPayload()['service']['preaviso']);
     }
 
     public function test_shipment_services_payment()

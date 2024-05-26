@@ -2,6 +2,7 @@
 
 namespace xGrz\Dhl24\Wizard;
 
+use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use xGrz\Dhl24\Actions\CreateShipment;
@@ -131,12 +132,33 @@ class DHLShipmentWizard
         is_null($date) && is_null($this->shipment->shipment_date)
             ? $this->shipment->shipment_date = now()
             : $this->shipment->shipment_date = $date;
+
+        if ($this->shipment->shipment_date->dayOfWeek === CarbonInterface::SATURDAY) {
+            $this->shipment->pickup_on_saturday = true;
+        }
+
+        if ($this->shipment->shipment_date->dayOfWeek === CarbonInterface::SUNDAY) {
+            $this->shipment->shipment_date->addDay();
+        }
         return $this;
     }
 
     public function setShipmentType(DHLDomesticShipmentType $shipmentType): static
     {
         $this->shipment->product = $shipmentType;
+        $this->shipment->delivery_evening = $shipmentType === DHLDomesticShipmentType::EVENING_DELIVERY;
+        return $this;
+    }
+
+    public function setSaturdayDelivery(bool $saturday = true): static
+    {
+        $this->shipment->delivery_on_saturday = $saturday;
+        return $this;
+    }
+
+    public function setSaturdayPickup(bool $saturday = true): static
+    {
+        $this->shipment->pickup_on_saturday = $saturday;
         return $this;
     }
 
@@ -169,6 +191,37 @@ class DHLShipmentWizard
     public function setComment(string $comment): static
     {
         $this->shipment->comment = $comment;
+        return $this;
+    }
+
+    public function setReturnOnDelivery(string $reference = null, bool $rod = true): static
+    {
+        $this->shipment->return_on_delivery = $rod;
+        $this->shipment->return_on_delivery_reference = $rod ? $reference : null;
+        return $this;
+    }
+
+    public function setProofOfDelivery(bool $pod = true): static
+    {
+        $this->shipment->proof_of_delivery = $pod;
+        return $this;
+    }
+
+    public function setSelfCollect(bool $selfCollect = true): static
+    {
+        $this->shipment->self_collect = $selfCollect;
+        return $this;
+    }
+
+    public function setPredeliveryInformation(bool $pdi = true): static
+    {
+        $this->shipment->predelivery_information = $pdi;
+        return $this;
+    }
+
+    public function setPreaviso(bool $preaviso = true): static
+    {
+        $this->shipment->preaviso = $preaviso;
         return $this;
     }
 
@@ -221,7 +274,7 @@ class DHLShipmentWizard
     {
         $services = collect()
             ->put('product', $this->shipment->product?->value)
-            ->when($this->shipment->collectOnDelivery, function (Collection $services) {
+            ->when($this->shipment->collect_on_delivery, function (Collection $services) {
                 return $services
                     ->put('collectOnDelivery', true)
                     ->put('collectOnDeliveryValue', $this->shipment->collect_on_delivery)
@@ -232,7 +285,32 @@ class DHLShipmentWizard
             })
             ->when($this->shipment->insurance, function (Collection $services) {
                 return $services->put('insurance', true)->put('insuranceValue', $this->shipment->insurance);
-            });
+            })
+            ->when($this->shipment->delivery_evening, function (Collection $services) {
+                return $services->put('deliveryEvening', true);
+            })
+            ->when($this->shipment->pickup_on_saturday, function (Collection $services) {
+                return $services->put('pickupOnSaturday', true);
+            })
+            ->when($this->shipment->delivery_on_saturday, function (Collection $services) {
+                return $services->put('deliveryOnSaturday', true);
+            })
+            ->when($this->shipment->return_on_delivery, function (Collection $services) {
+                return $services->put('returnOnDelivery', true)->put('returnOnDeliveryReference', $this->shipment->return_on_delivery_reference);
+            })
+            ->when($this->shipment->self_collect, function (Collection $services) {
+                return $services->put('selfCollect', true);
+            })
+            ->when($this->shipment->predelivery_information, function (Collection $services) {
+                return $services->put('predeliveryInformation', true);
+            })
+            ->when($this->shipment->preaviso, function (Collection $services) {
+                return $services->put('preaviso', true);
+            })
+            ->when($this->shipment->proof_of_delivery, function (Collection $services) {
+                return $services->put('proofOfDelivery', true);
+            })
+        ;
 
         return $services->toArray();
     }
