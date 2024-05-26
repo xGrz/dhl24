@@ -41,14 +41,16 @@ class DHLCostCenterService
     /**
      * @throws DHL24Exception
      */
-    public static function add(string $name)
+    public static function add(string $name): DHLCostCenter
     {
         if ($exists = self::isNameExists($name)) {
             $exists->deleted_at
                 ? throw new DHL24Exception('This cost center name was already used and deleted', 101)
                 : throw new DHL24Exception('This cost center name exists', 102);
         }
-        return DHLCostCenter::create(['name' => $name])->save();
+        $costCenter = DHLCostCenter::create(['name' => $name]);
+        $costCenter->save();
+        return $costCenter;
     }
 
     /**

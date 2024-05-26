@@ -27,7 +27,7 @@ class DHLShipment extends Model
 
     protected $casts = [
         'service' => 'array',
-        'shipment_date' => 'date',
+        'shipment_date' => 'datetime:Y-m-d',
         'shipper_postal_code' => PostalCodeCast::class,
         'receiver_postal_code' => PostalCodeCast::class,
         'receiver_type' => DHLAddressType::class,
@@ -38,6 +38,10 @@ class DHLShipment extends Model
         'id'
     ];
 
+    protected $attributes = [
+        'receiver_type' => DHLAddressType::CONSUMER
+    ];
+
     protected static function newFactory()
     {
         return DHLShipmentFactory::new();
@@ -45,7 +49,12 @@ class DHLShipment extends Model
 
     public function scopeWithDetails(Builder $query): void
     {
-        $query->with(['items', 'courier_booking', 'cost_center', 'tracking']);
+        $query->with(self::getRelationsListForDetails());
+    }
+
+    public static function getRelationsListForDetails(): array
+    {
+        return ['items', 'courier_booking', 'cost_center', 'tracking'];
     }
 
 

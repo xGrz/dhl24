@@ -3,6 +3,7 @@
 namespace xGrz\Dhl24\Facades;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -19,6 +20,7 @@ use xGrz\Dhl24\Models\DHLCostCenter;
 use xGrz\Dhl24\Models\DHLShipment;
 use xGrz\Dhl24\Services\DHLContentService;
 use xGrz\Dhl24\Services\DHLCostCenterService;
+use xGrz\Dhl24\Wizard\DHLShipmentWizard;
 
 class DHL24
 {
@@ -43,7 +45,7 @@ class DHL24
             ->get($type);
     }
 
-    public static function myShipments(Carbon $from = null, Carbon $to = null, int $page = 1): Collection
+    public static function dhlShipments(Carbon $from = null, Carbon $to = null, int $page = 1): Collection
     {
         return (new MyShipments())->get($from, $to, $page);
     }
@@ -101,19 +103,21 @@ class DHL24
         return DHLContentService::delete($suggestion);
     }
 
-
     public static function costsCenter(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
     {
         return DHLCostCenterService::getCostCenters($withPagination, $paginationName);
     }
+
     public static function deletedCostsCenter(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
     {
         return DHLCostCenterService::getDeletedCostCenters($withPagination, $paginationName);
     }
+
     public static function allCostCenters(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
     {
         return DHLCostCenterService::getAllCostCenters($withPagination, $paginationName);
     }
+
     public static function costCenterShipments(DHLCostCenter|int $center, bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
     {
         return DHLCostCenterService::getShipmentsByCostCenter($center, $withPagination, $paginationName);
@@ -122,7 +126,7 @@ class DHL24
     /**
      * @throws DHL24Exception
      */
-    public static function addCostCenter(string $name)
+    public static function addCostCenter(string $name): DHLCostCenter
     {
         return DHLCostCenterService::add($name);
     }
@@ -150,5 +154,24 @@ class DHL24
         return DHLCostCenterService::setDefault($center);
     }
 
+
+    public static function wizard(DHLShipment $shipment = null): DHLShipmentWizard
+    {
+        return new DHLShipmentWizard($shipment);
+    }
+
+    public static function shipments(bool $withRelations = true): Builder
+    {
+        return $withRelations
+            ? DHLShipment::withDetails()
+            : DHLShipment::query();
+    }
+
+    public static function shipment(DHLShipment|int $shipment): ?DHLShipment
+    {
+        if ($shipment instanceof DHLShipment) return $shipment->loadMissing(DHLShipment::getRelationsListForDetails());
+        return DHLShipment::withDetails()->find($shipment)
+            ?? DHLShipment::withDetails()->where('number', $shipment)->first();
+    }
 
 }

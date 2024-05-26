@@ -2,6 +2,7 @@
 
 namespace xGrz\Dhl24\Wizard;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use xGrz\Dhl24\Actions\CreateShipment;
 use xGrz\Dhl24\Enums\DHLAddressType;
@@ -19,6 +20,7 @@ class DHLShipmentWizard
     public function __construct(?DHLShipment $shipment = null)
     {
         $this->shipment = $shipment ?? new DHLShipment();
+        self::setShipmentDate();
     }
 
     public function setShipperName(string $name): static
@@ -124,6 +126,14 @@ class DHLShipmentWizard
         return $this;
     }
 
+    public function setShipmentDate(Carbon $date = null): static
+    {
+        is_null($date) && is_null($this->shipment->shipment_date)
+            ? $this->shipment->shipment_date = now()
+            : $this->shipment->shipment_date = $date;
+        return $this;
+    }
+
     public function setShipmentType(DHLDomesticShipmentType $shipmentType): static
     {
         $this->shipment->product = $shipmentType;
@@ -153,6 +163,12 @@ class DHLShipmentWizard
     public function setContent(string $content): static
     {
         $this->shipment->content = $content;
+        return $this;
+    }
+
+    public function setComment(string $comment): static
+    {
+        $this->shipment->comment = $comment;
         return $this;
     }
 
@@ -194,10 +210,7 @@ class DHLShipmentWizard
             'service' => $this->getServicesPayload(),
             'payment' => $this->getPaymentPayload(),
         ])
-            ->when($this->shipment->shipment_date,
-                fn(Collection $payload) => $payload->put('shipmentDate', $this->shipment->shipment_date->format('Y-m-d')),
-                fn(Collection $payload) => $payload->put('shipmentDate', now()->format('Y-m-d')),
-            )
+            ->put('shipmentDate', $this->shipment->shipment_date?->format('Y-m-d'))
             ->when($this->shipment->comment, fn(Collection $payload) => $payload->put('comment', $this->shipment->comment))
             ->put('content', $this->shipment->content)
             ->put('skipRestrictionCheck', true);
@@ -247,7 +260,7 @@ class DHLShipmentWizard
         ];
         if ($this->shipment->shipper_contact_phone) $shipper['contactPhone'] = $this->shipment->shipper_contact_phone;
         if ($this->shipment->shipper_contact_email) $shipper['contactEmail'] = $this->shipment->shipper_contact_email;
-        if ($this->shipment->shipper_contact_name) $shipper['contactName'] = $this->shipment->shipper_contact_name;
+        if ($this->shipment->shipper_contact_person) $shipper['contactPerson'] = $this->shipment->shipper_contact_person;
         return $shipper;
     }
 
@@ -264,7 +277,7 @@ class DHLShipmentWizard
         ];
         if ($this->shipment->receiver_contact_phone) $receiver['contactPhone'] = $this->shipment->receiver_contact_phone;
         if ($this->shipment->receiver_contact_email) $receiver['contactEmail'] = $this->shipment->receiver_contact_email;
-        if ($this->shipment->receiver_contact_name) $receiver['contactName'] = $this->shipment->receiver_contact_name;
+        if ($this->shipment->receiver_contact_person) $receiver['contactPerson'] = $this->shipment->receiver_contact_person;
         return $receiver;
     }
 
@@ -275,7 +288,7 @@ class DHLShipmentWizard
             foreach ($dhlItem as $prop => $value) {
                 if ($value instanceof \BackedEnum) $dhlItem[$prop] = $value->value;
                 if (empty($value)) unset($dhlItem[$prop]);
-                if ($item->non_standard) $dhlItem['nonStandard'] = true;
+                if ($item->non_standard) $dhlItem['non_standard'] = true;
             }
             return $dhlItem;
         });
