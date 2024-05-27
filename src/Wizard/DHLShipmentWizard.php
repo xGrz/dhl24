@@ -188,6 +188,18 @@ class DHLShipmentWizard
         return $this;
     }
 
+    public function setReference(string $reference): static
+    {
+        $this->shipment->reference = $reference;
+        return $this;
+    }
+
+    public function setEveningDelivery(bool $evening = true): static
+    {
+        $this->shipment->delivery_evening = $evening;
+        return $this;
+    }
+
     public function setReturnOnDelivery(string $reference = null, bool $rod = true): static
     {
         $this->shipment->return_on_delivery = $rod;
@@ -265,9 +277,18 @@ class DHLShipmentWizard
             'payment' => $this->getPaymentPayload(),
         ])
             ->put('shipmentDate', $this->shipment->shipment_date?->format('Y-m-d'))
-            ->when($this->shipment->comment, fn(Collection $payload) => $payload->put('comment', $this->shipment->comment))
+            ->when(
+                $this->shipment->comment,
+                fn(Collection $payload) => $payload->put('comment', $this->shipment->comment)
+            )
+            ->when(
+                $this->shipment->reference,
+                fn(Collection $payload) => $payload->put('reference', $this->shipment->reference),
+                fn(Collection $payload) => $payload->put('reference', $payload->get('service')['collectOnDeliveryReference'] ?? null)
+            )
             ->put('content', $this->shipment->content)
             ->put('skipRestrictionCheck', true);
+
         return $payload->toArray();
     }
 
@@ -275,43 +296,54 @@ class DHLShipmentWizard
     {
         $services = collect()
             ->put('product', $this->shipment->product?->value)
-            ->when($this->shipment->collect_on_delivery, function (Collection $services) {
-                return $services
+            ->when(
+                $this->shipment->collect_on_delivery,
+                fn(Collection $services) => $services
                     ->put('collectOnDelivery', true)
                     ->put('collectOnDeliveryValue', $this->shipment->collect_on_delivery)
-                    ->put('collectOnDeliveryForm', 'BANK_TRANSFER');
-            })
-            ->when($this->shipment->collect_on_delivery_reference, function (Collection $services) {
-                return $services->put('collectOnDeliveryReference', $this->shipment->collect_on_delivery_reference);
-            })
-            ->when($this->shipment->insurance, function (Collection $services) {
-                return $services->put('insurance', true)->put('insuranceValue', $this->shipment->insurance);
-            })
-            ->when($this->shipment->delivery_evening, function (Collection $services) {
-                return $services->put('deliveryEvening', true);
-            })
-            ->when($this->shipment->pickup_on_saturday, function (Collection $services) {
-                return $services->put('pickupOnSaturday', true);
-            })
-            ->when($this->shipment->delivery_on_saturday, function (Collection $services) {
-                return $services->put('deliveryOnSaturday', true);
-            })
-            ->when($this->shipment->return_on_delivery, function (Collection $services) {
-                return $services->put('returnOnDelivery', true)->put('returnOnDeliveryReference', $this->shipment->return_on_delivery_reference);
-            })
-            ->when($this->shipment->self_collect, function (Collection $services) {
-                return $services->put('selfCollect', true);
-            })
-            ->when($this->shipment->predelivery_information, function (Collection $services) {
-                return $services->put('predeliveryInformation', true);
-            })
-            ->when($this->shipment->preaviso, function (Collection $services) {
-                return $services->put('preaviso', true);
-            })
-            ->when($this->shipment->proof_of_delivery, function (Collection $services) {
-                return $services->put('proofOfDelivery', true);
-            })
-        ;
+                    ->put('collectOnDeliveryForm', 'BANK_TRANSFER'),
+            )
+            ->when(
+                $this->shipment->collect_on_delivery_reference,
+                fn(Collection $services) => $services->put('collectOnDeliveryReference', $this->shipment->collect_on_delivery_reference),
+                fn(Collection $services) => $services->put('collectOnDeliveryReference', $this->shipment->reference)
+            )
+            ->when(
+                $this->shipment->insurance,
+                fn(Collection $services) => $services->put('insurance', true)->put('insuranceValue', $this->shipment->insurance)
+            )
+            ->when(
+                $this->shipment->delivery_evening,
+                fn(Collection $services) => $services->put('deliveryEvening', true)
+            )
+            ->when(
+                $this->shipment->pickup_on_saturday,
+                fn(Collection $services) => $services->put('pickupOnSaturday', true)
+            )
+            ->when(
+                $this->shipment->delivery_on_saturday,
+                fn(Collection $services) => $services->put('deliveryOnSaturday', true)
+            )
+            ->when(
+                $this->shipment->return_on_delivery,
+                fn(Collection $services) => $services->put('returnOnDelivery', true)->put('returnOnDeliveryReference', $this->shipment->return_on_delivery_reference)
+            )
+            ->when(
+                $this->shipment->self_collect,
+                fn(Collection $services) => $services->put('selfCollect', true)
+            )
+            ->when(
+                $this->shipment->predelivery_information,
+                fn(Collection $services) => $services->put('predeliveryInformation', true)
+            )
+            ->when(
+                $this->shipment->preaviso,
+                fn(Collection $services) => $services->put('preaviso', true)
+            )
+            ->when(
+                $this->shipment->proof_of_delivery,
+                fn(Collection $services) => $services->put('proofOfDelivery', true)
+            );
 
         return $services->toArray();
     }
@@ -323,7 +355,10 @@ class DHLShipmentWizard
             'payerType' => $this->payer_type ?? 'SHIPPER',
             'accountNumber' => DHLConfig::getSapNumber(),
         ])
-            ->when($this->shipment->cost_center, fn(Collection $payment) => $payment->put('costsCenter', $this->shipment->cost_center->name));
+            ->when(
+                $this->shipment->cost_center,
+                fn(Collection $payment) => $payment->put('costsCenter', $this->shipment->cost_center->name)
+            );
 
         return $payment->toArray();
     }

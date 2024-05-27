@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use xGrz\Dhl24\Casts\PostalCodeCast;
 use xGrz\Dhl24\Enums\DHLAddressType;
 use xGrz\Dhl24\Enums\DHLDomesticShipmentType;
+use xGrz\Dhl24\Enums\DHLPayerType;
 use xGrz\Dhl24\Enums\DHLShipmentItemType;
 use xGrz\Dhl24\Observers\DHLShipmentObserver;
 
@@ -32,6 +33,7 @@ class DHLShipment extends Model
         'receiver_postal_code' => PostalCodeCast::class,
         'receiver_type' => DHLAddressType::class,
         'product' => DHLDomesticShipmentType::class,
+        'payer_type' => DHLPayerType::class,
     ];
 
     protected $guarded = [
@@ -46,7 +48,8 @@ class DHLShipment extends Model
         'predelivery_information' => false,
         'is_packstation' => false,
         'is_postfiliale' => false,
-        'payer_type' => DHLDomesticShipmentType::DOMESTIC,
+        'product' => DHLDomesticShipmentType::DOMESTIC,
+        'payer_type' => DHLPayerType::SHIPPER,
     ];
 
     protected static function newFactory()

@@ -43,7 +43,16 @@ class DHLShipmentWizardTest extends TestCase
             ->setCostCenter($cc)
             ->setCollectOnDelivery(400, 'INVOICE')
             ->setShipmentValue(500)
-            ;
+            ->setSaturdayDelivery()
+            ->setReturnOnDelivery('RETURN-INVOICE')
+            ->setSaturdayPickup()
+            ->setProofOfDelivery()
+            ->setSelfCollect()
+            ->setPredeliveryInformation()
+            ->setPreaviso()
+            ->setComment('Call first')
+            ->setEveningDelivery()
+            ->setReference('Order 11111');
     }
 
     public function test_access_shipment_wizard_with_facade()
@@ -468,6 +477,49 @@ class DHLShipmentWizardTest extends TestCase
         ]);
     }
 
+    public function test_set_shipment_reference()
+    {
+        $w = DHL24::wizard()->setReference('Order 200/2024');
+        $this->assertEquals('Order 200/2024', $w->getPayload()['reference']);
+    }
+
+    public function test_fill_shipment_reference_from_cod_reference()
+    {
+        $w = DHL24::wizard()->setCollectOnDelivery(100, 'Order 200/2024');
+        $this->assertEquals('Order 200/2024', $w->getPayload()['service']['collectOnDeliveryReference']);
+        $this->assertEquals('Order 200/2024', $w->getPayload()['reference']);
+    }
+
+    public function test_fill_cod_reference_from_shipment_reference()
+    {
+        $w = DHL24::wizard()
+            ->setReference('Order 200/2024')
+            ->setCollectOnDelivery(100);
+
+        $this->assertEquals('Order 200/2024', $w->getPayload()['service']['collectOnDeliveryReference']);
+        $this->assertEquals('Order 200/2024', $w->getPayload()['reference']);
+    }
+
+    public function test_cannot_overwrite_shipment_reference_from_cod_reference()
+    {
+        $w = DHL24::wizard()
+            ->setCollectOnDelivery(100, 'Order 200/2024')
+            ->setReference('INVOICE');
+
+        $this->assertEquals('Order 200/2024', $w->getPayload()['service']['collectOnDeliveryReference']);
+        $this->assertEquals('INVOICE', $w->getPayload()['reference']);
+    }
+
+    public function test_cannot_overwrite_cod_reference_from_shipment_reference()
+    {
+        $w = DHL24::wizard()
+            ->setReference('INVOICE')
+            ->setCollectOnDelivery(100, 'Order 200/2024');
+
+        $this->assertEquals('Order 200/2024', $w->getPayload()['service']['collectOnDeliveryReference']);
+        $this->assertEquals('INVOICE', $w->getPayload()['reference']);
+    }
+
     public function test_store_services_in_database()
     {
         $wizard = self::createTestWizard();
@@ -482,6 +534,17 @@ class DHLShipmentWizardTest extends TestCase
         $this->assertEquals('INVOICE', $payload['service']['collectOnDeliveryReference']);
         $this->assertEquals('Elektronika', $payload['content']);
         $this->assertEquals('TestCC', $payload['payment']['costsCenter']);
+        $this->assertTrue($payload['service']['deliveryOnSaturday']);
+        $this->assertTrue($payload['service']['returnOnDelivery']);
+        $this->assertEquals('RETURN-INVOICE', $payload['service']['returnOnDeliveryReference']);
+        $this->assertTrue($payload['service']['pickupOnSaturday']);
+        $this->assertTrue($payload['service']['proofOfDelivery']);
+        $this->assertTrue($payload['service']['selfCollect']);
+        $this->assertTrue($payload['service']['predeliveryInformation']);
+        $this->assertTrue($payload['service']['preaviso']);
+        $this->assertTrue($payload['service']['deliveryEvening']);
+        $this->assertEquals('Call first', $payload['comment']);
+        $this->assertEquals('Order 11111', $payload['reference']);
 
         $this->assertDatabaseHas('dhl_shipments', [
             'product' => DHLDomesticShipmentType::PREMIUM->value,
@@ -491,22 +554,20 @@ class DHLShipmentWizardTest extends TestCase
             'collect_on_delivery_reference' => 'INVOICE',
             'content' => 'Elektronika',
             'cost_center_id' => $cc->id,
-
-            'delivery_evening' => null,
-            'delivery_on_saturday' => null,
-            'pickup_on_saturday' => null,
-            'return_on_delivery' => null,
-            'return_on_delivery_reference' => null,
-            'proof_of_delivery' => null,
-            'self_collect' => null,
-            'predelivery_information' => null,
-            'preaviso' => null,
-            'payer_type' => null,
-            'comment' => null,
-            'reference' => null,
+            'delivery_evening' => true,
+            'delivery_on_saturday' => true,
+            'pickup_on_saturday' => true,
+            'return_on_delivery' => true,
+            'return_on_delivery_reference' => 'RETURN-INVOICE',
+            'proof_of_delivery' => true,
+            'self_collect' => true,
+            'predelivery_information' => true,
+            'preaviso' => true,
+            'payer_type' => 'SHIPPER',
+            'comment' => 'Call first',
+            'reference' => 'Order 11111',
         ]);
 
-        // delivery_evening, delivery_on_saturday, pickup_on_saturday, returu
     }
 
 

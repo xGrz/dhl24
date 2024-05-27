@@ -48,7 +48,7 @@ return new class extends Migration {
             $table->boolean('self_collect')->default(false);
             $table->boolean('predelivery_information')->default(false);
             $table->boolean('preaviso')->default(false);
-            $table->string('payer_type')->nullable();
+            $table->string('payer_type', 20)->nullable();
             $table->string('content', 30)->nullable();
             $table->string('comment', 100)->nullable();
             $table->string('reference', 200)->nullable();
