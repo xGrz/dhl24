@@ -55,6 +55,14 @@ class DHLShipmentWizardTest extends TestCase
             ->setReference('Order 11111');
     }
 
+    private function getPayload(): array
+    {
+        $wizard = self::createTestWizard();
+        $payload = $wizard->getPayload();
+        $wizard->store();
+        return $payload;
+    }
+
     public function test_access_shipment_wizard_with_facade()
     {
         $this->assertInstanceOf(DHLShipmentWizard::class, DHL24::wizard());
@@ -520,52 +528,146 @@ class DHLShipmentWizardTest extends TestCase
         $this->assertEquals('INVOICE', $w->getPayload()['reference']);
     }
 
-    public function test_store_services_in_database()
+
+    public function test_store_service_shipment_product()
     {
-        $wizard = self::createTestWizard();
-        $payload = $wizard->getPayload();
-        $wizard->store();
+        $this->assertEquals(DHLDomesticShipmentType::PREMIUM->value, self::getPayload()['service']['product']);
+        $this->assertDatabaseHas('dhl_shipments', [
+            'product' => DHLDomesticShipmentType::PREMIUM->value
+        ]);
+
+    }
+
+    public function test_store_service_insurance()
+    {
+        $this->assertEquals(500, self::getPayload()['service']['insuranceValue']);
+        $this->assertDatabaseHas('dhl_shipments', [
+            'insurance' => 500,
+        ]);
+    }
+
+    public function test_store_service_cod()
+    {
+        $this->assertEquals(400, self::getPayload()['service']['collectOnDeliveryValue']);
+        $this->assertEquals('INVOICE', self::getPayload()['service']['collectOnDeliveryReference']);
+        $this->assertDatabaseHas('dhl_shipments', [
+            'collect_on_delivery' => 400,
+            'collect_on_delivery_reference' => 'INVOICE',
+        ]);
+    }
+
+    public function test_store_shipment_date()
+    {
+        $this->assertEquals(now()->format('Y-m-d'), self::getPayload()['shipmentDate']);
+        $this->assertDatabaseHas('dhl_shipments', [
+            'shipment_date' => now()->format('Y-m-d'),
+        ]);
+
+    }
+
+    public function test_store_content()
+    {
+        $this->assertEquals('Elektronika', self::getPayload()['content']);
+        $this->assertDatabaseHas('dhl_shipments', [
+            'content' => 'Elektronika',
+        ]);
+    }
+
+    public function test_store_costs_center()
+    {
         $cc = DHLCostCenter::where('name', 'TestCC')->first();
 
-        $this->assertEquals(DHLDomesticShipmentType::PREMIUM->value, $payload['service']['product']);
-        $this->assertEquals(500, $payload['service']['insuranceValue']);
-        $this->assertEquals(400, $payload['service']['collectOnDeliveryValue']);
-        $this->assertEquals(now()->format('Y-m-d'), $payload['shipmentDate']);
-        $this->assertEquals('INVOICE', $payload['service']['collectOnDeliveryReference']);
-        $this->assertEquals('Elektronika', $payload['content']);
-        $this->assertEquals('TestCC', $payload['payment']['costsCenter']);
-        $this->assertTrue($payload['service']['deliveryOnSaturday']);
-        $this->assertTrue($payload['service']['returnOnDelivery']);
-        $this->assertEquals('RETURN-INVOICE', $payload['service']['returnOnDeliveryReference']);
-        $this->assertTrue($payload['service']['pickupOnSaturday']);
-        $this->assertTrue($payload['service']['proofOfDelivery']);
-        $this->assertTrue($payload['service']['selfCollect']);
-        $this->assertTrue($payload['service']['predeliveryInformation']);
-        $this->assertTrue($payload['service']['preaviso']);
-        $this->assertTrue($payload['service']['deliveryEvening']);
-        $this->assertEquals('Call first', $payload['comment']);
-        $this->assertEquals('Order 11111', $payload['reference']);
-
+        $this->assertEquals('TestCC', self::getPayload()['payment']['costsCenter']);
         $this->assertDatabaseHas('dhl_shipments', [
-            'product' => DHLDomesticShipmentType::PREMIUM->value,
-            'insurance' => 500,
-            'collect_on_delivery' => 400,
-            'shipment_date' => now()->format('Y-m-d'),
-            'collect_on_delivery_reference' => 'INVOICE',
-            'content' => 'Elektronika',
             'cost_center_id' => $cc->id,
-            'delivery_evening' => true,
-            'delivery_on_saturday' => true,
-            'pickup_on_saturday' => true,
+        ]);
+    }
+
+    public function test_store_delivery_on_saturday()
+    {
+        $this->assertTrue(self::getPayload()['service']['deliveryOnSaturday']);
+        $this->assertDatabaseHas('dhl_shipments', ['delivery_on_saturday' => true]);
+    }
+
+    public function test_store_return_on_delivery()
+    {
+        $this->assertTrue(self::getPayload()['service']['returnOnDelivery']);
+        $this->assertEquals('RETURN-INVOICE', self::getPayload()['service']['returnOnDeliveryReference']);
+        $this->assertDatabaseHas('dhl_shipments', [
             'return_on_delivery' => true,
             'return_on_delivery_reference' => 'RETURN-INVOICE',
+        ]);
+    }
+
+    public function test_store_pickup_on_saturday()
+    {
+        $this->assertTrue(self::getPayload()['service']['pickupOnSaturday']);
+        $this->assertDatabaseHas('dhl_shipments', [
+            'pickup_on_saturday' => true,
+        ]);
+    }
+
+    public function test_store_proof_of_delivery()
+    {
+        $this->assertTrue(self::getPayload()['service']['proofOfDelivery']);
+        $this->assertDatabaseHas('dhl_shipments', [
             'proof_of_delivery' => true,
+        ]);
+    }
+
+    public function test_store_evening_delivery()
+    {
+        $this->assertTrue(self::getPayload()['service']['deliveryEvening']);
+        $this->assertDatabaseHas('dhl_shipments', [
+            'delivery_evening' => true,
+        ]);
+    }
+
+    public function test_store_self_collect()
+    {
+        $this->assertTrue(self::getPayload()['service']['selfCollect']);
+        $this->assertDatabaseHas('dhl_shipments', [
             'self_collect' => true,
+        ]);
+    }
+
+    public function test_store_predelivery_information()
+    {
+        $this->assertTrue(self::getPayload()['service']['predeliveryInformation']);
+        $this->assertDatabaseHas('dhl_shipments', [
             'predelivery_information' => true,
+        ]);
+    }
+
+    public function test_store_preaviso() {
+        $this->assertTrue(self::getPayload()['service']['preaviso']);
+        $this->assertDatabaseHas('dhl_shipments', [
             'preaviso' => true,
-            'payer_type' => 'SHIPPER',
+        ]);
+    }
+
+    public function test_store_comment()
+    {
+        $this->assertEquals('Call first', self::getPayload()['comment']);
+        $this->assertDatabaseHas('dhl_shipments', [
             'comment' => 'Call first',
+        ]);
+    }
+
+    public function test_store_shipment_reference()
+    {
+        $this->assertEquals('Order 11111', self::getPayload()['reference']);
+        $this->assertDatabaseHas('dhl_shipments', [
             'reference' => 'Order 11111',
+        ]);
+
+    }
+
+    public function test_store_shipment_payer()
+    {
+        $this->assertEquals('SHIPPER', self::getPayload()['payment']['payer_type']);
+        $this->assertDatabaseHas('dhl_shipments', [
+            'payer_type' => 'SHIPPER',
         ]);
 
     }
