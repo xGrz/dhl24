@@ -42,7 +42,8 @@ class DHLShipmentWizardTest extends TestCase
             ->setContent('Elektronika')
             ->setCostCenter($cc)
             ->setCollectOnDelivery(400, 'INVOICE')
-            ->setShipmentValue(500);
+            ->setShipmentValue(500)
+            ;
     }
 
     public function test_access_shipment_wizard_with_facade()
@@ -206,7 +207,9 @@ class DHLShipmentWizardTest extends TestCase
 
     public function test_set_higher_insurance_after_cod_should_not_overwrite_insurance_value()
     {
-        $w = DHL24::wizard()->setCollectOnDelivery(200)->setShipmentValue(400);
+        $w = DHL24::wizard()
+            ->setCollectOnDelivery(200)
+            ->setShipmentValue(400);
 
         $this->assertEquals(400, $w->getPayload()['service']['insuranceValue']);
         $this->assertEquals(200, $w->getPayload()['service']['collectOnDeliveryValue']);
@@ -488,7 +491,22 @@ class DHLShipmentWizardTest extends TestCase
             'collect_on_delivery_reference' => 'INVOICE',
             'content' => 'Elektronika',
             'cost_center_id' => $cc->id,
+
+            'delivery_evening' => null,
+            'delivery_on_saturday' => null,
+            'pickup_on_saturday' => null,
+            'return_on_delivery' => null,
+            'return_on_delivery_reference' => null,
+            'proof_of_delivery' => null,
+            'self_collect' => null,
+            'predelivery_information' => null,
+            'preaviso' => null,
+            'payer_type' => null,
+            'comment' => null,
+            'reference' => null,
         ]);
+
+        // delivery_evening, delivery_on_saturday, pickup_on_saturday, returu
     }
 
 
