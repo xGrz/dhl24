@@ -15,27 +15,24 @@ class DHLIntelligentCostSaver
 
     private function setInsurance(int|float|null $amount, bool $force = false): void
     {
-        $amount = self::getCod() > $amount
-            ? self::getCod()
-            : $amount;
-
-        if (DHLConfig::shouldUseIntelligentCostSaver() && !$force) {
-            $this->shipment->insurance = $amount > DHLConfig::getIntelligentCostSaverMaxValue()
-                ? $amount
-                : self::getCod();
-        } else {
-            $this->shipment->insurance = $amount;
+        $amount = self::getCod() > $amount ? self::getCod() : $amount;
+        if (DHLConfig::shouldUseIntelligentCostSaver()
+            && $amount < DHLConfig::getIntelligentCostSaverMaxValue()
+            && !self::getCod()) {
+            $amount = null;
         }
 
         if ($rounding = DHLConfig::getShipmentInsuranceValueRounding()) {
-            $this->shipment->insurance = ceil($amount / $rounding) * $rounding;
+            $amount = ceil($amount / $rounding) * $rounding;
         }
+
+        $this->shipment->insurance = $amount;
     }
 
     private function setCod(int|float|null $amount): void
     {
         $this->shipment->collect_on_delivery = $amount;
-        if (self::getInsurance() < $amount) self::setInsurance($amount, true);
+        self::setInsurance($amount, true);
 
     }
 
