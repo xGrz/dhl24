@@ -5,10 +5,9 @@ use xGrz\Dhl24\Enums\DHLLabelType;
 return [
     'shipment-insurance' => [
         'insurance_value_round_up' => 0,
-
         /*
          * This is for domestic shipment with value < 500PLN.
-         * By law regulations defaults all those shipments are insured by default without charging
+         * By law regulations all those shipments are insured by default without charging by DHL.
          * When intelligent cost saver is set to true insurance will be removed in that case.
          */
         'intelligent_cost_saver' => true,

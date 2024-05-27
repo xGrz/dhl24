@@ -10,6 +10,7 @@ use xGrz\Dhl24\Enums\DHLAddressType;
 use xGrz\Dhl24\Enums\DHLDomesticShipmentType;
 use xGrz\Dhl24\Enums\DHLShipmentItemType;
 use xGrz\Dhl24\Facades\DHLConfig;
+use xGrz\Dhl24\Helpers\DHLIntelligentCostSaver;
 use xGrz\Dhl24\Models\DHLCostCenter;
 use xGrz\Dhl24\Models\DHLItem;
 use xGrz\Dhl24\Models\DHLShipment;
@@ -164,21 +165,18 @@ class DHLShipmentWizard
 
     public function setCollectOnDelivery(int|float $amount, string $reference = null): static
     {
-        $this->shipment->collect_on_delivery = $amount;
-        if ($reference) $this->shipment->collect_on_delivery_reference = $reference;
-        if (!$this->shipment->insurance || $this->shipment->insurance < $amount) {
-            $this->shipment->insurance = $amount;
-        }
+        DHLIntelligentCostSaver::apply($this->shipment, cod: $amount);
+        $this->shipment->collect_on_delivery_reference = $reference;
+//        if ($reference) $this->shipment->collect_on_delivery_reference = $reference;
+//        if (!$this->shipment->insurance || $this->shipment->insurance < $amount) {
+//            $this->shipment->insurance = $amount;
+//        }
         return $this;
     }
 
     public function setShipmentValue(int|float $amount): static
     {
-        if ($this->shipment->collect_on_delivery && $this->shipment->collect_on_delivery > $amount) {
-            $this->shipment->insurance = $this->shipment->collect_on_delivery;
-        } else {
-            $this->shipment->insurance = $amount;
-        }
+        DHLIntelligentCostSaver::apply($this->shipment, $amount);
         return $this;
     }
 
@@ -252,6 +250,13 @@ class DHLShipmentWizard
         $shipmentNumber = (new CreateShipment())->create($this);
         $this->shipment->fill(['number' => $shipmentNumber])->save();
         return $shipmentNumber;
+    }
+
+    public function store(): DHLShipment
+    {
+        $this->shipment->save();
+        $this->shipment = DHLShipment::with(['items'])->find($this->shipment->id);
+        return $this->shipment;
     }
 
     public function getPayload(): array

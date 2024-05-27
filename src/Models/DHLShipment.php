@@ -61,7 +61,12 @@ class DHLShipment extends Model
 
     public static function getRelationsListForDetails(): array
     {
-        return ['items', 'courier_booking', 'cost_center', 'tracking'];
+        return [
+            'items',
+            'courier_booking',
+            'cost_center',
+            'tracking'
+        ];
     }
 
 
@@ -70,10 +75,10 @@ class DHLShipment extends Model
         return $this->belongsTo(DHLCostCenter::class);
     }
 
-    public function courier_booking(): BelongsTo
-    {
-        return $this->belongsTo(DHLCourierBooking::class);
-    }
+//    public function courier_booking(): BelongsTo
+//    {
+//        return $this->belongsTo(DHLCourierBooking::class);
+//    }
 
     public function items(): HasMany
     {

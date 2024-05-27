@@ -75,27 +75,18 @@ class DHLConfigService
         $labelTypeName = config('dhl24.labels.defaultType', DHLLabelType::LP->name);
         return DHLLabelType::findByName($labelTypeName);
     }
-
-
-
-
     public function getShipmentInsuranceValueRounding(): int
     {
         return config('dhl24.shipment-insurance.insurance_value_round_up', 0);
     }
-
     public function shouldUseIntelligentCostSaver(): bool
     {
         return config('dhl24.shipment-insurance.intelligent_cost_saver', false);
     }
-
     public function getIntelligentCostSaverMaxValue(): int
     {
         return config('dhl24.shipment-insurance.intelligent_cost_saver_max_value', 0);
     }
-
-
-
     private static function normalizeDirectoryPath(string $path): string
     {
         return str($path)
