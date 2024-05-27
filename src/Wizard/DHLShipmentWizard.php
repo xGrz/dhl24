@@ -167,10 +167,6 @@ class DHLShipmentWizard
     {
         DHLIntelligentCostSaver::apply($this->shipment, cod: $amount);
         $this->shipment->collect_on_delivery_reference = $reference;
-//        if ($reference) $this->shipment->collect_on_delivery_reference = $reference;
-//        if (!$this->shipment->insurance || $this->shipment->insurance < $amount) {
-//            $this->shipment->insurance = $amount;
-//        }
         return $this;
     }
 
