@@ -6,13 +6,12 @@ use xGrz\Dhl24\Enums\DHLAddressType;
 use xGrz\Dhl24\Enums\DHLDomesticShipmentType;
 use xGrz\Dhl24\Enums\DHLShipmentItemType;
 use xGrz\Dhl24\Facades\DHL24;
-use xGrz\Dhl24\Models\DHLCostCenter;
 use xGrz\Dhl24\Wizard\DHLShipmentWizard;
 
 class DHLShipmentWizardTest extends TestCase
 {
-
     use RefreshDatabase;
+
 
     private static function createTestWizard(): DHLShipmentWizard
     {
@@ -70,7 +69,7 @@ class DHLShipmentWizardTest extends TestCase
 
     public function test_set_shipper_data()
     {
-        $wizard = DHL24::wizard()
+        $w = DHL24::wizard()
             ->setShipperName('ACME Corp Ltd.')
             ->setShipperPostalCode('02-777')
             ->setShipperCity('Otwock')
@@ -79,316 +78,18 @@ class DHLShipmentWizardTest extends TestCase
             ->setShipperContactPerson('John Rambo')
             ->setShipperContactEmail('john.rambo@example.com')
             ->setShipperContactPhone('504094400');
-
-        $shipper = $wizard->getPayload()['shipper'];
-        $this->assertEquals('ACME Corp Ltd.', $shipper['name']);
-        $this->assertEquals('02777', $shipper['postalCode']);
-        $this->assertEquals('Otwock', $shipper['city']);
-        $this->assertEquals('Warszawska', $shipper['street']);
-        $this->assertEquals('102/20', $shipper['houseNumber']);
-        $this->assertEquals('John Rambo', $shipper['contactPerson']);
-        $this->assertEquals('john.rambo@example.com', $shipper['contactEmail']);
-        $this->assertEquals('504094400', $shipper['contactPhone']);
-    }
-
-    public function test_set_receiver_data()
-    {
-        $wizard = DHL24::wizard()
-            ->setReceiverName('ACME Corp Ltd.')
-            ->setReceiverPostalCode('02-777', 'DE')
-            ->setReceiverCity('Otwock')
-            ->setReceiverStreet('Warszawska')
-            ->setReceiverHouseNumber('102/20')
-            ->setReceiverContactPerson('John Rambo')
-            ->setReceiverContactEmail('john.rambo@example.com')
-            ->setReceiverContactPhone('504094400');
+        $payloadShipper = $w->getPayload()['shipper'];
+        $w->store();
 
 
-        $receiver = $wizard->getPayload()['receiver'];
-        $this->assertEquals('DE', $receiver['country']);
-        $this->assertEquals('ACME Corp Ltd.', $receiver['name']);
-        $this->assertEquals('02777', $receiver['postalCode']);
-        $this->assertEquals('Otwock', $receiver['city']);
-        $this->assertEquals('Warszawska', $receiver['street']);
-        $this->assertEquals('102/20', $receiver['houseNumber']);
-        $this->assertEquals('John Rambo', $receiver['contactPerson']);
-        $this->assertEquals('john.rambo@example.com', $receiver['contactEmail']);
-        $this->assertEquals('504094400', $receiver['contactPhone']);
-        $this->assertEquals(DHLAddressType::CONSUMER->value, $receiver['addressType']);
-
-        $wizard->setReceiverType(DHLAddressType::BUSINESS);
-        $this->assertEquals(DHLAddressType::BUSINESS->value, $wizard->getPayload()['receiver']['addressType']);
-    }
-
-    public function test_add_items()
-    {
-        $wizard = DHL24::wizard()
-            ->addItem(DHLShipmentItemType::ENVELOPE, 1)
-            ->addItem(DHLShipmentItemType::PACKAGE, 1, 20, 20, 15, 10, false)
-            ->addItem(DHLShipmentItemType::PALLET, 3, 120, 80, 60, 30, true);
-
-        $items = $wizard->getPayload()['pieceList'];
-        $this->assertCount(3, $items);
-
-        $this->assertCount(2, $items[0]);
-        $this->assertCount(6, $items[1]);
-        $this->assertCount(7, $items[2]);
-
-        $this->assertEquals(DHLShipmentItemType::PALLET->value, $items[2]['type']);
-        $this->assertEquals(3, $items[2]['quantity']);
-        $this->assertEquals(120, $items[2]['weight']);
-        $this->assertEquals(80, $items[2]['width']);
-        $this->assertEquals(60, $items[2]['height']);
-        $this->assertEquals(30, $items[2]['length']);
-        $this->assertTrue($items[2]['non_standard']);
-
-    }
-
-    public function test_shipment_services_product()
-    {
-        $w = DHL24::wizard()->setShipmentType(DHLDomesticShipmentType::PREMIUM);
-        $this->assertEquals('PR', $w->getPayload()['service']['product']);
-        $this->assertArrayNotHasKey('deliveryEvening', $w->getPayload()['service']);
-
-        $w = DHL24::wizard()->setShipmentType(DHLDomesticShipmentType::DOMESTIC09);
-        $this->assertEquals('09', $w->getPayload()['service']['product']);
-        $this->assertArrayNotHasKey('deliveryEvening', $w->getPayload()['service']);
-
-        $w = DHL24::wizard()->setShipmentType(DHLDomesticShipmentType::DOMESTIC12);
-        $this->assertEquals('12', $w->getPayload()['service']['product']);
-        $this->assertArrayNotHasKey('deliveryEvening', $w->getPayload()['service']);
-
-        $w = DHL24::wizard()->setShipmentType(DHLDomesticShipmentType::DOMESTIC);
-        $this->assertEquals('AH', $w->getPayload()['service']['product']);
-        $this->assertArrayNotHasKey('deliveryEvening', $w->getPayload()['service']);
-    }
-
-    public function test_shipment_services_delivery_evening()
-    {
-        $w = DHL24::wizard()->setShipmentType(DHLDomesticShipmentType::EVENING_DELIVERY);
-        $this->assertEquals('DW', $w->getPayload()['service']['product']);
-        $this->assertTrue($w->getPayload()['service']['deliveryEvening']);
-    }
-
-    public function test_shipment_services_delivery_on_saturday()
-    {
-        $w = DHL24::wizard()->setSaturdayDelivery();
-        $this->assertTrue($w->getPayload()['service']['deliveryOnSaturday']);
-    }
-
-    public function test_shipment_services_pickup_on_saturday()
-    {
-        $w = DHL24::wizard()->setSaturdayPickup();
-        $this->assertTrue($w->getPayload()['service']['pickupOnSaturday']);
-    }
-
-    public function test_set_insurance_is_added_to_payload()
-    {
-        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
-        Config::set('dhl24.shipment-insurance.insurance_value_round_up', 0);
-        $w = DHL24::wizard()->setShipmentValue(200.99);
-
-        $this->assertTrue($w->getPayload()['service']['insurance']);
-        $this->assertEquals(200.99, $w->getPayload()['service']['insuranceValue']);
-    }
-
-    public function test_set_insurance_with_cost_saver_enabled_with_value_below_limit()
-    {
-        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', true);
-        Config::set('dhl24.shipment-insurance.intelligent_cost_saver_max_value', 500);
-        $w = DHL24::wizard()->setShipmentValue(200.99);
-
-        $this->assertArrayNotHasKey('insurance', $w->getPayload()['service'], 'Insurance shouldn`t be set.');
-        $this->assertArrayNotHasKey('insuranceValue', $w->getPayload()['service']);
-    }
-
-    public function test_set_insurance_with_cost_saver_enabled_with_value_higher_then_limit()
-    {
-        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', true);
-        Config::set('dhl24.shipment-insurance.intelligent_cost_saver_max_value', 500);
-        $w = DHL24::wizard()->setShipmentValue(500.99);
-
-        $this->assertTrue($w->getPayload()['service']['insurance']);
-        $this->assertEquals(500.99, $w->getPayload()['service']['insuranceValue']);
-    }
-
-    public function test_set_insurance_with_enabled_rounding()
-    {
-        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
-        Config::set('dhl24.shipment-insurance.insurance_value_round_up', 50);
-        $w = DHL24::wizard()->setShipmentValue(500.99);
-
-        $this->assertTrue($w->getPayload()['service']['insurance']);
-        $this->assertEquals(550, $w->getPayload()['service']['insuranceValue']);
-    }
-
-    public function test_set_higher_insurance_after_cod_should_not_overwrite_insurance_value()
-    {
-        $w = DHL24::wizard()
-            ->setCollectOnDelivery(200)
-            ->setShipmentValue(400);
-
-        $this->assertEquals(400, $w->getPayload()['service']['insuranceValue']);
-        $this->assertEquals(200, $w->getPayload()['service']['collectOnDeliveryValue']);
-    }
-
-    public function test_cod_with_reference_and_insurance_is_added_to_payload()
-    {
-        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
-        Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
-        $w = DHL24::wizard()->setCollectOnDelivery(200.01, 'INV/188/2024');
-
-        $this->assertTrue($w->getPayload()['service']['collectOnDelivery']);
-        $this->assertTrue($w->getPayload()['service']['insurance']);
-        $this->assertEquals(200.01, $w->getPayload()['service']['collectOnDeliveryValue']);
-        $this->assertEquals(200.01, $w->getPayload()['service']['insuranceValue']);
-        $this->assertEquals('INV/188/2024', $w->getPayload()['service']['collectOnDeliveryReference']);
-    }
-
-    public function test_cod_with_reference_and_insurance_is_added_to_payload_with_insurance_rounding()
-    {
-        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
-        Config::set('dhl24.shipment-insurance.insurance_value_round_up', 50);
-        $w = DHL24::wizard()->setCollectOnDelivery(230.01, 'INV/188/2024');
-
-        $this->assertTrue($w->getPayload()['service']['collectOnDelivery']);
-        $this->assertTrue($w->getPayload()['service']['insurance']);
-        $this->assertEquals(230.01, $w->getPayload()['service']['collectOnDeliveryValue']);
-        $this->assertEquals(250, $w->getPayload()['service']['insuranceValue']);
-        $this->assertEquals('INV/188/2024', $w->getPayload()['service']['collectOnDeliveryReference']);
-    }
-
-    public function test_cod_with_reference_and_insurance_is_added_to_payload_with_insurance_rounding_and_cost_saver_enabled()
-    {
-        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', true);
-        Config::set('dhl24.shipment-insurance.insurance_value_round_up', 100);
-        $w = DHL24::wizard()->setCollectOnDelivery(230.01, 'INV/1881/2024');
-
-        $this->assertTrue($w->getPayload()['service']['collectOnDelivery']);
-        $this->assertTrue($w->getPayload()['service']['insurance']);
-        $this->assertEquals(230.01, $w->getPayload()['service']['collectOnDeliveryValue']);
-        $this->assertEquals(300, $w->getPayload()['service']['insuranceValue']);
-        $this->assertEquals('INV/1881/2024', $w->getPayload()['service']['collectOnDeliveryReference']);
-    }
-
-    public function test_cod_with_higher_value_then_insurance_bumps_insurance_value()
-    {
-        $w = DHL24::wizard()
-            ->setCollectOnDelivery(300)
-            ->setShipmentValue(200);
-
-        $this->assertEquals(300, $w->getPayload()['service']['collectOnDeliveryValue']);
-        $this->assertEquals(300, $w->getPayload()['service']['insuranceValue']);
-
-        $w = DHL24::wizard()
-            ->setShipmentValue(200)
-            ->setCollectOnDelivery(300);
-
-        $this->assertEquals(300, $w->getPayload()['service']['collectOnDeliveryValue']);
-        $this->assertEquals(300, $w->getPayload()['service']['insuranceValue']);
-    }
-
-    public function test_cod_adds_insurance_when_cost_saver_enabled_and_below_minimum_value()
-    {
-        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', true);
-        Config::set('dhl24.shipment-insurance.intelligent_cost_saver_max_value', 1000);
-        $w = DHL24::wizard()->setCollectOnDelivery(400);
-
-        $this->assertTrue($w->getPayload()['service']['collectOnDelivery']);
-        $this->assertTrue($w->getPayload()['service']['insurance']);
-        $this->assertEquals(400, $w->getPayload()['service']['collectOnDeliveryValue']);
-        $this->assertEquals(400, $w->getPayload()['service']['insuranceValue']);
-    }
-
-    public function test_shipment_services_return_on_delivery()
-    {
-        $w = DHL24::wizard()->setReturnOnDelivery('INV/199/2024');
-
-        $this->assertTrue($w->getPayload()['service']['returnOnDelivery']);
-        $this->assertEquals('INV/199/2024', $w->getPayload()['service']['returnOnDeliveryReference']);
-    }
-
-    public function test_shipment_services_proof_of_delivery()
-    {
-        $w = DHL24::wizard()->setProofOfDelivery();
-        $this->assertTrue($w->getPayload()['service']['proofOfDelivery']);
-    }
-
-    public function test_shipment_services_self_collect()
-    {
-        $w = DHL24::wizard()->setSelfCollect();
-        $this->assertTrue($w->getPayload()['service']['selfCollect']);
-    }
-
-    public function test_shipment_services_predelivery_information()
-    {
-        $w = DHL24::wizard()->setPredeliveryInformation();
-        $this->assertTrue($w->getPayload()['service']['predeliveryInformation']);
-    }
-
-    public function test_shipment_services_preaviso()
-    {
-        $w = DHL24::wizard()->setPreaviso();
-        $this->assertTrue($w->getPayload()['service']['preaviso']);
-    }
-
-    public function test_shipment_services_payment()
-    {
-        Config::set('dhl24.auth.sap', 123123123);
-        $payment = DHL24::wizard()->getPayload()['payment'];
-
-        $this->assertEquals('BANK_TRANSFER', $payment['paymentMethod']);
-        $this->assertEquals('SHIPPER', $payment['payerType']);
-        $this->assertEquals('123123123', $payment['accountNumber']);
-    }
-
-    public function test_cost_center_exists_in_payment_structure()
-    {
-        $cc = DHL24::addCostCenter('TestCostCenter');
-        $wizard = DHL24::wizard()->setCostCenter($cc);
-
-        $this->assertEquals($cc->name, $wizard->getPayload()['payment']['costsCenter']);
-    }
-
-    public function test_shipment_content()
-    {
-        $wizard = DHL24::wizard();
-        $wizard->setContent('Sex, drugs and r&r');
-
-        $this->assertEquals('Sex, drugs and r&r', $wizard->getPayload()['content']);
-    }
-
-    public function test_shipment_comment()
-    {
-        $wizard = DHL24::wizard();
-        $this->assertArrayNotHasKey('comment', $wizard->getPayload());
-
-        $wizard->setComment('Call customer before delivery');
-        $this->assertEquals('Call customer before delivery', $wizard->getPayload()['comment']);
-    }
-
-    public function test_shipment_date()
-    {
-        $wizard = DHL24::wizard();
-
-        $this->assertEquals(now()->format('Y-m-d'), $wizard->getPayload()['shipmentDate']);
-    }
-
-    public function test_store_shipment_shipper_data_in_database()
-    {
-        $wizard = self::createTestWizard();
-        $payload = $wizard->getPayload();
-        $wizard->store();
-
-        // SHIPPER
-        $this->assertEquals('ACME Corp Ltd.', $payload['shipper']['name']);
-        $this->assertEquals('02777', $payload['shipper']['postalCode']);
-        $this->assertEquals('Otwock', $payload['shipper']['city']);
-        $this->assertEquals('Warszawska', $payload['shipper']['street']);
-        $this->assertEquals('102/20', $payload['shipper']['houseNumber']);
-        $this->assertEquals('John Rambo', $payload['shipper']['contactPerson']);
-        $this->assertEquals('john.rambo@example.com', $payload['shipper']['contactEmail']);
-        $this->assertEquals('504094400', $payload['shipper']['contactPhone']);
+        $this->assertEquals('ACME Corp Ltd.', $payloadShipper['name']);
+        $this->assertEquals('02777', $payloadShipper['postalCode']);
+        $this->assertEquals('Otwock', $payloadShipper['city']);
+        $this->assertEquals('Warszawska', $payloadShipper['street']);
+        $this->assertEquals('102/20', $payloadShipper['houseNumber']);
+        $this->assertEquals('John Rambo', $payloadShipper['contactPerson']);
+        $this->assertEquals('john.rambo@example.com', $payloadShipper['contactEmail']);
+        $this->assertEquals('504094400', $payloadShipper['contactPhone']);
 
         $this->assertDatabaseHas('dhl_shipments', [
             'shipper_name' => 'ACME Corp Ltd.',
@@ -399,27 +100,34 @@ class DHLShipmentWizardTest extends TestCase
             'shipper_contact_person' => 'John Rambo',
             'shipper_contact_email' => 'john.rambo@example.com',
             'shipper_contact_phone' => '504094400',
-
         ]);
     }
 
-    public function test_store_receiver_data_in_database()
+    public function test_set_receiver_data()
     {
-        $wizard = self::createTestWizard();
-        $payload = $wizard->getPayload();
-        $shipment = $wizard->store();
+        $w = DHL24::wizard()
+            ->setReceiverName('Microsoft Corp Ltd.')
+            ->setReceiverPostalCode('03888', 'DE')
+            ->setReceiverCity('Lomza')
+            ->setReceiverStreet('Gdańska')
+            ->setReceiverHouseNumber('101/1')
+            ->setReceiverContactPerson('Johnny Travolta')
+            ->setReceiverContactEmail('j.t@example.com')
+            ->setReceiverContactPhone('677987787');
 
-        // RECEIVER
-        $this->assertEquals('C', $payload['receiver']['addressType']);
-        $this->assertEquals('DE', $payload['receiver']['country']);
-        $this->assertEquals('Microsoft Corp Ltd.', $payload['receiver']['name']);
-        $this->assertEquals('03888', $payload['receiver']['postalCode']);
-        $this->assertEquals('Lomza', $payload['receiver']['city']);
-        $this->assertEquals('Gdańska', $payload['receiver']['street']);
-        $this->assertEquals('101/1', $payload['receiver']['houseNumber']);
-        $this->assertEquals('Johnny Travolta', $payload['receiver']['contactPerson']);
-        $this->assertEquals('j.t@example.com', $payload['receiver']['contactEmail']);
-        $this->assertEquals('677987787', $payload['receiver']['contactPhone']);
+        $payloadReceiver = $w->getPayload()['receiver'];
+        $w->store();
+
+        $this->assertEquals('DE', $payloadReceiver['country']);
+        $this->assertEquals('Microsoft Corp Ltd.', $payloadReceiver['name']);
+        $this->assertEquals('03888', $payloadReceiver['postalCode']);
+        $this->assertEquals('Lomza', $payloadReceiver['city']);
+        $this->assertEquals('Gdańska', $payloadReceiver['street']);
+        $this->assertEquals('101/1', $payloadReceiver['houseNumber']);
+        $this->assertEquals('Johnny Travolta', $payloadReceiver['contactPerson']);
+        $this->assertEquals('j.t@example.com', $payloadReceiver['contactEmail']);
+        $this->assertEquals('677987787', $payloadReceiver['contactPhone']);
+        $this->assertEquals(DHLAddressType::CONSUMER->value, $payloadReceiver['addressType']);
 
         $this->assertDatabaseHas('dhl_shipments', [
             'receiver_type' => DHLAddressType::CONSUMER,
@@ -433,14 +141,36 @@ class DHLShipmentWizardTest extends TestCase
             'receiver_contact_email' => 'j.t@example.com',
             'receiver_contact_phone' => '677987787',
         ]);
-        $shipment->delete();
+
+        $w->setReceiverType(DHLAddressType::BUSINESS);
+        $w->store();
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'receiver_type' => DHLAddressType::BUSINESS,
+            'receiver_country' => 'DE',
+            'receiver_name' => 'Microsoft Corp Ltd.',
+            'receiver_postal_code' => '03888',
+            'receiver_city' => 'Lomza',
+            'receiver_street' => 'Gdańska',
+            'receiver_house_number' => '101/1',
+            'receiver_contact_person' => 'Johnny Travolta',
+            'receiver_contact_email' => 'j.t@example.com',
+            'receiver_contact_phone' => '677987787',
+        ]);
+
+
+//        $w->setReceiverType(DHLAddressType::BUSINESS);
+//        $this->assertEquals(DHLAddressType::BUSINESS->value, $w->getPayload()['receiver']['addressType']);
     }
 
-    public function test_store_items_data_in_database()
+    public function test_add_items_to_shipment()
     {
-        $wizard = self::createTestWizard();
-        $payload = $wizard->getPayload();
-        $wizard->store();
+        $w = DHL24::wizard()
+            ->addItem(DHLShipmentItemType::ENVELOPE, 1)
+            ->addItem(DHLShipmentItemType::PACKAGE, 2, 20, 25, 15, 10, false)
+            ->addItem(DHLShipmentItemType::PALLET, 3, 120, 80, 60, 30, true);
+        $payload = $w->getPayload();
+        $w->store();
 
         $this->assertCount(3, $payload['pieceList']);
         $this->assertEquals(DHLShipmentItemType::ENVELOPE->value, $payload['pieceList'][0]['type']);
@@ -485,189 +215,658 @@ class DHLShipmentWizardTest extends TestCase
         ]);
     }
 
-    public function test_set_shipment_reference()
-    {
-        $w = DHL24::wizard()->setReference('Order 200/2024');
-        $this->assertEquals('Order 200/2024', $w->getPayload()['reference']);
-    }
-
-    public function test_fill_shipment_reference_from_cod_reference()
-    {
-        $w = DHL24::wizard()->setCollectOnDelivery(100, 'Order 200/2024');
-        $this->assertEquals('Order 200/2024', $w->getPayload()['service']['collectOnDeliveryReference']);
-        $this->assertEquals('Order 200/2024', $w->getPayload()['reference']);
-    }
-
-    public function test_fill_cod_reference_from_shipment_reference()
+    public function test_service_product_type_domestic_()
     {
         $w = DHL24::wizard()
-            ->setReference('Order 200/2024')
-            ->setCollectOnDelivery(100);
+            ->setShipmentType(DHLDomesticShipmentType::DOMESTIC);
+        $service = $w->getPayload()['service'];
+        $w->store();
 
-        $this->assertEquals('Order 200/2024', $w->getPayload()['service']['collectOnDeliveryReference']);
-        $this->assertEquals('Order 200/2024', $w->getPayload()['reference']);
-    }
+        $this->assertEquals('AH', $service['product']);
+        $this->assertArrayNotHasKey('deliveryEvening', $service);
+        $this->assertArrayNotHasKey('deliveryOnSaturday', $service);
+        $this->assertArrayNotHasKey('pickupOnSaturday', $service);
 
-    public function test_cannot_overwrite_shipment_reference_from_cod_reference()
-    {
-        $w = DHL24::wizard()
-            ->setCollectOnDelivery(100, 'Order 200/2024')
-            ->setReference('INVOICE');
-
-        $this->assertEquals('Order 200/2024', $w->getPayload()['service']['collectOnDeliveryReference']);
-        $this->assertEquals('INVOICE', $w->getPayload()['reference']);
-    }
-
-    public function test_cannot_overwrite_cod_reference_from_shipment_reference()
-    {
-        $w = DHL24::wizard()
-            ->setReference('INVOICE')
-            ->setCollectOnDelivery(100, 'Order 200/2024');
-
-        $this->assertEquals('Order 200/2024', $w->getPayload()['service']['collectOnDeliveryReference']);
-        $this->assertEquals('INVOICE', $w->getPayload()['reference']);
-    }
-
-
-    public function test_store_service_shipment_product()
-    {
-        $this->assertEquals(DHLDomesticShipmentType::PREMIUM->value, self::getPayload()['service']['product']);
         $this->assertDatabaseHas('dhl_shipments', [
-            'product' => DHLDomesticShipmentType::PREMIUM->value
+            'product' => 'AH',
+            'delivery_evening' => false,
+            'delivery_on_saturday' => false,
+            'pickup_on_saturday' => false,
+        ]);
+    }
+
+    public function test_service_product_type_domestic_09()
+    {
+        $w = DHL24::wizard()
+            ->setShipmentType(DHLDomesticShipmentType::DOMESTIC09);
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertEquals('09', $service['product']);
+        $this->assertArrayNotHasKey('deliveryEvening', $service);
+        $this->assertArrayNotHasKey('deliveryOnSaturday', $service);
+        $this->assertArrayNotHasKey('pickupOnSaturday', $service);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'product' => '09',
+            'delivery_evening' => false,
+            'delivery_on_saturday' => false,
+            'pickup_on_saturday' => false,
+        ]);
+    }
+
+    public function test_service_product_type_domestic_12()
+    {
+        $w = DHL24::wizard()
+            ->setShipmentType(DHLDomesticShipmentType::DOMESTIC12);
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertEquals('12', $service['product']);
+        $this->assertArrayNotHasKey('deliveryEvening', $service);
+        $this->assertArrayNotHasKey('deliveryOnSaturday', $service);
+        $this->assertArrayNotHasKey('pickupOnSaturday', $service);
+
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'product' => '12',
+            'delivery_evening' => false,
+            'delivery_on_saturday' => false,
+            'pickup_on_saturday' => false,
+        ]);
+    }
+
+    public function test_service_product_type_premium()
+    {
+        $w = DHL24::wizard()
+            ->setShipmentType(DHLDomesticShipmentType::PREMIUM);
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertEquals('PR', $service['product']);
+        $this->assertArrayNotHasKey('deliveryEvening', $service);
+        $this->assertArrayNotHasKey('deliveryOnSaturday', $service);
+        $this->assertArrayNotHasKey('pickupOnSaturday', $service);
+
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'product' => 'PR',
+            'delivery_evening' => false,
+            'delivery_on_saturday' => false,
+            'pickup_on_saturday' => false,
+        ]);
+    }
+
+    public function test_service_product_type_delivery_evening()
+    {
+        $w = DHL24::wizard()
+            ->setShipmentType(DHLDomesticShipmentType::EVENING_DELIVERY);
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertEquals('DW', $service['product']);
+        $this->assertTrue($service['deliveryEvening']);
+        $this->assertArrayNotHasKey('deliveryOnSaturday', $service);
+        $this->assertArrayNotHasKey('pickupOnSaturday', $service);
+
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'product' => 'DW',
+            'delivery_evening' => true,
+            'delivery_on_saturday' => false,
+            'pickup_on_saturday' => false,
+        ]);
+    }
+
+    public function test_service_delivery_on_saturday()
+    {
+        $w = DHL24::wizard()
+            ->setSaturdayDelivery();
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertTrue($service['deliveryOnSaturday']);
+        $this->assertArrayNotHasKey('pickupOnSaturday', $service);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'delivery_on_saturday' => true,
+            'pickup_on_saturday' => false,
+            'delivery_evening' => false,
         ]);
 
     }
 
-    public function test_store_service_insurance()
+    public function test_service_pickup_on_saturday()
     {
-        $this->assertEquals(500, self::getPayload()['service']['insuranceValue']);
+        $w = DHL24::wizard()
+            ->setSaturdayPickup();
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertTrue($service['pickupOnSaturday']);
+        $this->assertArrayNotHasKey('deliveryEvening', $service);
+        $this->assertArrayNotHasKey('deliveryOnSaturday', $service);
+
         $this->assertDatabaseHas('dhl_shipments', [
+            'pickup_on_saturday' => true,
+            'delivery_evening' => false,
+            'delivery_on_saturday' => false,
+
+        ]);
+    }
+
+    public function test_service_collect_on_delivery_with_reference()
+    {
+        $w = DHL24::wizard()
+            ->setCollectOnDelivery(250, 'INV 5/2024');
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertTrue($service['collectOnDelivery']);
+        $this->assertEquals(250, $service['collectOnDeliveryValue']);
+        $this->assertEquals('BANK_TRANSFER', $service['collectOnDeliveryForm']);
+        $this->assertEquals('INV 5/2024', $service['collectOnDeliveryReference']);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'collect_on_delivery' => 250,
+            'collect_on_delivery_reference' => 'INV 5/2024',
+            'insurance' => 250,
+        ]);
+    }
+
+    public function test_service_pure_insurance_without_helpers()
+    {
+        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
+        Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
+        $w = DHL24::wizard()
+            ->setShipmentValue(290);
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertEquals(290, $service['insurance']);
+        $this->assertArrayNotHasKey('collect_on_delivery', $service);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'insurance' => 290,
+        ]);
+    }
+
+    public function test_service_insurance_with_rounding()
+    {
+        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
+        Config::set('dhl24.shipment-insurance.insurance_value_round_up', 50);
+        $w = DHL24::wizard()
+            ->setShipmentValue(290);
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertEquals(300, $service['insurance']);
+        $this->assertArrayNotHasKey('collect_on_delivery', $service);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'insurance' => 300,
+        ]);
+    }
+
+    public function test_service_insurance_with_cost_saver_below_max_value()
+    {
+        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', true);
+        Config::set('dhl24.shipment-insurance.intelligent_cost_saver_max_value', 298);
+        Config::set('dhl24.shipment-insurance.insurance_value_round_up', 100);
+        $w = DHL24::wizard()
+            ->setShipmentValue(290);
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertArrayNotHasKey('insurance', $service);
+        $this->assertArrayNotHasKey('collect_on_delivery', $service);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'insurance' => null,
+        ]);
+    }
+
+    public function test_service_insurance_with_cost_saver_over_max_value()
+    {
+        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', true);
+        Config::set('dhl24.shipment-insurance.intelligent_cost_saver_max_value', 288);
+        Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
+        $w = DHL24::wizard()
+            ->setShipmentValue(290);
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertTrue($service['insurance']);
+        $this->assertEquals(290, $service['insuranceValue']);
+        $this->assertArrayNotHasKey('collect_on_delivery', $service);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'insurance' => 290,
+        ]);
+    }
+
+    public function test_service_insurance_with_value_rounding()
+    {
+        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
+        Config::set('dhl24.shipment-insurance.insurance_value_round_up', 200);
+        $w = DHL24::wizard()
+            ->setShipmentValue(290);
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertTrue($service['insurance']);
+        $this->assertEquals(400, $service['insuranceValue']);
+        $this->assertArrayNotHasKey('collect_on_delivery', $service);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'insurance' => 400,
+        ]);
+    }
+
+
+    public function test_collect_on_delivery_automatically_sets_insurance()
+    {
+        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
+        Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
+
+        $w = DHL24::wizard()
+            ->setCollectOnDelivery(300);
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertTrue($service['insurance']);
+        $this->assertEquals(300, $service['insuranceValue']);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'insurance' => 300,
+        ]);
+    }
+
+    public function test_collect_on_delivery_automatically_set_insurance_cannot_be_overwritten_by_lower_insurance()
+    {
+        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
+        Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
+
+        $w = DHL24::wizard()
+            ->setCollectOnDelivery(300)
+            ->setShipmentValue(100);
+
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertTrue($service['insurance']);
+        $this->assertEquals(300, $service['insuranceValue']);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'insurance' => 300,
+        ]);
+    }
+
+    public function test_collect_on_delivery_automatically_set_insurance_can_be_overwritten_by_higher_insurance()
+    {
+        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
+        Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
+
+        $w = DHL24::wizard()
+            ->setCollectOnDelivery(300)
+            ->setShipmentValue(500);
+
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertTrue($service['insurance']);
+        $this->assertEquals(500, $service['insuranceValue']);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'collect_on_delivery' => 300,
             'insurance' => 500,
         ]);
     }
 
-    public function test_store_service_cod()
+    public function test_collect_on_delivery_should_not_overwrite_higher_insurance_value()
     {
-        $this->assertEquals(400, self::getPayload()['service']['collectOnDeliveryValue']);
-        $this->assertEquals('INVOICE', self::getPayload()['service']['collectOnDeliveryReference']);
+        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
+        Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
+
+        $w = DHL24::wizard()
+            ->setShipmentValue(500)
+            ->setCollectOnDelivery(300);
+
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertTrue($service['insurance']);
+        $this->assertEquals(500, $service['insuranceValue']);
+
         $this->assertDatabaseHas('dhl_shipments', [
+            'collect_on_delivery' => 300,
+            'insurance' => 500,
+        ]);
+    }
+
+    public function test_collect_on_delivery_higher_then_insurance_should_overwrite_insurance()
+    {
+        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
+        Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
+
+        $w = DHL24::wizard()
+            ->setShipmentValue(300)
+            ->setCollectOnDelivery(500);
+
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertTrue($service['insurance']);
+        $this->assertEquals(500, $service['insuranceValue']);
+        $this->assertEquals(500, $service['collectOnDeliveryValue']);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'collect_on_delivery' => 500,
+            'insurance' => 500,
+        ]);
+    }
+
+
+    public function test_collect_on_delivery_set_insurance_when_cost_saver_is_applied()
+    {
+        Config::set('dhl24.shipment-insurance.intelligent_cost_saver', true);
+        Config::set('dhl24.shipment-insurance.intelligent_cost_saver_max_value', 500);
+        Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
+
+        $w = DHL24::wizard()
+            ->setCollectOnDelivery(400);
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertEquals(400, $service['insurance']);
+        $this->assertEquals(400, $service['collectOnDelivery']);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'insurance' => 400,
             'collect_on_delivery' => 400,
-            'collect_on_delivery_reference' => 'INVOICE',
         ]);
     }
 
-    public function test_store_shipment_date()
+    public function test_service_return_on_delivery()
     {
-        $this->assertEquals(now()->format('Y-m-d'), self::getPayload()['shipmentDate']);
-        $this->assertDatabaseHas('dhl_shipments', [
-            'shipment_date' => now()->format('Y-m-d'),
-        ]);
+        $w = DHL24::wizard()
+            ->setReturnOnDelivery('INV/199/2024');
+        $service = $w->getPayload()['service'];
+        $w->store();
 
-    }
+        $this->assertTrue($service['returnOnDelivery']);
+        $this->assertEquals('INV/199/2024', $service['returnOnDeliveryReference']);
 
-    public function test_store_content()
-    {
-        $this->assertEquals('Elektronika', self::getPayload()['content']);
-        $this->assertDatabaseHas('dhl_shipments', [
-            'content' => 'Elektronika',
-        ]);
-    }
-
-    public function test_store_costs_center()
-    {
-        $cc = DHLCostCenter::where('name', 'TestCC')->first();
-
-        $this->assertEquals('TestCC', self::getPayload()['payment']['costsCenter']);
-        $this->assertDatabaseHas('dhl_shipments', [
-            'cost_center_id' => $cc->id,
-        ]);
-    }
-
-    public function test_store_delivery_on_saturday()
-    {
-        $this->assertTrue(self::getPayload()['service']['deliveryOnSaturday']);
-        $this->assertDatabaseHas('dhl_shipments', ['delivery_on_saturday' => true]);
-    }
-
-    public function test_store_return_on_delivery()
-    {
-        $this->assertTrue(self::getPayload()['service']['returnOnDelivery']);
-        $this->assertEquals('RETURN-INVOICE', self::getPayload()['service']['returnOnDeliveryReference']);
         $this->assertDatabaseHas('dhl_shipments', [
             'return_on_delivery' => true,
-            'return_on_delivery_reference' => 'RETURN-INVOICE',
+            'return_on_delivery_reference' => 'INV/199/2024',
         ]);
     }
 
-    public function test_store_pickup_on_saturday()
+    public function test_service_proof_of_delivery()
     {
-        $this->assertTrue(self::getPayload()['service']['pickupOnSaturday']);
-        $this->assertDatabaseHas('dhl_shipments', [
-            'pickup_on_saturday' => true,
-        ]);
-    }
+        $w = DHL24::wizard()
+            ->setProofOfDelivery();
+        $service = $w->getPayload()['service'];
+        $w->store();
 
-    public function test_store_proof_of_delivery()
-    {
-        $this->assertTrue(self::getPayload()['service']['proofOfDelivery']);
+        $this->assertTrue($service['proofOfDelivery']);
+
         $this->assertDatabaseHas('dhl_shipments', [
             'proof_of_delivery' => true,
         ]);
     }
 
-    public function test_store_evening_delivery()
+    public function test_service_self_collect()
     {
-        $this->assertTrue(self::getPayload()['service']['deliveryEvening']);
-        $this->assertDatabaseHas('dhl_shipments', [
-            'delivery_evening' => true,
-        ]);
-    }
+        $w = DHL24::wizard()
+            ->setSelfCollect();
+        $service = $w->getPayload()['service'];
+        $w->store();
 
-    public function test_store_self_collect()
-    {
-        $this->assertTrue(self::getPayload()['service']['selfCollect']);
+        $this->assertTrue($service['selfCollect']);
+
         $this->assertDatabaseHas('dhl_shipments', [
             'self_collect' => true,
         ]);
     }
 
-    public function test_store_predelivery_information()
+    public function test_service_predelivery_information()
     {
-        $this->assertTrue(self::getPayload()['service']['predeliveryInformation']);
+        $w = DHL24::wizard()
+            ->setPredeliveryInformation();
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertTrue($service['predeliveryInformation']);
+
         $this->assertDatabaseHas('dhl_shipments', [
             'predelivery_information' => true,
         ]);
     }
 
-    public function test_store_preaviso() {
-        $this->assertTrue(self::getPayload()['service']['preaviso']);
+    public function test_service_preaviso()
+    {
+        $w = DHL24::wizard()
+            ->setPreaviso();
+        $service = $w->getPayload()['service'];
+        $w->store();
+
+        $this->assertTrue($service['preaviso']);
+
         $this->assertDatabaseHas('dhl_shipments', [
             'preaviso' => true,
         ]);
     }
 
-    public function test_store_comment()
+
+    public function test_payment_data_is_automatically_filled_by_wizard_with_shipper_payer_type()
     {
-        $this->assertEquals('Call first', self::getPayload()['comment']);
+        Config::set('dhl24.auth.sap', 123123123);
+        $w = DHL24::wizard();
+        $payment = $w->getPayload()['payment'];
+        $w->store();
+
+        $this->assertEquals('BANK_TRANSFER', $payment['paymentMethod']);
+        $this->assertEquals('SHIPPER', $payment['payerType']);
+        $this->assertEquals('123123123', $payment['accountNumber']);
+
         $this->assertDatabaseHas('dhl_shipments', [
-            'comment' => 'Call first',
+            'payer_type' => 'SHIPPER'
         ]);
     }
 
-    public function test_store_shipment_reference()
+    public function test_assigning_cost_center()
     {
-        $this->assertEquals('Order 11111', self::getPayload()['reference']);
-        $this->assertDatabaseHas('dhl_shipments', [
-            'reference' => 'Order 11111',
-        ]);
+        $cc = DHL24::addCostCenter('TestCostCenter');
+        $w = DHL24::wizard()
+            ->setCostCenter($cc);
+        $payment = $w->getPayload()['payment'];
+        $w->store();
 
+        $this->assertEquals($cc->name, $payment['costsCenter']);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'cost_center_id' => $cc->id
+        ]);
     }
 
-    public function test_store_shipment_payer()
+    public function test_fill_today_shipment_date_by_default()
     {
-        $this->assertEquals('SHIPPER', self::getPayload()['payment']['payer_type']);
+        $w = DHL24::wizard();
+        $shipment = $w->getPayload();
+        $w->store();
+
+        $this->assertEquals(now()->format('Y-m-d'), $shipment['shipmentDate']);
         $this->assertDatabaseHas('dhl_shipments', [
-            'payer_type' => 'SHIPPER',
+            'shipment_date' => now()->format('Y-m-d')
+        ]);
+    }
+
+    public function test_manual_shipment_date_assign()
+    {
+        $w = DHL24::wizard()
+            ->setShipmentDate(now()->addDays(2));
+        $shipment = $w->getPayload();
+        $w->store();
+
+        $this->assertEquals(now()->addDays(2)->format('Y-m-d'), $shipment['shipmentDate']);
+        $this->assertDatabaseHas('dhl_shipments', [
+            'shipment_date' => now()->addDays(2)->format('Y-m-d')
+        ]);
+    }
+
+    public function test_skip_restriction_check_missing_in_payload_when_disabled()
+    {
+        Config::set('dhl24.restrictions-check', false);
+        $w = DHL24::wizard();
+        $shipment = $w->getPayload();
+
+        $this->assertArrayNotHasKey('skipRestrictionCheck', $shipment);
+    }
+
+    public function test_skip_restriction_check_exists_in_payload_when_enabled()
+    {
+        Config::set('dhl24.restrictions-check', true);
+        $w = DHL24::wizard();
+        $shipment = $w->getPayload();
+
+        $this->assertArrayHasKey('skipRestrictionCheck', $shipment);
+        $this->assertTrue($shipment['skipRestrictionCheck']);
+    }
+
+    public function test_shipment_comment()
+    {
+        $w = DHL24::wizard()
+            ->setComment('Call customer before delivery');
+        $shipment = $w->getPayload();
+        $w->store();
+
+        $this->assertEquals('Call customer before delivery', $shipment['comment']);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'comment' => 'Call customer before delivery'
+        ]);
+    }
+
+    public function test_shipment_content()
+    {
+        $w = DHL24::wizard()
+            ->setContent('Sex, drugs and r&r');
+        $shipment = $w->getPayload();
+        $w->store();
+
+        $this->assertEquals('Sex, drugs and r&r', $shipment['content']);
+        $this->assertDatabaseHas('dhl_shipments', [
+            'content' => 'Sex, drugs and r&r'
+        ]);
+    }
+
+    public function test_shipment_reference()
+    {
+        $w = DHL24::wizard()
+            ->setReference('ORDER 111');
+        $shipment = $w->getPayload();
+        $w->store();
+
+        $this->assertEquals('ORDER 111', $shipment['reference']);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'reference' => 'ORDER 111'
+        ]);
+    }
+
+    public function test_shipment_reference_fills_cod_ref_when_cod_set_without_ref()
+    {
+        $w = DHL24::wizard()
+            ->setCollectOnDelivery(200)
+            ->setReference('ORDER 111');
+        $shipment = $w->getPayload();
+        $w->store();
+
+        $this->assertEquals('ORDER 111', $shipment['service']['collectOnDeliveryReference']);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'reference' => 'ORDER 111',
+            'collect_on_delivery_reference' => null
+        ]);
+    }
+
+    public function test_shipment_reference_fills_cod_ref_when_cod_set_without_ref_reversed_assign()
+    {
+        $w = DHL24::wizard()
+            ->setReference('ORDER 111')
+            ->setCollectOnDelivery(200);
+        $shipment = $w->getPayload();
+        $w->store();
+
+        $this->assertEquals('ORDER 111', $shipment['service']['collectOnDeliveryReference']);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'reference' => 'ORDER 111',
+            'collect_on_delivery_reference' => null
+        ]);
+    }
+
+    public function test_shipment_reference_is_not_applied_to_cod_ref_when_cod_set_ref()
+    {
+        $w = DHL24::wizard()
+            ->setCollectOnDelivery(200, 'ORDER 222')
+            ->setReference('ORDER 111');
+        $shipment = $w->getPayload();
+        $w->store();
+
+        $this->assertEquals('ORDER 222', $shipment['service']['collectOnDeliveryReference']);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'reference' => 'ORDER 111',
+            'collect_on_delivery_reference' => 'ORDER 222'
+        ]);
+    }
+
+    public function test_shipment_reference_is_not_applied_to_cod_ref_when_cod_set_ref_reversed_assign()
+    {
+        $w = DHL24::wizard()
+            ->setReference('ORDER 111')
+            ->setCollectOnDelivery(200, 'ORDER 222');
+                $shipment = $w->getPayload();
+        $w->store();
+
+        $this->assertEquals('ORDER 222', $shipment['service']['collectOnDeliveryReference']);
+
+        $this->assertDatabaseHas('dhl_shipments', [
+            'reference' => 'ORDER 111',
+            'collect_on_delivery_reference' => 'ORDER 222'
+        ]);
+    }
+
+    public function test_collect_on_delivery_reference_is_copied_into_shipment_reference_when_empty()
+    {
+        $w = DHL24::wizard()
+            ->setCollectOnDelivery(200, 'ORDER 222');
+        $shipment = $w->getPayload();
+        $w->store();
+
+        $this->assertEquals('ORDER 222', $shipment['reference']);
+        $this->assertDatabaseHas('dhl_shipments', [
+            'reference' => null,
+            'collect_on_delivery_reference' => 'ORDER 222',
+        ]);
+    }
+
+    public function test_collect_on_delivery_reference_is_not_copied_into_shipment_reference_when_reference_is_filled()
+    {
+        $w = DHL24::wizard()
+            ->setReference('INV 2002')
+            ->setCollectOnDelivery(200, 'ORDER 222');
+        $shipment = $w->getPayload();
+        $w->store();
+
+        $this->assertEquals('INV 2002', $shipment['reference']);
+        $this->assertEquals('ORDER 222', $shipment['service']['collectOnDeliveryReference']);
+        $this->assertDatabaseHas('dhl_shipments', [
+            'reference' => 'INV 2002',
+            'collect_on_delivery_reference' => 'ORDER 222',
         ]);
 
     }

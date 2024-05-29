@@ -87,6 +87,11 @@ class DHLConfigService
     {
         return config('dhl24.shipment-insurance.intelligent_cost_saver_max_value', 0);
     }
+
+    public function getRestrictionCheckSetting()
+    {
+        return config('dhl24.restrictions-check', false);
+    }
     private static function normalizeDirectoryPath(string $path): string
     {
         return str($path)

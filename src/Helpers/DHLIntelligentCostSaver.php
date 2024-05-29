@@ -26,7 +26,10 @@ class DHLIntelligentCostSaver
             $amount = ceil($amount / $rounding) * $rounding;
         }
 
-        $this->shipment->insurance = $amount;
+        if ($amount > $this->shipment->insurance) {
+            $this->shipment->insurance = $amount;
+        }
+
     }
 
     private function setCod(int|float|null $amount): void

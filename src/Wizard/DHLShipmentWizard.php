@@ -287,7 +287,10 @@ class DHLShipmentWizard
                 fn(Collection $payload) => $payload->put('reference', $payload->get('service')['collectOnDeliveryReference'] ?? null)
             )
             ->put('content', $this->shipment->content)
-            ->put('skipRestrictionCheck', true);
+            ->when(
+                DHLConfig::getRestrictionCheckSetting(),
+                fn(Collection $payload) => $payload->put('skipRestrictionCheck', true)
+            );
 
         return $payload->toArray();
     }
