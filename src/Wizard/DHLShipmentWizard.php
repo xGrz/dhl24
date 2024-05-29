@@ -22,113 +22,113 @@ class DHLShipmentWizard
     public function __construct(?DHLShipment $shipment = null)
     {
         $this->shipment = $shipment ?? new DHLShipment();
-        self::setShipmentDate();
+        self::shipmentDate();
     }
 
-    public function setShipperName(string $name): static
+    public function shipperName(string $name): static
     {
         $this->shipment->shipper_name = $name;
         return $this;
     }
 
-    public function setShipperPostalCode(string $postalCode): static
+    public function shipperPostalCode(string $postalCode): static
     {
         $this->shipment->shipper_postal_code = $postalCode;
         return $this;
     }
 
-    public function setShipperCity(string $city): static
+    public function shipperCity(string $city): static
     {
         $this->shipment->shipper_city = $city;
         return $this;
     }
 
-    public function setShipperStreet(string $street): static
+    public function shipperStreet(string $street): static
     {
         $this->shipment->shipper_street = $street;
         return $this;
     }
 
-    public function setShipperHouseNumber(string $houseNumber): static
+    public function shipperHouseNumber(string $houseNumber): static
     {
         $this->shipment->shipper_house_number = $houseNumber;
         return $this;
     }
 
-    public function setShipperContactPerson(string $contactPerson): static
+    public function shipperContactPerson(string $contactPerson): static
     {
         $this->shipment->shipper_contact_person = $contactPerson;
         return $this;
     }
 
-    public function setShipperContactPhone(string $contactPhone): static
+    public function shipperContactPhone(string $contactPhone): static
     {
         $this->shipment->shipper_contact_phone = $contactPhone;
         return $this;
     }
 
-    public function setShipperContactEmail(string $contactEmail): static
+    public function shipperContactEmail(string $contactEmail): static
     {
         $this->shipment->shipper_contact_email = $contactEmail;
         return $this;
     }
 
-    public function setReceiverType(DHLAddressType $addressType): static
+    public function receiverType(DHLAddressType $addressType): static
     {
         $this->shipment->receiver_type = $addressType;
         return $this;
     }
 
-    public function setReceiverName(string $name): static
+    public function receiverName(string $name): static
     {
         $this->shipment->receiver_name = $name;
         return $this;
     }
 
-    public function setReceiverPostalCode(string $postalCode, string $country = 'PL'): static
+    public function receiverPostalCode(string $postalCode, string $country = 'PL'): static
     {
         $this->shipment->receiver_country = $country;
         $this->shipment->receiver_postal_code = $postalCode;
         return $this;
     }
 
-    public function setReceiverCity(string $city): static
+    public function receiverCity(string $city): static
     {
         $this->shipment->receiver_city = $city;
         return $this;
     }
 
-    public function setReceiverStreet(string $street): static
+    public function receiverStreet(string $street): static
     {
         $this->shipment->receiver_street = $street;
         return $this;
     }
 
-    public function setReceiverHouseNumber(string $houseNumber): static
+    public function receiverHouseNumber(string $houseNumber): static
     {
         $this->shipment->receiver_house_number = $houseNumber;
         return $this;
     }
 
-    public function setReceiverContactPerson(string $contactPerson): static
+    public function receiverContactPerson(string $contactPerson): static
     {
         $this->shipment->receiver_contact_person = $contactPerson;
         return $this;
     }
 
-    public function setReceiverContactPhone(string $contactPhone): static
+    public function receiverContactPhone(string $contactPhone): static
     {
         $this->shipment->receiver_contact_phone = $contactPhone;
         return $this;
     }
 
-    public function setReceiverContactEmail(string $contactEmail): static
+    public function receiverContactEmail(string $contactEmail): static
     {
         $this->shipment->receiver_contact_email = $contactEmail;
         return $this;
     }
 
-    public function setShipmentDate(Carbon $date = null): static
+    public function shipmentDate(Carbon $date = null): static
     {
         is_null($date) && is_null($this->shipment->shipment_date)
             ? $this->shipment->shipment_date = now()
@@ -144,76 +144,76 @@ class DHLShipmentWizard
         return $this;
     }
 
-    public function setShipmentType(DHLDomesticShipmentType $shipmentType): static
+    public function shipmentType(DHLDomesticShipmentType $shipmentType): static
     {
         $this->shipment->product = $shipmentType;
         $this->shipment->delivery_evening = $shipmentType === DHLDomesticShipmentType::EVENING_DELIVERY;
         return $this;
     }
 
-    public function setSaturdayDelivery(bool $saturday = true): static
+    public function saturdayDelivery(bool $saturday = true): static
     {
         $this->shipment->delivery_on_saturday = $saturday;
         return $this;
     }
 
-    public function setSaturdayPickup(bool $saturday = true): static
+    public function saturdayPickup(bool $saturday = true): static
     {
         $this->shipment->pickup_on_saturday = $saturday;
         return $this;
     }
 
-    public function setCollectOnDelivery(int|float $amount, string $reference = null): static
+    public function collectOnDelivery(int|float $amount, string $reference = null): static
     {
         DHLIntelligentCostSaver::apply($this->shipment, cod: $amount);
         $this->shipment->collect_on_delivery_reference = $reference;
         return $this;
     }
 
-    public function setShipmentValue(int|float $amount): static
+    public function shipmentValue(int|float $amount): static
     {
         DHLIntelligentCostSaver::apply($this->shipment, $amount);
         return $this;
     }
 
-    public function setContent(string $content): static
+    public function content(string $content): static
     {
         $this->shipment->content = $content;
         return $this;
     }
 
-    public function setComment(string $comment): static
+    public function comment(string $comment): static
     {
         $this->shipment->comment = $comment;
         return $this;
     }
 
-    public function setReference(string $reference): static
+    public function reference(string $reference): static
     {
         $this->shipment->reference = $reference;
         return $this;
     }
 
-    public function setEveningDelivery(bool $evening = true): static
+    public function eveningDelivery(bool $evening = true): static
     {
         $this->shipment->delivery_evening = $evening;
         return $this;
     }
 
-    public function setReturnOnDelivery(string $reference = null, bool $rod = true): static
+    public function returnOnDelivery(string $reference = null, bool $rod = true): static
     {
         $this->shipment->return_on_delivery = $rod;
         $this->shipment->return_on_delivery_reference = $rod ? $reference : null;
         return $this;
     }
 
-    public function setProofOfDelivery(bool $pod = true): static
+    public function proofOfDelivery(bool $pod = true): static
     {
         $this->shipment->proof_of_delivery = $pod;
         return $this;
     }
 
-    public function setSelfCollect(bool $selfCollect = true): static
+    public function selfCollect(bool $selfCollect = true): static
     {
         $this->shipment->self_collect = $selfCollect;
         return $this;

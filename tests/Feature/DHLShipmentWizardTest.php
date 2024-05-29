@@ -18,40 +18,40 @@ class DHLShipmentWizardTest extends TestCase
         $cc = DHL24::addCostCenter('TestCC');
 
         return DHL24::wizard()
-            ->setShipperName('ACME Corp Ltd.')
-            ->setShipperPostalCode('02-777')
-            ->setShipperCity('Otwock')
-            ->setShipperStreet('Warszawska')
-            ->setShipperHouseNumber('102/20')
-            ->setShipperContactPerson('John Rambo')
-            ->setShipperContactEmail('john.rambo@example.com')
-            ->setShipperContactPhone('504094400')
-            ->setReceiverName('Microsoft Corp Ltd.')
-            ->setReceiverPostalCode('03-888', 'DE')
-            ->setReceiverCity('Lomza')
-            ->setReceiverStreet('Gdańska')
-            ->setReceiverHouseNumber('101/1')
-            ->setReceiverContactPerson('Johnny Travolta')
-            ->setReceiverContactEmail('j.t@example.com')
-            ->setReceiverContactPhone('677987787')
+            ->shipperName('ACME Corp Ltd.')
+            ->shipperPostalCode('02-777')
+            ->shipperCity('Otwock')
+            ->shipperStreet('Warszawska')
+            ->shipperHouseNumber('102/20')
+            ->shipperContactPerson('John Rambo')
+            ->shipperContactEmail('john.rambo@example.com')
+            ->shipperContactPhone('504094400')
+            ->receiverName('Microsoft Corp Ltd.')
+            ->receiverPostalCode('03-888', 'DE')
+            ->receiverCity('Lomza')
+            ->receiverStreet('Gdańska')
+            ->receiverHouseNumber('101/1')
+            ->receiverContactPerson('Johnny Travolta')
+            ->receiverContactEmail('j.t@example.com')
+            ->receiverContactPhone('677987787')
             ->addItem(DHLShipmentItemType::ENVELOPE, 1)
             ->addItem(DHLShipmentItemType::PACKAGE, 2, 20, 25, 15, 10, false)
             ->addItem(DHLShipmentItemType::PALLET, 3, 120, 80, 60, 30, true)
-            ->setShipmentType(DHLDomesticShipmentType::PREMIUM)
-            ->setContent('Elektronika')
+            ->shipmentType(DHLDomesticShipmentType::PREMIUM)
+            ->content('Elektronika')
             ->setCostCenter($cc)
-            ->setCollectOnDelivery(400, 'INVOICE')
-            ->setShipmentValue(500)
-            ->setSaturdayDelivery()
-            ->setReturnOnDelivery('RETURN-INVOICE')
-            ->setSaturdayPickup()
-            ->setProofOfDelivery()
-            ->setSelfCollect()
+            ->collectOnDelivery(400, 'INVOICE')
+            ->shipmentValue(500)
+            ->saturdayDelivery()
+            ->returnOnDelivery('RETURN-INVOICE')
+            ->saturdayPickup()
+            ->proofOfDelivery()
+            ->selfCollect()
             ->setPredeliveryInformation()
             ->setPreaviso()
-            ->setComment('Call first')
-            ->setEveningDelivery()
-            ->setReference('Order 11111');
+            ->comment('Call first')
+            ->eveningDelivery()
+            ->reference('Order 11111');
     }
 
     private function getPayload(): array
@@ -70,14 +70,14 @@ class DHLShipmentWizardTest extends TestCase
     public function test_set_shipper_data()
     {
         $w = DHL24::wizard()
-            ->setShipperName('ACME Corp Ltd.')
-            ->setShipperPostalCode('02-777')
-            ->setShipperCity('Otwock')
-            ->setShipperStreet('Warszawska')
-            ->setShipperHouseNumber('102/20')
-            ->setShipperContactPerson('John Rambo')
-            ->setShipperContactEmail('john.rambo@example.com')
-            ->setShipperContactPhone('504094400');
+            ->shipperName('ACME Corp Ltd.')
+            ->shipperPostalCode('02-777')
+            ->shipperCity('Otwock')
+            ->shipperStreet('Warszawska')
+            ->shipperHouseNumber('102/20')
+            ->shipperContactPerson('John Rambo')
+            ->shipperContactEmail('john.rambo@example.com')
+            ->shipperContactPhone('504094400');
         $payloadShipper = $w->getPayload()['shipper'];
         $w->store();
 
@@ -106,14 +106,14 @@ class DHLShipmentWizardTest extends TestCase
     public function test_set_receiver_data()
     {
         $w = DHL24::wizard()
-            ->setReceiverName('Microsoft Corp Ltd.')
-            ->setReceiverPostalCode('03888', 'DE')
-            ->setReceiverCity('Lomza')
-            ->setReceiverStreet('Gdańska')
-            ->setReceiverHouseNumber('101/1')
-            ->setReceiverContactPerson('Johnny Travolta')
-            ->setReceiverContactEmail('j.t@example.com')
-            ->setReceiverContactPhone('677987787');
+            ->receiverName('Microsoft Corp Ltd.')
+            ->receiverPostalCode('03888', 'DE')
+            ->receiverCity('Lomza')
+            ->receiverStreet('Gdańska')
+            ->receiverHouseNumber('101/1')
+            ->receiverContactPerson('Johnny Travolta')
+            ->receiverContactEmail('j.t@example.com')
+            ->receiverContactPhone('677987787');
 
         $payloadReceiver = $w->getPayload()['receiver'];
         $w->store();
@@ -142,7 +142,7 @@ class DHLShipmentWizardTest extends TestCase
             'receiver_contact_phone' => '677987787',
         ]);
 
-        $w->setReceiverType(DHLAddressType::BUSINESS);
+        $w->receiverType(DHLAddressType::BUSINESS);
         $w->store();
 
         $this->assertDatabaseHas('dhl_shipments', [
@@ -159,7 +159,7 @@ class DHLShipmentWizardTest extends TestCase
         ]);
 
 
-//        $w->setReceiverType(DHLAddressType::BUSINESS);
+//        $w->receiverType(DHLAddressType::BUSINESS);
 //        $this->assertEquals(DHLAddressType::BUSINESS->value, $w->getPayload()['receiver']['addressType']);
     }
 
@@ -218,7 +218,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_service_product_type_domestic_()
     {
         $w = DHL24::wizard()
-            ->setShipmentType(DHLDomesticShipmentType::DOMESTIC);
+            ->shipmentType(DHLDomesticShipmentType::DOMESTIC);
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -238,7 +238,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_service_product_type_domestic_09()
     {
         $w = DHL24::wizard()
-            ->setShipmentType(DHLDomesticShipmentType::DOMESTIC09);
+            ->shipmentType(DHLDomesticShipmentType::DOMESTIC09);
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -258,7 +258,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_service_product_type_domestic_12()
     {
         $w = DHL24::wizard()
-            ->setShipmentType(DHLDomesticShipmentType::DOMESTIC12);
+            ->shipmentType(DHLDomesticShipmentType::DOMESTIC12);
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -279,7 +279,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_service_product_type_premium()
     {
         $w = DHL24::wizard()
-            ->setShipmentType(DHLDomesticShipmentType::PREMIUM);
+            ->shipmentType(DHLDomesticShipmentType::PREMIUM);
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -300,7 +300,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_service_product_type_delivery_evening()
     {
         $w = DHL24::wizard()
-            ->setShipmentType(DHLDomesticShipmentType::EVENING_DELIVERY);
+            ->shipmentType(DHLDomesticShipmentType::EVENING_DELIVERY);
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -321,7 +321,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_service_delivery_on_saturday()
     {
         $w = DHL24::wizard()
-            ->setSaturdayDelivery();
+            ->saturdayDelivery();
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -339,7 +339,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_service_pickup_on_saturday()
     {
         $w = DHL24::wizard()
-            ->setSaturdayPickup();
+            ->saturdayPickup();
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -358,7 +358,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_service_collect_on_delivery_with_reference()
     {
         $w = DHL24::wizard()
-            ->setCollectOnDelivery(250, 'INV 5/2024');
+            ->collectOnDelivery(250, 'INV 5/2024');
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -379,7 +379,7 @@ class DHLShipmentWizardTest extends TestCase
         Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
         Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
         $w = DHL24::wizard()
-            ->setShipmentValue(290);
+            ->shipmentValue(290);
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -396,7 +396,7 @@ class DHLShipmentWizardTest extends TestCase
         Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
         Config::set('dhl24.shipment-insurance.insurance_value_round_up', 50);
         $w = DHL24::wizard()
-            ->setShipmentValue(290);
+            ->shipmentValue(290);
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -414,7 +414,7 @@ class DHLShipmentWizardTest extends TestCase
         Config::set('dhl24.shipment-insurance.intelligent_cost_saver_max_value', 298);
         Config::set('dhl24.shipment-insurance.insurance_value_round_up', 100);
         $w = DHL24::wizard()
-            ->setShipmentValue(290);
+            ->shipmentValue(290);
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -432,7 +432,7 @@ class DHLShipmentWizardTest extends TestCase
         Config::set('dhl24.shipment-insurance.intelligent_cost_saver_max_value', 288);
         Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
         $w = DHL24::wizard()
-            ->setShipmentValue(290);
+            ->shipmentValue(290);
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -450,7 +450,7 @@ class DHLShipmentWizardTest extends TestCase
         Config::set('dhl24.shipment-insurance.intelligent_cost_saver', false);
         Config::set('dhl24.shipment-insurance.insurance_value_round_up', 200);
         $w = DHL24::wizard()
-            ->setShipmentValue(290);
+            ->shipmentValue(290);
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -470,7 +470,7 @@ class DHLShipmentWizardTest extends TestCase
         Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
 
         $w = DHL24::wizard()
-            ->setCollectOnDelivery(300);
+            ->collectOnDelivery(300);
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -488,8 +488,8 @@ class DHLShipmentWizardTest extends TestCase
         Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
 
         $w = DHL24::wizard()
-            ->setCollectOnDelivery(300)
-            ->setShipmentValue(100);
+            ->collectOnDelivery(300)
+            ->shipmentValue(100);
 
         $service = $w->getPayload()['service'];
         $w->store();
@@ -508,8 +508,8 @@ class DHLShipmentWizardTest extends TestCase
         Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
 
         $w = DHL24::wizard()
-            ->setCollectOnDelivery(300)
-            ->setShipmentValue(500);
+            ->collectOnDelivery(300)
+            ->shipmentValue(500);
 
         $service = $w->getPayload()['service'];
         $w->store();
@@ -529,8 +529,8 @@ class DHLShipmentWizardTest extends TestCase
         Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
 
         $w = DHL24::wizard()
-            ->setShipmentValue(500)
-            ->setCollectOnDelivery(300);
+            ->shipmentValue(500)
+            ->collectOnDelivery(300);
 
         $service = $w->getPayload()['service'];
         $w->store();
@@ -550,8 +550,8 @@ class DHLShipmentWizardTest extends TestCase
         Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
 
         $w = DHL24::wizard()
-            ->setShipmentValue(300)
-            ->setCollectOnDelivery(500);
+            ->shipmentValue(300)
+            ->collectOnDelivery(500);
 
         $service = $w->getPayload()['service'];
         $w->store();
@@ -574,7 +574,7 @@ class DHLShipmentWizardTest extends TestCase
         Config::set('dhl24.shipment-insurance.insurance_value_round_up', false);
 
         $w = DHL24::wizard()
-            ->setCollectOnDelivery(400);
+            ->collectOnDelivery(400);
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -590,7 +590,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_service_return_on_delivery()
     {
         $w = DHL24::wizard()
-            ->setReturnOnDelivery('INV/199/2024');
+            ->returnOnDelivery('INV/199/2024');
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -606,7 +606,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_service_proof_of_delivery()
     {
         $w = DHL24::wizard()
-            ->setProofOfDelivery();
+            ->proofOfDelivery();
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -620,7 +620,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_service_self_collect()
     {
         $w = DHL24::wizard()
-            ->setSelfCollect();
+            ->selfCollect();
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -706,7 +706,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_manual_shipment_date_assign()
     {
         $w = DHL24::wizard()
-            ->setShipmentDate(now()->addDays(2));
+            ->shipmentDate(now()->addDays(2));
         $shipment = $w->getPayload();
         $w->store();
 
@@ -738,7 +738,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_shipment_comment()
     {
         $w = DHL24::wizard()
-            ->setComment('Call customer before delivery');
+            ->comment('Call customer before delivery');
         $shipment = $w->getPayload();
         $w->store();
 
@@ -752,7 +752,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_shipment_content()
     {
         $w = DHL24::wizard()
-            ->setContent('Sex, drugs and r&r');
+            ->content('Sex, drugs and r&r');
         $shipment = $w->getPayload();
         $w->store();
 
@@ -765,7 +765,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_shipment_reference()
     {
         $w = DHL24::wizard()
-            ->setReference('ORDER 111');
+            ->reference('ORDER 111');
         $shipment = $w->getPayload();
         $w->store();
 
@@ -779,8 +779,8 @@ class DHLShipmentWizardTest extends TestCase
     public function test_shipment_reference_fills_cod_ref_when_cod_set_without_ref()
     {
         $w = DHL24::wizard()
-            ->setCollectOnDelivery(200)
-            ->setReference('ORDER 111');
+            ->collectOnDelivery(200)
+            ->reference('ORDER 111');
         $shipment = $w->getPayload();
         $w->store();
 
@@ -795,8 +795,8 @@ class DHLShipmentWizardTest extends TestCase
     public function test_shipment_reference_fills_cod_ref_when_cod_set_without_ref_reversed_assign()
     {
         $w = DHL24::wizard()
-            ->setReference('ORDER 111')
-            ->setCollectOnDelivery(200);
+            ->reference('ORDER 111')
+            ->collectOnDelivery(200);
         $shipment = $w->getPayload();
         $w->store();
 
@@ -811,8 +811,8 @@ class DHLShipmentWizardTest extends TestCase
     public function test_shipment_reference_is_not_applied_to_cod_ref_when_cod_set_ref()
     {
         $w = DHL24::wizard()
-            ->setCollectOnDelivery(200, 'ORDER 222')
-            ->setReference('ORDER 111');
+            ->collectOnDelivery(200, 'ORDER 222')
+            ->reference('ORDER 111');
         $shipment = $w->getPayload();
         $w->store();
 
@@ -827,8 +827,8 @@ class DHLShipmentWizardTest extends TestCase
     public function test_shipment_reference_is_not_applied_to_cod_ref_when_cod_set_ref_reversed_assign()
     {
         $w = DHL24::wizard()
-            ->setReference('ORDER 111')
-            ->setCollectOnDelivery(200, 'ORDER 222');
+            ->reference('ORDER 111')
+            ->collectOnDelivery(200, 'ORDER 222');
                 $shipment = $w->getPayload();
         $w->store();
 
@@ -843,7 +843,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_collect_on_delivery_reference_is_copied_into_shipment_reference_when_empty()
     {
         $w = DHL24::wizard()
-            ->setCollectOnDelivery(200, 'ORDER 222');
+            ->collectOnDelivery(200, 'ORDER 222');
         $shipment = $w->getPayload();
         $w->store();
 
@@ -857,8 +857,8 @@ class DHLShipmentWizardTest extends TestCase
     public function test_collect_on_delivery_reference_is_not_copied_into_shipment_reference_when_reference_is_filled()
     {
         $w = DHL24::wizard()
-            ->setReference('INV 2002')
-            ->setCollectOnDelivery(200, 'ORDER 222');
+            ->reference('INV 2002')
+            ->collectOnDelivery(200, 'ORDER 222');
         $shipment = $w->getPayload();
         $w->store();
 
