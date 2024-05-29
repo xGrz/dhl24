@@ -28,6 +28,11 @@ return [
         'username' => env('DHL24_USERNAME'),
         'password' => env('DHL24_PASSWORD'),
         'sap' => env('DHL24_SAP', ''),
-    ]
+    ],
+    /*
+     * Allow to create shipments event is date is excluded (like sundays).
+     */
+    'restrictions-check' => false,
+
 
 ];
