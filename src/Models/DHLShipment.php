@@ -2,7 +2,6 @@
 
 namespace xGrz\Dhl24\Models;
 
-use Database\Factories\DHLShipmentFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -52,10 +51,6 @@ class DHLShipment extends Model
         'payer_type' => DHLPayerType::SHIPPER,
     ];
 
-    protected static function newFactory()
-    {
-        return DHLShipmentFactory::new();
-    }
 
     public function scopeWithDetails(Builder $query): void
     {
