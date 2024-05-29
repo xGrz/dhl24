@@ -49,7 +49,6 @@ class DHLContentService
     {
         return self::suggestion($suggestion)
             ->update(['is_default' => true]);
-
     }
 
     private static function suggestion(DHLContentSuggestion|int $suggestion): DHLContentSuggestion

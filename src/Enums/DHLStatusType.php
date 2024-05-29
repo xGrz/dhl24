@@ -2,12 +2,15 @@
 
 namespace xGrz\Dhl24\Enums;
 
+use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Interfaces\WithLabel;
 use xGrz\Dhl24\Traits\HasLabel;
 
 enum DHLStatusType: int implements WithLabel
 {
     use HasLabel;
+
+    // ALL STATES BETWEEN 100 and 200 pointing to DELIVERED state.
 
     case NOT_FOUND = 0;
     case CREATED = 1;
@@ -52,6 +55,17 @@ enum DHLStatusType: int implements WithLabel
             DHLStatusType::RETURNED => 'text-red-500',
             default => 'text-red-200'
         };
+    }
+
+    /**
+     * @throws DHL24Exception
+     */
+    public static function findByName($statusName): DHLStatusType
+    {
+        foreach (self::cases() as $case) {
+            if ($case->name == $statusName) return $case;
+        }
+        throw new DHL24Exception('Unknown state [' . $statusName . ']');
     }
 
 

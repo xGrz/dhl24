@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use xGrz\Dhl24\Enums\DHLStatusType;
 
+/**
+ * @property DHLTracking $pivot
+ */
 class DHLStatus extends Model
 {
 

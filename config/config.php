@@ -33,6 +33,7 @@ return [
      * Allow to create shipments event is date is excluded (like sundays).
      */
     'restrictions-check' => false,
+    'track_shipment_max_age' => 30,
 
 
 ];
