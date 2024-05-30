@@ -26,6 +26,12 @@ class DHLStatus extends Model
     {
         $query->orderBy('type');
     }
+
+    public function scopeFinishedState(Builder $query): void
+    {
+        $query->whereBetween('type', [100, 200]);
+    }
+
     public function getDescription(): string
     {
         return $this->custom_description ?? $this->description;

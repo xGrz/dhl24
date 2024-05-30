@@ -2,11 +2,9 @@
 
 namespace xGrz\Dhl24\Services;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 use xGrz\Dhl24\Actions\Track;
 use xGrz\Dhl24\Enums\DHLStatusType;
-use xGrz\Dhl24\Enums\StatusType;
 use xGrz\Dhl24\Events\ShipmentDeliveredEvent;
 use xGrz\Dhl24\Events\ShipmentSentEvent;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
@@ -74,9 +72,16 @@ class DHLTrackingService
 
     public static function getUndeliveredShipments(): Collection
     {
-        return DHLShipment::whereDoesntHave('tracking', function (Builder $q) {
-            $q->whereIn('status', DHLStatusType::getDeliveredStateValues());
+        return DHLShipment::whereDoesntHave('tracking', function ($q) {
+            $q->whereIn('status', self::finishingStates());
         })->get();
+    }
+
+    public static function finishingStates(): array
+    {
+        return DHLStatus::finishedState()->get()->map(function ($status) {
+            return $status->symbol;
+        })->toArray();
     }
 
 }

@@ -68,5 +68,4 @@ enum DHLStatusType: int implements WithLabel
         throw new DHL24Exception('Unknown state [' . $statusName . ']');
     }
 
-
 }

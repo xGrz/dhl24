@@ -15,6 +15,7 @@ use xGrz\Dhl24\Actions\Version;
 use xGrz\Dhl24\Enums\DHLLabelType;
 use xGrz\Dhl24\Enums\DHLServicePointType;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
+use xGrz\Dhl24\Jobs\TrackShipmentsJob;
 use xGrz\Dhl24\Models\DHLContentSuggestion;
 use xGrz\Dhl24\Models\DHLCostCenter;
 use xGrz\Dhl24\Models\DHLShipment;
@@ -172,6 +173,11 @@ class DHL24
         if ($shipment instanceof DHLShipment) return $shipment->loadMissing(DHLShipment::getRelationsListForDetails());
         return DHLShipment::withDetails()->find($shipment)
             ?? DHLShipment::withDetails()->where('number', $shipment)->first();
+    }
+
+    public static function updateShipmentTracking(): int
+    {
+        return (new TrackShipmentsJob())->handle();
     }
 
 }
