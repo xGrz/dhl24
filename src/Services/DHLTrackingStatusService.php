@@ -51,4 +51,9 @@ class DHLTrackingStatusService
             ? $status
             : DHLStatus::where('symbol', $status)->first();
     }
+
+    public static function getStatusTypes(): array
+    {
+        return DHLStatusType::getOptions();
+    }
 }

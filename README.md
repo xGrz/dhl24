@@ -55,14 +55,35 @@ ___
 
 ## TRACKING SHIPMENTS
 
+Tracking is locally stored for each shipment.
+
+### CUSTOMIZE SHIPMENT STATE
+
+As shipment state messages provided by API ale not well formatted you can change message displayed in your app.
+Please read docs for [state manager](docs/state-manager.md).
+
+
 ### TRACK ALL (queue)
 If you want to update tracking information please run:
 ```php
 xGrz\Dhl24\Facades\DHL24::updateShipmentTracking();
 ```
 This method dispatches jobs for updating tracking for packages in transport.
-As output, you will get integer with count of tracked shipments.
+As output, you will get integer with count of tracked shipments. 
 
-This method dispatches jobs! You have to configure queue or this method will be risky to run (timeout of PHP script may occur when you have a lot of shipments in transport).
-Queue approach is recommended. 
+> You have to configure queue or this method will be risky to run (timeout of PHP script may occur when you have a lot of shipments in transport).
+Queue approach is recommended.
+
+### TRACK SINGLE SHIPMENT
+
+```php
+xGrz\Dhl24\Facades\DHL24::trackShipment($shipment, $shouldDispatchJob = true);
+```
+As a `shipment` you can provide `DHLSHipment` model, shipment number or `DHLShipment->id`.
+`shouldDispatchJob` (default: true) by default is putting job into queue. If you want to process job without touching queue set to `false`. 
+
+
+This shipment should exist in your system. You can't track shipments created outside of this package.
+
+
 ___

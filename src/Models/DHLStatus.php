@@ -24,7 +24,9 @@ class DHLStatus extends Model
 
     public function scopeOrderByTypes(Builder $query): void
     {
-        $query->orderBy('type');
+        $query
+            ->orderBy('type')
+            ->orderBy('symbol');
     }
 
     public function scopeFinishedState(Builder $query): void

@@ -21,6 +21,7 @@ use xGrz\Dhl24\Models\DHLCostCenter;
 use xGrz\Dhl24\Models\DHLShipment;
 use xGrz\Dhl24\Services\DHLContentService;
 use xGrz\Dhl24\Services\DHLCostCenterService;
+use xGrz\Dhl24\Services\DHLTrackingService;
 use xGrz\Dhl24\Wizard\DHLShipmentWizard;
 
 class DHL24
@@ -178,6 +179,23 @@ class DHL24
     public static function updateShipmentTracking(): int
     {
         return (new TrackShipmentsJob())->handle();
+    }
+
+    /**
+     * @throws DHL24Exception
+     */
+    public static function trackShipment(DHLShipment|string|int $shipment, bool $shouldDispatchJob = true): void
+    {
+        $shouldDispatchJob
+            ? (new TrackShipmentsJob($shipment))->handle()
+            : (new DHLTrackingService($shipment));
+    }
+
+    public static function getShipment(DHLShipment|string|int $shipment): ?DHLShipment
+    {
+        if ($shipment instanceof DHLShipment) return $shipment;
+        return DHLShipment::where('number', $shipment)->first()
+            ?? DHLShipment::find($shipment)->first();
     }
 
 }
