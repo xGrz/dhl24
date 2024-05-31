@@ -15,6 +15,7 @@ DHL24.PL Laravel integration
   * [Shipment state manager (based on tracking status)](docs/state-manager.md)
 * [Download shipment label](docs/label.md)
 * [Shipment wizard](docs/wizard.md)
+* [Shipment cost](docs/cost.md)
 ___
 
 ## Installation

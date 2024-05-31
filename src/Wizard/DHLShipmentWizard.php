@@ -5,10 +5,12 @@ namespace xGrz\Dhl24\Wizard;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use xGrz\Dhl24\Actions\Cost;
 use xGrz\Dhl24\Actions\CreateShipment;
 use xGrz\Dhl24\Enums\DHLAddressType;
 use xGrz\Dhl24\Enums\DHLDomesticShipmentType;
 use xGrz\Dhl24\Enums\DHLShipmentItemType;
+use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Facades\DHLConfig;
 use xGrz\Dhl24\Helpers\DHLIntelligentCostSaver;
 use xGrz\Dhl24\Models\DHLCostCenter;
@@ -267,6 +269,15 @@ class DHLShipmentWizard
         return $this->shipment;
     }
 
+
+    /**
+     * @throws DHL24Exception
+     */
+    public function getCost(): float
+    {
+        return (new Cost())->get($this)->price();
+    }
+
     public function getPayload(): array
     {
         $payload = collect([
@@ -288,10 +299,6 @@ class DHLShipmentWizard
             )
             ->put('content', $this->shipment->content)
             ->put('skipRestrictionCheck', DHLConfig::getRestrictionCheckSetting())
-//            ->when(
-//                DHLConfig::getRestrictionCheckSetting(),
-//                fn(Collection $payload) => $payload->put('skipRestrictionCheck', true)
-//            );
         ;
 
         return $payload->toArray();

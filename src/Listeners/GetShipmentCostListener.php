@@ -15,7 +15,7 @@ class GetShipmentCostListener implements ShouldQueue
     public function handle(ShipmentCreatedEvent $event): void
     {
 //        $event->shipment->update([
-//            'cost' => DHL24::getPrice($event->shipment, DHLLabel)
+//            'cost' => DHL24::price($event->shipment, DHLLabel)
 //        ]);
     }
 }
