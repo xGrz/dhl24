@@ -34,8 +34,9 @@ For update type you simply use:
 $state = new xGrz\Dhl24\Services\DHLTrackingStatusService($status);
 $state->updateType(xGrz\Dhl24\Enums\DHLStatusType::CREATED);
 ```
+Status Types are hardcoded as enum. 
 
-Status Types are hardcoded as enum. If you want to get full list of status types (for ex. as option list) use this method:
+If you want to get full list of status types (for ex. as option list) use this method:
 ```php
 xGrz\Dhl24\Services\DHLTrackingStatusService::getStatusTypes();
 ```
