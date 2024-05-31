@@ -54,7 +54,6 @@ class Label extends ApiCalls
         );
     }
 
-
     public function setType(DHLLabelType $type = null): static
     {
         $this->payload['itemsToPrint'][0]['labelType'] = $type?->value  ?? DHLConfig::getDefaultLabelType()->value;

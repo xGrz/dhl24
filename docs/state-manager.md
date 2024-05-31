@@ -1,5 +1,7 @@
 # SHIPMENT STATE MANAGER
 
+As shipment state messages provided by API ale not well formatted you can change message displayed in your app.
+
 Shipment state manager handles typical states of shipment as predefined states.
 We store them in `dhl_statuses` table. 
 

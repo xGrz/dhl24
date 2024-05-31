@@ -1,5 +1,8 @@
 # Content suggestion
 
+DHL API requires to provide shipment contents.
+This package has helper for content suggestions.
+
 ## Add content suggestion
 If you want to add content suggestion use facade method:
 ```php
@@ -33,3 +36,26 @@ xGrz\Dhl24\Facades\DHL24::deleteContentSuggestion($suggestion)
 ```
 Parameter `suggestion` can be eider `xGrz\Dhl24\Models\DHLContentSuggestion` or `id` of suggestion to delete.
 This model deletes permanently database row. Soft delete is not supported here.
+___
+
+## How to use it?
+You can provide suggestions list as select if you don't allow users providing own contents.
+```bladehtml
+<select>
+    @foreach(xGrz\Dhl24\Facades\DHL24::contentSuggestions() as $suggestion)
+        <option>{{$suggestion->name}}</option>
+    @endforeach
+</select>
+```
+
+If user can provide own content the best way is to use datalist related to input:
+```bladehtml
+<input list="contents"/>
+<datalist id="contents">
+    @foreach(xGrz\Dhl24\Facades\DHL24::contentSuggestions() as $suggestion)
+        <option value="{{$suggestion->name}}"/>
+    @endforeach
+</datalist>
+
+```
+

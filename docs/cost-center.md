@@ -1,5 +1,9 @@
 # COST CENTERS
 
+>This is optional, so you don't have to use it.
+
+Package can manage costs centers for accountants. You can have billing information divided into sections on your invoices.
+
 > Package provides cost center manager. You can divide your shipments by unlimited number of cost centers.
 > DHL invoice attachment divides shipments by those cost centers.
 ___

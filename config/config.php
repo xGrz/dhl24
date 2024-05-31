@@ -16,7 +16,6 @@ return [
     'reports' => [
         'disk' => 'local',
         'directory' => 'dhl/reports',
-        'defaultType' => '',
     ],
     'labels' => [
         'disk' => 'local',
