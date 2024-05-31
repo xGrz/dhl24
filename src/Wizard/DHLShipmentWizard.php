@@ -219,19 +219,19 @@ class DHLShipmentWizard
         return $this;
     }
 
-    public function setPredeliveryInformation(bool $pdi = true): static
+    public function preDeliveryInformation(bool $pdi = true): static
     {
         $this->shipment->predelivery_information = $pdi;
         return $this;
     }
 
-    public function setPreaviso(bool $preaviso = true): static
+    public function preAviso(bool $preaviso = true): static
     {
         $this->shipment->preaviso = $preaviso;
         return $this;
     }
 
-    public function setCostCenter(DHLCostCenter $costCenter): static
+    public function costCenter(DHLCostCenter $costCenter): static
     {
         $this->shipment->cost_center()->associate($costCenter);
         return $this;
@@ -287,10 +287,12 @@ class DHLShipmentWizard
                 fn(Collection $payload) => $payload->put('reference', $payload->get('service')['collectOnDeliveryReference'] ?? null)
             )
             ->put('content', $this->shipment->content)
-            ->when(
-                DHLConfig::getRestrictionCheckSetting(),
-                fn(Collection $payload) => $payload->put('skipRestrictionCheck', true)
-            );
+            ->put('skipRestrictionCheck', DHLConfig::getRestrictionCheckSetting())
+//            ->when(
+//                DHLConfig::getRestrictionCheckSetting(),
+//                fn(Collection $payload) => $payload->put('skipRestrictionCheck', true)
+//            );
+        ;
 
         return $payload->toArray();
     }

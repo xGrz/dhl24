@@ -39,7 +39,7 @@ class DHLShipmentWizardTest extends TestCase
             ->addItem(DHLShipmentItemType::PALLET, 3, 120, 80, 60, 30, true)
             ->shipmentType(DHLDomesticShipmentType::PREMIUM)
             ->content('Elektronika')
-            ->setCostCenter($cc)
+            ->costCenter($cc)
             ->collectOnDelivery(400, 'INVOICE')
             ->shipmentValue(500)
             ->saturdayDelivery()
@@ -47,8 +47,8 @@ class DHLShipmentWizardTest extends TestCase
             ->saturdayPickup()
             ->proofOfDelivery()
             ->selfCollect()
-            ->setPredeliveryInformation()
-            ->setPreaviso()
+            ->preDeliveryInformation()
+            ->preAviso()
             ->comment('Call first')
             ->eveningDelivery()
             ->reference('Order 11111');
@@ -634,7 +634,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_service_predelivery_information()
     {
         $w = DHL24::wizard()
-            ->setPredeliveryInformation();
+            ->preDeliveryInformation();
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -648,7 +648,7 @@ class DHLShipmentWizardTest extends TestCase
     public function test_service_preaviso()
     {
         $w = DHL24::wizard()
-            ->setPreaviso();
+            ->preAviso();
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -680,7 +680,7 @@ class DHLShipmentWizardTest extends TestCase
     {
         $cc = DHL24::addCostCenter('TestCostCenter');
         $w = DHL24::wizard()
-            ->setCostCenter($cc);
+            ->costCenter($cc);
         $payment = $w->getPayload()['payment'];
         $w->store();
 

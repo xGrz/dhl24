@@ -585,7 +585,7 @@ class DHLWizardTest extends TestCase
     public function test_service_predelivery_information()
     {
         $w = DHL24::wizard()
-            ->setPredeliveryInformation();
+            ->preDeliveryInformation();
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -599,7 +599,7 @@ class DHLWizardTest extends TestCase
     public function test_service_preaviso()
     {
         $w = DHL24::wizard()
-            ->setPreaviso();
+            ->preAviso();
         $service = $w->getPayload()['service'];
         $w->store();
 
@@ -631,7 +631,7 @@ class DHLWizardTest extends TestCase
     {
         $cc = DHL24::addCostCenter('TestCostCenter');
         $w = DHL24::wizard()
-            ->setCostCenter($cc);
+            ->costCenter($cc);
         $payment = $w->getPayload()['payment'];
         $w->store();
 

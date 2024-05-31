@@ -13,7 +13,8 @@ DHL24.PL Laravel integration
   * [Shipment content manager](docs/content-suggestions.md)
   * [Shipment cost center manager / billings](docs/cost-center.md)
   * [Shipment state manager (based on tracking status)](docs/state-manager.md)
-* [Shipment label](docs/label.md)
+* [Download shipment label](docs/label.md)
+* [Shipment wizard](docs/wizard.md)
 ___
 
 ## Installation
