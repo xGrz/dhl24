@@ -57,19 +57,19 @@ class DHLShipmentWizard
         return $this;
     }
 
-    public function shipperContactPerson(string $contactPerson): static
+    public function shipperContactPerson(string $contactPerson = null): static
     {
         $this->shipment->shipper_contact_person = $contactPerson;
         return $this;
     }
 
-    public function shipperContactPhone(string $contactPhone): static
+    public function shipperContactPhone(string $contactPhone = null): static
     {
         $this->shipment->shipper_contact_phone = $contactPhone;
         return $this;
     }
 
-    public function shipperContactEmail(string $contactEmail): static
+    public function shipperContactEmail(string $contactEmail = null): static
     {
         $this->shipment->shipper_contact_email = $contactEmail;
         return $this;
@@ -112,19 +112,19 @@ class DHLShipmentWizard
         return $this;
     }
 
-    public function receiverContactPerson(string $contactPerson): static
+    public function receiverContactPerson(string $contactPerson = null): static
     {
         $this->shipment->receiver_contact_person = $contactPerson;
         return $this;
     }
 
-    public function receiverContactPhone(string $contactPhone): static
+    public function receiverContactPhone(string $contactPhone = null): static
     {
         $this->shipment->receiver_contact_phone = $contactPhone;
         return $this;
     }
 
-    public function receiverContactEmail(string $contactEmail): static
+    public function receiverContactEmail(string $contactEmail = null): static
     {
         $this->shipment->receiver_contact_email = $contactEmail;
         return $this;
@@ -132,12 +132,8 @@ class DHLShipmentWizard
 
     public function shipmentDate(Carbon $date = null): static
     {
-        is_null($date) && is_null($this->shipment->shipment_date)
-            ? $this->shipment->shipment_date = now()
-            : $this->shipment->shipment_date = $date;
-
-        if ($this->shipment->shipment_date->dayOfWeek === CarbonInterface::SATURDAY) {
-            $this->shipment->pickup_on_saturday = true;
+        if (!$this->shipment->shipment_date) {
+            $this->shipment->shipment_date = $date ?? now();
         }
 
         if ($this->shipment->shipment_date->dayOfWeek === CarbonInterface::SUNDAY) {
@@ -184,13 +180,13 @@ class DHLShipmentWizard
         return $this;
     }
 
-    public function comment(string $comment): static
+    public function comment(string $comment = null): static
     {
         $this->shipment->comment = $comment;
         return $this;
     }
 
-    public function reference(string $reference): static
+    public function reference(string $reference = null): static
     {
         $this->shipment->reference = $reference;
         return $this;
@@ -233,7 +229,7 @@ class DHLShipmentWizard
         return $this;
     }
 
-    public function costCenter(DHLCostCenter $costCenter): static
+    public function costCenter(DHLCostCenter $costCenter = null): static
     {
         $this->shipment->cost_center()->associate($costCenter);
         return $this;
@@ -262,20 +258,30 @@ class DHLShipmentWizard
         return $shipmentNumber;
     }
 
-    public function store(): DHLShipment
+    public function shipmentNumber(string|int $number): static
     {
-        $this->shipment->save();
+        $this->shipment->number = $number;
+        return $this;
+    }
+
+    public function store($quietly = false): DHLShipment
+    {
+        $quietly
+            ? $this->shipment->saveQuietly()
+            : $this->shipment->save();
+
         $this->shipment = DHLShipment::with(['items'])->find($this->shipment->id);
         return $this->shipment;
     }
-
 
     /**
      * @throws DHL24Exception
      */
     public function getCost(): float
     {
-        return (new Cost())->get($this)->price();
+        $cost = (new Cost())->get($this)->price();
+        $this->shipment->update(['cost' => $cost]);
+        return $cost;
     }
 
     public function getPayload(): array
@@ -298,8 +304,7 @@ class DHLShipmentWizard
                 fn(Collection $payload) => $payload->put('reference', $payload->get('service')['collectOnDeliveryReference'] ?? null)
             )
             ->put('content', $this->shipment->content)
-            ->put('skipRestrictionCheck', DHLConfig::getRestrictionCheckSetting())
-        ;
+            ->put('skipRestrictionCheck', DHLConfig::getRestrictionCheckSetting());
 
         return $payload->toArray();
     }

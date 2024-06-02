@@ -22,6 +22,7 @@ $cost = DHL24::wizard(DHLShipment)->getCost();
 ```
 
 `$cost` will return total cost with fuel surcharge (nett).
+> Received cost will be stored in DHLShipment->cost automatically.
 
 ## DETAILED COST
 
@@ -31,7 +32,7 @@ PREPARE WIZARD as mention in [ShipmentWizard](wizard.md) docs.
 
 ```php
 use xGrz\Dhl24\Facades\DHL24;
-DHL24::wizard()
+$wizard DHL24::wizard()
     // -> ...
 ```
 
@@ -41,13 +42,13 @@ or open existing shipment in Wizard:
 use xGrz\Dhl24\Facades\DHL24;
 use xGrz\Dhl24\Models\DHLShipment;
 
-DHL24::wizard(DHLShipment::first());
+$wizard DHL24::wizard(DHLShipment::first());
 ```
 
-Call action:
+Get cost action:
 
 ```php
-$cost = (new \xGrz\Dhl24\Actions\Cost());
+$cost = (new \xGrz\Dhl24\Actions\Cost($wizard));
 ```
 
 Now you can check some additional cost information on `$cost` object:

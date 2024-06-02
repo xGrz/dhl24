@@ -2,35 +2,32 @@
 
 namespace xGrz\Dhl24\Observers;
 
+use Illuminate\Support\Facades\Bus;
 use xGrz\Dhl24\Events\ShipmentCreatedEvent;
+use xGrz\Dhl24\Jobs\GetShipmentCostJob;
+use xGrz\Dhl24\Jobs\GetShipmentLabelJob;
 use xGrz\Dhl24\Models\DHLShipment;
 
 class DHLShipmentObserver
 {
+    /**
+     * @throws \Throwable
+     */
     public function created(DHLShipment $shipment): void
     {
         self::updateItems($shipment);
-        if ($shipment->number) {
-            event(new ShipmentCreatedEvent($shipment));
-        }
-
+        self::dispatchFinalizeShipmentJobs($shipment);
     }
 
     public function updating(DHLShipment $shipment): void
     {
         self::updateItems($shipment);
-        if ($shipment->number && $shipment->isDirty('number')) {
-            event(new ShipmentCreatedEvent($shipment));
-        }
+        self::dispatchFinalizeShipmentJobs($shipment);
     }
 
-    public function deleted(DHLShipment $shipment): void
+    public function updated(DHLShipment $shipment): void
     {
-//        try {
-//            (new Label($shipment))->delete();
-//        } catch (DHL24Exception $e) {
-//
-//        }
+//        ShipmentCreatedEvent::dispatch($shipment);
     }
 
     private function updateItems(DHLShipment $shipment): void
@@ -39,6 +36,22 @@ class DHLShipmentObserver
             foreach ($shipment->items as $item) {
                 $shipment->items()->save($item);
             }
+        }
+    }
+
+    private function dispatchFinalizeShipmentJobs(DHLShipment $shipment): void
+    {
+        if (!empty($shipment->number) && ($shipment->isDirty('number'))) {
+            Bus::batch([
+                [
+                    new GetShipmentLabelJob($shipment),
+                    new GetShipmentCostJob($shipment),
+                ]
+            ])
+                ->then(
+                    fn() => ShipmentCreatedEvent::dispatch($shipment)
+                )
+                ->dispatch();
         }
     }
 

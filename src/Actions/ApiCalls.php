@@ -2,6 +2,7 @@
 
 namespace xGrz\Dhl24\Actions;
 
+use Illuminate\Support\Facades\Log;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Facades\DHLConfig;
 
@@ -30,6 +31,7 @@ class ApiCalls
         try {
             return DHLConfig::connection()->$method($this->getPayload());
         } catch (\SoapFault $e) {
+            Log::error('DHL error: ' . $e->getMessage(), $this->payload);
             throw new DHL24Exception($e->getMessage(), $e->getCode(), $e);
         }
     }

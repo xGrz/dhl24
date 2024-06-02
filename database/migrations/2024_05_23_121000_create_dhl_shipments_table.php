@@ -29,7 +29,7 @@ return new class extends Migration {
             $table->boolean('is_postfiliale')->default(false);
             $table->string('receiver_name', 60)->nullable();
             $table->string('receiver_postal_code', 10)->nullable();
-            $table->string('receiver_city', 17)->nullable();
+            $table->string('receiver_city', 40)->nullable();
             $table->string('receiver_street', 35)->nullable();
             $table->string('receiver_house_number', 10)->nullable();
             $table->string('receiver_contact_person', 60)->nullable();
@@ -40,7 +40,7 @@ return new class extends Migration {
             $table->boolean('delivery_on_saturday')->default(false);
             $table->boolean('pickup_on_saturday')->default(false);
             $table->double('collect_on_delivery')->nullable();
-            $table->string('collect_on_delivery_reference', 20)->nullable();
+            $table->string('collect_on_delivery_reference', 200)->nullable();
             $table->double('insurance')->nullable();
             $table->boolean('return_on_delivery')->default(false);
             $table->string('return_on_delivery_reference')->nullable();

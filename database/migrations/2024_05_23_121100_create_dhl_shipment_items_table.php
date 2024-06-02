@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('dhl_shipment_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('shipment_id')->constrained('dhl_shipments');
+            $table->foreignId('shipment_id')->constrained('dhl_shipments')->onDelete('cascade');
             $table->integer('quantity');
             $table->string('type', 20)->default(DHLShipmentItemType::PACKAGE);
             $table->double('weight')->nullable();
