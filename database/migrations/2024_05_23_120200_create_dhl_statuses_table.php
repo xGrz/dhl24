@@ -10,8 +10,8 @@ return new class extends Migration {
     {
         Schema::create('dhl_statuses', function (Blueprint $table) {
             $table->string('symbol', 10)->primary();
-            $table->string('description');
-            $table->string('custom_description')->nullable();
+            $table->string('system_description');
+            $table->string('description')->nullable();
             $table->integer('type')->nullable();
             $table->timestamps();
         });

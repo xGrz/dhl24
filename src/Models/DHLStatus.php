@@ -3,6 +3,7 @@
 namespace xGrz\Dhl24\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use xGrz\Dhl24\Enums\DHLStatusType;
@@ -21,6 +22,9 @@ class DHLStatus extends Model
     protected $casts = [
         'type' => DHLStatusType::class,
     ];
+    protected $appends = [
+        'name'
+    ];
 
     public function scopeOrderByTypes(Builder $query): void
     {
@@ -34,9 +38,12 @@ class DHLStatus extends Model
         $query->whereBetween('type', [100, 200]);
     }
 
-    public function getDescription(): string
+    public function label(): Attribute
     {
-        return $this->custom_description ?? $this->description;
+        return Attribute::make(
+            get: fn(string $value) => $this->description ?? $this->system_description,
+            set: fn(string $value) => $this->description = $value,
+        );
     }
 
     public function shipments(): BelongsToMany
