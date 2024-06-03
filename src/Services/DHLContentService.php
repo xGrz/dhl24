@@ -2,56 +2,64 @@
 
 namespace xGrz\Dhl24\Services;
 
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\UniqueConstraintViolationException;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Models\DHLContentSuggestion;
 
 class DHLContentService
 {
-    public static function getContents(): EloquentCollection
+    private ?DHLContentSuggestion $suggestion = null;
+
+    public function __construct(DHLContentSuggestion|int|null $suggestion)
     {
-        return DHLContentSuggestion::sorted()->get();
+        if ($suggestion) $this->suggestion = self::loadSuggestion($suggestion);
+    }
+
+    public static function query(): Builder
+    {
+        return DHLContentSuggestion::query()->sorted();
     }
 
     /**
      * @throws DHL24Exception
      */
-    public static function add(string $name)
+    public function add(string $name): static
     {
         try {
-            return DHLContentSuggestion::create(['name' => $name])->save();
+            DHLContentSuggestion::create(['name' => $name])->save();
         } catch (UniqueConstraintViolationException $e) {
             throw new DHL24Exception('Content suggestion [' . $name . '] already exists.', 100, $e);
         }
+        return $this;
     }
 
     /**
      * @throws DHL24Exception
      */
-    public static function rename(DHLContentSuggestion|int $suggestion, string $name): bool
+    public function rename(string $name): static
     {
         try {
-            return self::suggestion($suggestion)
-                ->update(['name' => $name]);
+            $this->suggestion->update(['name' => $name]);
         } catch (UniqueConstraintViolationException $e) {
             throw new DHL24Exception('Content suggestion [' . $name . '] already exists.', 100, $e);
         }
+        return $this;
     }
 
-    public static function delete(DHLContentSuggestion|int $suggestion): ?bool
+    public function delete(): static
     {
-        return self::suggestion($suggestion)
-            ->delete();
+        $this->suggestion->delete();
+        return $this;
     }
 
-    public static function setDefault(DHLContentSuggestion|int $suggestion): bool
+    public function setDefault(): static
     {
-        return self::suggestion($suggestion)
-            ->update(['is_default' => true]);
+        $this->suggestion->update(['is_default' => true]);
+        return $this;
     }
 
-    private static function suggestion(DHLContentSuggestion|int $suggestion): DHLContentSuggestion
+    private function loadSuggestion(DHLContentSuggestion|int $suggestion): DHLContentSuggestion
     {
         return $suggestion instanceof DHLContentSuggestion
             ? $suggestion

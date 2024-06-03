@@ -21,7 +21,7 @@ class GetShipmentCostJob implements ShouldQueue
 
     public function handle(): void
     {
-        if ($this->batch()->cancelled()) {
+        if ($this->batch()?->cancelled()) {
             return;
         }
         DHL24::wizard($this->shipment)->getCost();

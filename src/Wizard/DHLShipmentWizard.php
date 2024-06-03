@@ -132,9 +132,7 @@ class DHLShipmentWizard
 
     public function shipmentDate(Carbon $date = null): static
     {
-        if (!$this->shipment->shipment_date) {
-            $this->shipment->shipment_date = $date ?? now();
-        }
+        $this->shipment->shipment_date = $date ?? now();
 
         if ($this->shipment->shipment_date->dayOfWeek === CarbonInterface::SUNDAY) {
             $this->shipment->shipment_date->addDay();

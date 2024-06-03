@@ -1,8 +1,6 @@
 <?php
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Tests\TestCase;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Facades\DHL24;
@@ -16,7 +14,7 @@ class DHLCostCenterTest extends TestCase
     private function create(int $count = 10): void
     {
         for ($i = 0; $i < $count; $i++) {
-            DHL24::addCostCenter('TestCostCenterName' . $i);
+            DHL24::costsCenter()->add('TestCostCenterName' . $i);
         }
     }
 
@@ -31,7 +29,7 @@ class DHLCostCenterTest extends TestCase
         self::create(5);
 
         $this->expectException(DHL24Exception::class);
-        DHL24::addCostCenter('TestCostCenterName2');
+        DHL24::costsCenter()->add('TestCostCenterName2');
     }
 
     public function test_rename_cost_center()
@@ -40,7 +38,7 @@ class DHLCostCenterTest extends TestCase
 
         $cc = DHLCostCenter::inRandomOrder()->first();
         $ccName = $cc->name;
-        DHL24::renameCostCenter($cc, 'Renamed');
+        DHL24::costsCenter($cc)->rename('Renamed');
 
         $this->assertDatabaseMissing('dhl_cost_centers', ['name' => $ccName]);
         $this->assertDatabaseHas('dhl_cost_centers', ['name' => 'Renamed']);
@@ -50,7 +48,7 @@ class DHLCostCenterTest extends TestCase
     {
         self::create(5);
         $cc = DHLCostCenter::inRandomOrder()->first();
-        DHL24::deleteCostCenter($cc);
+        DHL24::costsCenter($cc)->delete();
         $cc = $cc->toArray();
 
         $this->assertDatabaseMissing('dhl_cost_centers', ['id' => $cc['id'], 'name' => $cc['name']]);
@@ -61,7 +59,7 @@ class DHLCostCenterTest extends TestCase
         self::create(1);
         $cc = DHLCostCenter::first();
         DHLShipment::create(['cost_center_id' => $cc->id]);
-        DHL24::deleteCostCenter($cc);
+        DHL24::costsCenter($cc)->delete();
 
         $this->assertDatabaseHas('dhl_cost_centers', ['id' => $cc['id'], 'name' => $cc['name']]);
         $this->assertSoftDeleted($cc);
@@ -73,7 +71,7 @@ class DHLCostCenterTest extends TestCase
         $cc = DHLCostCenter::first();
         $cc->deleted_at = now();
 
-        DHL24::restoreCostCenter($cc->id);
+        DHL24::costsCenter($cc)->restore();
         $this->assertNotSoftDeleted($cc);
     }
 
@@ -85,11 +83,11 @@ class DHLCostCenterTest extends TestCase
 
         $this->assertDatabaseMissing('dhl_cost_centers', ['is_default' => 1]);
 
-        DHL24::setDefaultCostCenter($cc1);
+        DHL24::costsCenter($cc1)->setDefault();
         $this->assertEquals(1, DHLCostCenter::where(['is_default' => 1])->count());
         $this->assertDatabaseHas('dhl_cost_centers', ['name' => $cc1->name, 'is_default' => 1]);
 
-        DHL24::setDefaultCostCenter($cc2);
+        DHL24::costsCenter($cc2)->setDefault($cc2);
         $this->assertEquals(1, DHLCostCenter::where(['is_default' => 1])->count());
         $this->assertDatabaseHas('dhl_cost_centers', ['name' => $cc2->name, 'is_default' => 1]);
         $this->assertDatabaseHas('dhl_cost_centers', ['name' => $cc1->name, 'is_default' => 0]);
@@ -105,15 +103,15 @@ class DHLCostCenterTest extends TestCase
                 $center->update(['deleted_at' => now()]);
             });
 
-        $this->assertEquals(8, DHL24::costsCenter()->count());
+        $this->assertEquals(8, DHL24::costsCenter()->query()->get()->count());
     }
 
     public function test_default_center_is_first_on_listing()
     {
         self::create();
         $cc = DHLCostCenter::inRandomOrder()->first();
-        DHL24::setDefaultCostCenter($cc);
-        $listing = DHL24::costsCenter();
+        DHL24::costsCenter($cc)->setDefault();
+        $listing = DHL24::costsCenter()->query()->get();
 
         $this->assertTrue($listing->first()->is_default);
     }
@@ -128,7 +126,7 @@ class DHLCostCenterTest extends TestCase
                 $center->update(['deleted_at' => now()]);
             });
 
-        $this->assertEquals(4, DHL24::deletedCostsCenter()->count());
+        $this->assertEquals(4, DHL24::costsCenter()->query()->onlyTrashed()->count());
     }
 
     public function test_get_complete_list_of_cost_centers()
@@ -141,35 +139,7 @@ class DHLCostCenterTest extends TestCase
                 $center->update(['deleted_at' => now()]);
             });
 
-        $this->assertEquals(10, DHL24::allCostCenters()->count());
-    }
-
-    public function test_default_pagination_on_cost_center_listing()
-    {
-        self::create(20);
-        $listing = DHL24::costsCenter(true);
-
-        $this->assertInstanceOf(LengthAwarePaginator::class, $listing);
-        $this->assertCount(15, $listing);
-    }
-
-
-    public function test_custom_pagination_on_cost_center_listing()
-    {
-        self::create(20);
-        $listing = DHL24::costsCenter(9);
-
-        $this->assertInstanceOf(LengthAwarePaginator::class, $listing);
-        $this->assertCount(9, $listing);
-    }
-
-    public function test_without_pagination_on_cost_center_listing()
-    {
-        self::create(17);
-        $listing = DHL24::costsCenter(false);
-
-        $this->assertInstanceOf(Collection::class, $listing);
-        $this->assertCount(17, $listing);
+        $this->assertEquals(10, DHL24::costsCenter()->query()->withTrashed()->count());
     }
 
     public function test_assigned_shipments_listing()
@@ -180,20 +150,8 @@ class DHLCostCenterTest extends TestCase
             DHLShipment::create(['cost_center_id' => $cc->id]);
         }
 
-        $this->assertCount(9, DHL24::costCenterShipments($cc));
-        $this->assertInstanceOf(DHLShipment::class, DHL24::costCenterShipments($cc)->first());
-    }
-
-    public function test_assigned_shipments_listing_with_pagination()
-    {
-        self::create(2);
-        $cc = DHLCostCenter::first();
-        for($i=0;$i<31;$i++) {
-            DHLShipment::create(['cost_center_id' => $cc->id]);
-        }
-
-        $this->assertCount(11, DHL24::costCenterShipments($cc, 11));
-        $this->assertInstanceOf(DHLShipment::class, DHL24::costCenterShipments($cc, 15)->first());
+        $this->assertCount(9, DHL24::costsCenter($cc)->shipments()->get());
+        $this->assertInstanceOf(DHLShipment::class, DHL24::costsCenter($cc)->shipments()->first());
     }
 
 

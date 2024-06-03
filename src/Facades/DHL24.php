@@ -2,9 +2,7 @@
 
 namespace xGrz\Dhl24\Facades;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use xGrz\Dhl24\Actions\Label;
@@ -68,93 +66,67 @@ class DHL24
             ->get();
     }
 
-    public static function contentSuggestions(): array
+
+    public static function contentSuggestions(DHLContentSuggestion|int|null $suggestion = null): DHLContentService
     {
-        return DHLContentService::getContents()
-            ->map(fn($suggestion) => [
-                'id' => $suggestion->id,
-                'name' => $suggestion->name,
-                'is_default' => $suggestion->is_default
-            ])
-            ->toArray();
+        return (new DHLContentService($suggestion));
     }
 
-    /**
-     * @throws DHL24Exception
-     */
-    public static function addContentSuggestion(string $name)
+    public static function costsCenter(DHLCostCenter|int|null $costsCenter = null): DHLCostCenterService
     {
-        return DHLContentService::add($name);
+        return (new DHLCostCenterService($costsCenter));
     }
 
-    /**
-     * @throws DHL24Exception
-     */
-    public static function renameContentSuggestion(DHLContentSuggestion|int $suggestion, string $name): bool
-    {
-        return DHLContentService::rename($suggestion, $name);
-    }
-
-    public static function deleteContentSuggestion(DHLContentSuggestion|int $suggestion): ?bool
-    {
-        return DHLContentService::delete($suggestion);
-    }
-
-    public static function setDefaultContent(DHLContentSuggestion|int $suggestion): ?bool
-    {
-        return DHLContentService::delete($suggestion);
-    }
-
-    public static function costsCenter(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
-    {
-        return DHLCostCenterService::getCostCenters($withPagination, $paginationName);
-    }
-
-    public static function deletedCostsCenter(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
-    {
-        return DHLCostCenterService::getDeletedCostCenters($withPagination, $paginationName);
-    }
-
-    public static function allCostCenters(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
-    {
-        return DHLCostCenterService::getAllCostCenters($withPagination, $paginationName);
-    }
-
-    public static function costCenterShipments(DHLCostCenter|int $center, bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
-    {
-        return DHLCostCenterService::getShipmentsByCostCenter($center, $withPagination, $paginationName);
-    }
-
-    /**
-     * @throws DHL24Exception
-     */
-    public static function addCostCenter(string $name): DHLCostCenter
-    {
-        return DHLCostCenterService::add($name);
-    }
-
-    /**
-     * @throws DHL24Exception
-     */
-    public static function renameCostCenter(DHLCostCenter|int $center, string $name): bool
-    {
-        return DHLCostCenterService::rename($center, $name);
-    }
-
-    public static function deleteCostCenter(DHLCostCenter|int $center): ?bool
-    {
-        return DHLCostCenterService::delete($center);
-    }
-
-    public static function restoreCostCenter(DHLCostCenter|int $center): bool|int
-    {
-        return DHLCostCenterService::restore($center);
-    }
-
-    public static function setDefaultCostCenter(DHLCostCenter|int $center): bool
-    {
-        return DHLCostCenterService::setDefault($center);
-    }
+//    public static function costsCenter(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
+//    {
+//        return DHLCostCenterService::getCostCenters($withPagination, $paginationName);
+//    }
+//
+//    public static function deletedCostsCenter(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
+//    {
+//        return DHLCostCenterService::getDeletedCostCenters($withPagination, $paginationName);
+//    }
+//
+//    public static function allCostCenters(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
+//    {
+//        return DHLCostCenterService::getAllCostCenters($withPagination, $paginationName);
+//    }
+//
+//    public static function costCenterShipments(DHLCostCenter|int $center, bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
+//    {
+//        return DHLCostCenterService::getShipmentsByCostCenter($center, $withPagination, $paginationName);
+//    }
+//
+//    /**
+//     * @throws DHL24Exception
+//     */
+//    public static function addCostCenter(string $name): DHLCostCenter
+//    {
+//        return DHLCostCenterService::add($name);
+//    }
+//
+//    /**
+//     * @throws DHL24Exception
+//     */
+//    public static function renameCostCenter(DHLCostCenter|int $center, string $name): bool
+//    {
+//        return DHLCostCenterService::rename($center, $name);
+//    }
+//
+//    public static function deleteCostCenter(DHLCostCenter|int $center): ?bool
+//    {
+//        return DHLCostCenterService::delete($center);
+//    }
+//
+//    public static function restoreCostCenter(DHLCostCenter|int $center): bool|int
+//    {
+//        return DHLCostCenterService::restore($center);
+//    }
+//
+//    public static function setDefaultCostCenter(DHLCostCenter|int $center): bool
+//    {
+//        return DHLCostCenterService::setDefault($center);
+//    }
 
 
     public static function wizard(DHLShipment $shipment = null): DHLShipmentWizard

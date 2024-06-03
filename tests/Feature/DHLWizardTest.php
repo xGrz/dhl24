@@ -667,23 +667,22 @@ class DHLWizardTest extends TestCase
         ]);
     }
 
-    public function test_skip_restriction_check_missing_in_payload_when_disabled()
+    public function test_skip_restriction_check_when_disabled()
     {
         Config::set('dhl24.restrictions-check', false);
         $w = DHL24::wizard();
         $shipment = $w->getPayload();
 
-        $this->assertArrayNotHasKey('skipRestrictionCheck', $shipment);
+        $this->assertTrue($shipment['skipRestrictionCheck']);
     }
 
-    public function test_skip_restriction_check_exists_in_payload_when_enabled()
+    public function test_skip_restriction_check_when_enabled()
     {
         Config::set('dhl24.restrictions-check', true);
         $w = DHL24::wizard();
         $shipment = $w->getPayload();
 
-        $this->assertArrayHasKey('skipRestrictionCheck', $shipment);
-        $this->assertTrue($shipment['skipRestrictionCheck']);
+        $this->assertFalse($shipment['skipRestrictionCheck']);
     }
 
     public function test_shipment_comment()

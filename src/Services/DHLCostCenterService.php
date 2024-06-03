@@ -2,10 +2,10 @@
 
 namespace xGrz\Dhl24\Services;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Builder;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Models\DHLCostCenter;
+use xGrz\Dhl24\Models\DHLShipment;
 use xGrz\Dhl24\Traits\HandlesPagination;
 
 class DHLCostCenterService
@@ -13,79 +13,71 @@ class DHLCostCenterService
 
     use HandlesPagination;
 
-    public static function getCostCenters(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
+    private ?DHLCostCenter $costsCenter = null;
+
+    public function __construct(DHLCostCenter|int|null $costsCenter = null)
     {
-        return self::applyPagination(DHLCostCenter::sorted(), $withPagination, $paginationName);
+        if ($costsCenter) $this->costsCenter = self::loadCostCenter($costsCenter);
     }
 
-    public static function getDeletedCostCenters(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
+    public static function query(): Builder
     {
-        return self::applyPagination(DHLCostCenter::onlyTrashed()->sorted(), $withPagination, $paginationName);
-    }
-
-    public static function getAllCostCenters(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
-    {
-        return self::applyPagination(DHLCostCenter::withTrashed()->sorted(), $withPagination, $paginationName);
-    }
-
-    public static function getShipmentsByCostCenter(DHLCostCenter|int $center, bool|int $withPagination = false, string $paginationName = null)
-    {
-        return self::costCenter($center)
-            ->load([
-                'shipments' => function ($shipments) use ($withPagination, $paginationName) {
-                    self::applyPagination($shipments, $withPagination, $paginationName);
-                }
-            ])->shipments;
+        return DHLCostCenter::query()->sorted();
     }
 
     /**
      * @throws DHL24Exception
      */
-    public static function add(string $name): DHLCostCenter
+    public function add(string $name): static
     {
         if ($exists = self::isNameExists($name)) {
             $exists->deleted_at
                 ? throw new DHL24Exception('This cost center name was already used and deleted', 101)
                 : throw new DHL24Exception('This cost center name exists', 102);
         }
-        $costCenter = DHLCostCenter::create(['name' => $name]);
-        $costCenter->save();
-        return $costCenter;
+        DHLCostCenter::create(['name' => $name])->save();
+        return $this;
     }
 
     /**
      * @throws DHL24Exception
      */
-    public static function rename(DHLCostCenter|int $center, string $name): bool
+    public function rename(string $name): static
     {
         if ($exists = self::isNameExists($name)) {
             $exists->deleted_at
                 ? throw new DHL24Exception('This cost center name was already used and deleted', 101)
                 : throw new DHL24Exception('This cost center name exists', 102);
         }
-        return self::costCenter($center)->update(['name' => $name]);
+        $this->costsCenter->update(['name' => $name]);
+        return $this;
     }
 
-    public static function delete(DHLCostCenter|int $center): ?bool
+    public function delete(): ?static
     {
-        $center = self::costCenter($center);
-        if (!$center) return false;
-        $center->loadMissing(['shipments']);
-        return ($center->shipments->isEmpty())
-            ? $center->forceDelete()
-            : $center->delete();
+        $this->costsCenter->loadMissing(['shipments']);
+        $this->costsCenter->shipments->isEmpty()
+            ? $this->costsCenter->forceDelete()
+            : $this->costsCenter->delete();
+        return $this;
     }
 
-    public static function restore(DHLCostCenter|int $center): bool|int
+    public function setDefault(): static
     {
-        return self::costCenter($center)->restore();
+        $this->costsCenter->update(['is_default' => true]);
+        return $this;
     }
 
-    public static function setDefault(DHLCostCenter|int $center): bool
+    public function restore(): static
     {
-        return self::costCenter($center)
-            ->update(['is_default' => true]);
+        $this->costsCenter->restore();
+        return $this;
+    }
 
+
+    public function shipments(): Builder
+    {
+        return DHLShipment::query()->where('cost_center_id', $this->costsCenter->id);
     }
 
     private static function isNameExists(string $name): ?DHLCostCenter
@@ -95,7 +87,7 @@ class DHLCostCenterService
             ->first();
     }
 
-    private static function costCenter(DHLCostCenter|int $center): ?DHLCostCenter
+    private static function loadCostCenter(DHLCostCenter|int $center): ?DHLCostCenter
     {
         return $center instanceof DHLCostCenter
             ? $center
