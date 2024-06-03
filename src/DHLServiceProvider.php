@@ -16,6 +16,7 @@ class DHLServiceProvider extends ServiceProvider
     {
         self::setupPackageConfig();
         self::setupMigrations();
+        self::setupTranslations();
     }
 
     private function setupPackageConfig(): void
@@ -35,5 +36,10 @@ class DHLServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         }
+    }
+
+    private function setupTranslations(): void
+    {
+        $this->loadTranslationsFrom(__DIR__ . '/../lang', 'dhl');
     }
 }
