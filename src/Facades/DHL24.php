@@ -17,8 +17,10 @@ use xGrz\Dhl24\Jobs\TrackShipmentsJob;
 use xGrz\Dhl24\Models\DHLContentSuggestion;
 use xGrz\Dhl24\Models\DHLCostCenter;
 use xGrz\Dhl24\Models\DHLShipment;
+use xGrz\Dhl24\Models\DHLStatus;
 use xGrz\Dhl24\Services\DHLContentService;
 use xGrz\Dhl24\Services\DHLCostCenterService;
+use xGrz\Dhl24\Services\DHLStateService;
 use xGrz\Dhl24\Services\DHLTrackingService;
 use xGrz\Dhl24\Wizard\DHLShipmentWizard;
 
@@ -66,7 +68,6 @@ class DHL24
             ->get();
     }
 
-
     public static function contentSuggestions(DHLContentSuggestion|int|null $suggestion = null): DHLContentService
     {
         return (new DHLContentService($suggestion));
@@ -75,6 +76,11 @@ class DHL24
     public static function costsCenter(DHLCostCenter|int|null $costsCenter = null): DHLCostCenterService
     {
         return (new DHLCostCenterService($costsCenter));
+    }
+
+    public static function states(DHLStatus|string|null $status = null): DHLStateService
+    {
+        return new DHLStateService($status);
     }
 
     public static function wizard(DHLShipment $shipment = null): DHLShipmentWizard
