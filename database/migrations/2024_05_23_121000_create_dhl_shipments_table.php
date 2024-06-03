@@ -13,7 +13,7 @@ return new class extends Migration {
     {
         Schema::create('dhl_shipments', function (Blueprint $table) {
             $table->id();
-            $table->string('number')->nullable()->unique();
+            $table->unsignedBigInteger('number')->nullable()->unique();
             $table->date('shipment_date')->nullable();
             $table->string('shipper_name', 60)->nullable();
             $table->string('shipper_postal_code', 10)->nullable();
