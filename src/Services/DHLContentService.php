@@ -16,9 +16,9 @@ class DHLContentService
         if ($suggestion) $this->suggestion = self::loadSuggestion($suggestion);
     }
 
-    public static function query(): Builder
+    public function query(): Builder
     {
-        return DHLContentSuggestion::query()->sorted();
+        return DHLContentSuggestion::query();
     }
 
     /**
@@ -56,6 +56,12 @@ class DHLContentService
     public function setDefault(): static
     {
         $this->suggestion->update(['is_default' => true]);
+        return $this;
+    }
+
+    public function removeDefault(): static
+    {
+        DHLContentSuggestion::where('is_default', true)->update(['is_default' => false]);
         return $this;
     }
 

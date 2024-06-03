@@ -9,23 +9,36 @@ Package can manage costs centers for accountants. You can have billing informati
 ___
 ## LISTING (query)
 
-`query` method applies sorted scope (sorting by name). If cost center is marked as default it will be always on first place in results.
+`query` method return DHLCostsCenter query builder. Typically, you will sort your results by `name` or by `is_default`.
+You can use predefined scopes `sortedByNames` on query or `defaultFirst`. If you want to combine them use `defaultFirst` before `sortedByNames` to get default cost center as first on list.
 
 ### Active listing
 ```php
-\xGrz\Dhl24\Facades\DHL24::costsCenter()->query()->get();
+\xGrz\Dhl24\Facades\DHL24::costsCenter()
+    ->query()
+    ->defaultFirst()
+    ->sortedByNames()
+    ->get();
 ```
 ___
 
 ### Soft deleted listing
 ```php
-\xGrz\Dhl24\Facades\DHL24::costsCenter()->query()->onlyTrashed()->get();
+\xGrz\Dhl24\Facades\DHL24::costsCenter()
+    ->query()
+    ->sortedByNames()
+    ->onlyTrashed()
+    ->get();
 ```
 ___
 
 ### Active and soft deleted listing
 ```php
-\xGrz\Dhl24\Facades\DHL24::costsCenter()->query()->withTrashed()->paginate();
+\xGrz\Dhl24\Facades\DHL24::costsCenter()
+    ->query()
+    ->sortedByNames()
+    ->withTrashed()
+    ->paginate();
 ```
 In this example we get paginated list except listing all models.
 ___

@@ -20,10 +20,15 @@ class DHLCostCenter extends Model
         'is_default' => 'boolean'
     ];
 
-    public function scopeSorted(Builder $query): void
+    public function scopeDefaultFirst(Builder $query): void
     {
-        $query->orderBy('is_default', 'DESC')->orderBy('name');
+        $query->orderBy('is_default', 'DESC');
     }
+    public function scopeSortedByNames(Builder $query): void
+    {
+        $query->orderBy('name');
+    }
+
 
     public function shipments(): HasMany
     {

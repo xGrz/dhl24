@@ -20,9 +20,9 @@ class DHLCostCenterService
         if ($costsCenter) $this->costsCenter = self::loadCostCenter($costsCenter);
     }
 
-    public static function query(): Builder
+    public function query(): Builder
     {
-        return DHLCostCenter::query()->sorted();
+        return DHLCostCenter::query();
     }
 
     /**

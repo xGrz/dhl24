@@ -15,10 +15,11 @@ ___
 
 ## Suggestions listing (query)
 ```php
-xGrz\Dhl24\Facades\DHL24::contentSuggestions()->query(): Builder;
+xGrz\Dhl24\Facades\DHL24::contentSuggestions()->query()->sortedByNames(): Builder;
 ```
 This method return query builder for content suggestions. You can use all eloquent query builder methods. It allows to add pagination or filtering results.
-This method has already assigned scope for sorting by name. If you have marked suggestion as default it will be always first on list. 
+Typically, you will sort your results by `name` or by `is_default`.
+You can use predefined scopes `sortedByNames` on query or `defaultFirst`. If you want to combine them use `defaultFirst` before `sortedByNames` to get default cost center as first on list.
 ___
 
 ## Rename suggestion
