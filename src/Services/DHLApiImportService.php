@@ -45,7 +45,6 @@ class DHLApiImportService
             ->each(function ($shipment) {
                 $this->shipments->push($shipment);
             });
-
         if ($shipments->count() < 100) return;
         self::importMyShipments(++$page);
     }
@@ -62,7 +61,6 @@ class DHLApiImportService
 
     private function storeShipmentLocally(object $shipment): void
     {
-        //dd($shipment);
         $wizard= DHL24::wizard()
             ->shipmentDate(Carbon::parse($shipment->shipmentTime->shipmentDate))
             ->content($shipment->content)
@@ -103,7 +101,7 @@ class DHLApiImportService
 
     }
 
-    private function addItem($shipmentItem, DHLShipmentWizard $wizard): DHLShipmentWizard
+    private function addItem($shipmentItem, DHLShipmentWizard $wizard): void
     {
         $wizard->addItem(
             DHLShipmentItemType::findByName($shipmentItem->type),
@@ -114,7 +112,6 @@ class DHLApiImportService
             $shipmentItem->length,
             $shipmentItem->nonStandard,
         );
-        return $wizard;
     }
 
 }

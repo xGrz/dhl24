@@ -2,7 +2,6 @@
 
 namespace xGrz\Dhl24\Wizard;
 
-use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use xGrz\Dhl24\Actions\Cost;
@@ -23,8 +22,12 @@ class DHLShipmentWizard
 
     public function __construct(?DHLShipment $shipment = null)
     {
-        $this->shipment = $shipment ?? new DHLShipment();
-        self::shipmentDate();
+        if ($shipment) {
+            $this->shipment = $shipment;
+        } else {
+            $this->shipment = new DHLShipment();
+            self::shipmentDate();
+        }
     }
 
     public function shipperName(string $name): static
@@ -130,13 +133,9 @@ class DHLShipmentWizard
         return $this;
     }
 
-    public function shipmentDate(Carbon $date = null): static
+    public function shipmentDate(Carbon $carbonDate = null): static
     {
-        $this->shipment->shipment_date = $date ?? now();
-
-        if ($this->shipment->shipment_date->dayOfWeek === CarbonInterface::SUNDAY) {
-            $this->shipment->shipment_date->addDay();
-        }
+        $this->shipment->shipment_date = $carbonDate ?? now();
         return $this;
     }
 

@@ -90,7 +90,7 @@ class DHLConfigService
 
     public function getTrackingMaxShipmentAge(): int
     {
-        return config('dhl24.track_shipment_max_age', 7);
+        return config('dhl24.track_shipment_max_age', 14);
     }
 
     public function getRestrictionCheckSetting(): bool
