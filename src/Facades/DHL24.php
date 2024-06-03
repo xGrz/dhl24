@@ -77,58 +77,6 @@ class DHL24
         return (new DHLCostCenterService($costsCenter));
     }
 
-//    public static function costsCenter(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
-//    {
-//        return DHLCostCenterService::getCostCenters($withPagination, $paginationName);
-//    }
-//
-//    public static function deletedCostsCenter(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
-//    {
-//        return DHLCostCenterService::getDeletedCostCenters($withPagination, $paginationName);
-//    }
-//
-//    public static function allCostCenters(bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
-//    {
-//        return DHLCostCenterService::getAllCostCenters($withPagination, $paginationName);
-//    }
-//
-//    public static function costCenterShipments(DHLCostCenter|int $center, bool|int $withPagination = false, string $paginationName = null): EloquentCollection|LengthAwarePaginator
-//    {
-//        return DHLCostCenterService::getShipmentsByCostCenter($center, $withPagination, $paginationName);
-//    }
-//
-//    /**
-//     * @throws DHL24Exception
-//     */
-//    public static function addCostCenter(string $name): DHLCostCenter
-//    {
-//        return DHLCostCenterService::add($name);
-//    }
-//
-//    /**
-//     * @throws DHL24Exception
-//     */
-//    public static function renameCostCenter(DHLCostCenter|int $center, string $name): bool
-//    {
-//        return DHLCostCenterService::rename($center, $name);
-//    }
-//
-//    public static function deleteCostCenter(DHLCostCenter|int $center): ?bool
-//    {
-//        return DHLCostCenterService::delete($center);
-//    }
-//
-//    public static function restoreCostCenter(DHLCostCenter|int $center): bool|int
-//    {
-//        return DHLCostCenterService::restore($center);
-//    }
-//
-//    public static function setDefaultCostCenter(DHLCostCenter|int $center): bool
-//    {
-//        return DHLCostCenterService::setDefault($center);
-//    }
-
-
     public static function wizard(DHLShipment $shipment = null): DHLShipmentWizard
     {
         return new DHLShipmentWizard($shipment);
