@@ -88,6 +88,11 @@ class DHLConfigService
         return config('dhl24.shipment-insurance.intelligent_cost_saver_max_value', 0);
     }
 
+    public function getTrackingMaxShipmentAge(): int
+    {
+        return config('dhl24.track_shipment_max_age', 7);
+    }
+
     public function getRestrictionCheckSetting(): bool
     {
         return !config('dhl24.restrictions-check', false);

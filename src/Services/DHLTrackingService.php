@@ -8,6 +8,7 @@ use xGrz\Dhl24\Enums\DHLStatusType;
 use xGrz\Dhl24\Events\ShipmentDeliveredEvent;
 use xGrz\Dhl24\Events\ShipmentSentEvent;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
+use xGrz\Dhl24\Facades\DHLConfig;
 use xGrz\Dhl24\Models\DHLShipment;
 use xGrz\Dhl24\Models\DHLStatus;
 
@@ -74,7 +75,10 @@ class DHLTrackingService
     {
         return DHLShipment::whereDoesntHave('tracking', function ($q) {
             $q->whereIn('status', self::finishingStates());
-        })->get();
+        })
+            ->where('updated_at', '>', now()->subDays(DHLConfig::getTrackingMaxShipmentAge())->startOfDay())
+            ->where('shipment_date', '>', now()->subDays(DHLConfig::getTrackingMaxShipmentAge())->startOfDay())
+            ->get();
     }
 
     public static function finishingStates(): array
