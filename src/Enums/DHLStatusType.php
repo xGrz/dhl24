@@ -28,7 +28,7 @@ enum DHLStatusType: int implements WithLabel
 
     public function getLangKey(): string
     {
-        return 'shipment.statusType';
+        return 'state';
     }
 
     public static function getOptions(): array
