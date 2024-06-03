@@ -629,7 +629,8 @@ class DHLWizardTest extends TestCase
 
     public function test_assigning_cost_center()
     {
-        $cc = DHL24::addCostCenter('TestCostCenter');
+        DHL24::costsCenter()->add('TestCostCenter');
+        $cc = DHL24::costsCenter()->query()->where('name', 'TestCostCenter')->first();
         $w = DHL24::wizard()
             ->costCenter($cc);
         $payment = $w->getPayload()['payment'];
