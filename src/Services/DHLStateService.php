@@ -34,7 +34,7 @@ class DHLStateService
 
     public function rename(string $name): static
     {
-        $this->status->update(['custom_description' => $name]);
+        $this->status->update(['description' => $name]);
         return $this;
     }
 

@@ -111,7 +111,7 @@ class DHLCostCenterTest extends TestCase
         self::create();
         $cc = DHLCostCenter::inRandomOrder()->first();
         DHL24::costsCenter($cc)->setDefault();
-        $listing = DHL24::costsCenter()->query()->get();
+        $listing = DHL24::costsCenter()->query()->defaultFirst()->get();
 
         $this->assertTrue($listing->first()->is_default);
     }

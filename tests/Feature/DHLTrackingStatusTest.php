@@ -33,7 +33,7 @@ class DHLTrackingStatusTest extends TestCase
 
         $this->assertDatabaseHas(DHLStatus::class, [
             'symbol' => 'DOR',
-            'custom_description' => 'Doręczona',
+            'description' => 'Doręczona',
         ]);
     }
 

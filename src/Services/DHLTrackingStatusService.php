@@ -39,9 +39,9 @@ class DHLTrackingStatusService
         return $this;
     }
 
-    public function updateDescription(string $custom_description = null): static
+    public function updateDescription(string $description = null): static
     {
-        $this->status->update(['custom_description' => $custom_description]);
+        $this->status->update(['description' => $description]);
         return $this;
     }
 
