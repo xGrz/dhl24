@@ -32,9 +32,9 @@ class DHLTrackingStateService
         return $this;
     }
 
-    public function exists(string $symbol): bool
+    public function exists(string $code): bool
     {
-        return DHLTrackingState::where('symbol', $symbol)->count();
+        return DHLTrackingState::where('code', $code)->count();
     }
 
     public function rename(string $name): static
