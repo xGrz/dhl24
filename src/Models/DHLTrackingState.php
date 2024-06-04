@@ -11,12 +11,12 @@ use xGrz\Dhl24\Enums\DHLStatusType;
 /**
  * @property DHLTracking $pivot
  */
-class DHLStatus extends Model
+class DHLTrackingState extends Model
 {
 
-    protected $table = 'dhl_statuses';
+    protected $table = 'dhl_tracking_states';
     protected $keyType = 'string';
-    protected $primaryKey = 'symbol';
+    protected $primaryKey = 'code';
     public $incrementing = false;
     protected $guarded = [];
     protected $casts = [
@@ -30,7 +30,7 @@ class DHLStatus extends Model
     {
         $query
             ->orderBy('type')
-            ->orderBy('symbol');
+            ->orderBy('code');
     }
 
     public function scopeFinishedState(Builder $query): void
@@ -48,6 +48,6 @@ class DHLStatus extends Model
 
     public function shipments(): BelongsToMany
     {
-        return $this->belongsToMany(DHLShipment::class, 'dhl_shipment_tracking', 'status', 'shipment_id');
+        return $this->belongsToMany(DHLShipment::class, 'dhl_shipment_tracking', 'code', 'shipment_id');
     }
 }

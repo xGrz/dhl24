@@ -4,31 +4,31 @@ namespace xGrz\Dhl24\Services;
 
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use xGrz\Dhl24\Enums\DHLStatusType;
-use xGrz\Dhl24\Models\DHLStatus;
+use xGrz\Dhl24\Models\DHLTrackingState;
 
 class DHLTrackingStatusService
 {
 
-    private DHLStatus $status;
+    private DHLTrackingState $status;
 
-    public function __construct(DHLStatus|string $status) {
+    public function __construct(DHLTrackingState|string $status) {
         $this->status = self::getStatus($status);
     }
 
     public static function getStates(): EloquentCollection
     {
-        return DHLStatus::orderByTypes()->get();
+        return DHLTrackingState::orderByTypes()->get();
     }
 
-    public static function findForTracking(string $statusSymbol, string $description = null): DHLStatus
+    public static function findForTracking(string $statusSymbol, string $description = null): DHLTrackingState
     {
-        return DHLStatus::updateOrCreate(
-            ['symbol' => $statusSymbol],
-            ['description' => $description],
+        return DHLTrackingState::updateOrCreate(
+            ['code' => $statusSymbol],
+            ['system_description' => $description],
         );
     }
 
-    public static function getState(DHLStatus|string $status): DHLStatus
+    public static function getState(DHLTrackingState|string $status): DHLTrackingState
     {
         return self::getStatus($status);
     }
@@ -45,11 +45,11 @@ class DHLTrackingStatusService
         return $this;
     }
 
-    private static function getStatus(DHLStatus|string $status): DHLStatus
+    private static function getStatus(DHLTrackingState|string $status): DHLTrackingState
     {
-        return $status instanceof DHLStatus
+        return $status instanceof DHLTrackingState
             ? $status
-            : DHLStatus::where('symbol', $status)->first();
+            : DHLTrackingState::where('code', $status)->first();
     }
 
     public static function getStatusTypes(): array

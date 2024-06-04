@@ -3,7 +3,7 @@
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use xGrz\Dhl24\Enums\DHLStatusType;
-use xGrz\Dhl24\Models\DHLStatus;
+use xGrz\Dhl24\Models\DHLTrackingState;
 use xGrz\Dhl24\Services\DHLTrackingStatusService;
 
 class DHLTrackingStatusTest extends TestCase
@@ -20,9 +20,9 @@ class DHLTrackingStatusTest extends TestCase
     {
         $state = DHLTrackingStatusService::getState('DOR');
 
-        $this->assertEquals('DOR', $state->symbol);
-        $this->assertNotNull($state->description);
-        $this->assertNull($state->custom_description);
+        $this->assertEquals('DOR', $state->code);
+        $this->assertNotNull($state->system_description);
+        $this->assertNull($state->description);
         $this->assertEquals(DHLStatusType::DELIVERED, $state->type);
     }
 
@@ -31,8 +31,8 @@ class DHLTrackingStatusTest extends TestCase
         $status = new DHLTrackingStatusService('DOR');
         $status->updateDescription('Doręczona');
 
-        $this->assertDatabaseHas(DHLStatus::class, [
-            'symbol' => 'DOR',
+        $this->assertDatabaseHas(DHLTrackingState::class, [
+            'code' => 'DOR',
             'description' => 'Doręczona',
         ]);
     }
@@ -42,8 +42,8 @@ class DHLTrackingStatusTest extends TestCase
         $status = new DHLTrackingStatusService('DOR');
         $status->updateType(DHLStatusType::ERROR);
 
-        $this->assertDatabaseHas(DHLStatus::class, [
-            'symbol' => 'DOR',
+        $this->assertDatabaseHas(DHLTrackingState::class, [
+            'code' => 'DOR',
             'type' => DHLStatusType::ERROR,
         ]);
     }
@@ -51,31 +51,31 @@ class DHLTrackingStatusTest extends TestCase
     public function test_find_for_tracking_returns_existing_model()
     {
         $model = DHLTrackingStatusService::findForTracking('DOR', 'ABC');
-        $this->assertEquals('DOR', $model->symbol);
+        $this->assertEquals('DOR', $model->code);
     }
 
     public function test_find_for_tracking_updates_api_description()
     {
         $model = DHLTrackingStatusService::findForTracking('DOR', 'XXX');
-        $this->assertEquals('DOR', $model->symbol);
-        $this->assertDatabaseHas(DHLStatus::class, [
-            'symbol' => 'DOR',
-            'description' => 'XXX',
+        $this->assertEquals('DOR', $model->code);
+        $this->assertDatabaseHas(DHLTrackingState::class, [
+            'code' => 'DOR',
+            'system_description' => 'XXX',
         ]);
     }
 
     public function test_find_for_tracking_creates_new_state_when_not_found()
     {
-        $rows = DHLStatus::count();
+        $rows = DHLTrackingState::count();
         $model = DHLTrackingStatusService::findForTracking('DOR1', 'XXXYYY');
 
-        $this->assertEquals('DOR1', $model->symbol);
-        $this->assertDatabaseHas(DHLStatus::class, [
-            'symbol' => 'DOR1',
-            'description' => 'XXXYYY',
+        $this->assertEquals('DOR1', $model->code);
+        $this->assertDatabaseHas(DHLTrackingState::class, [
+            'code' => 'DOR1',
+            'system_description' => 'XXXYYY',
             'type' => null,
         ]);
-        $this->assertEquals($rows + 1, DHLStatus::count());
+        $this->assertEquals($rows + 1, DHLTrackingState::count());
     }
 
     public function test_get_type_options()

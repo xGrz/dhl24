@@ -17,7 +17,7 @@ use xGrz\Dhl24\Jobs\TrackShipmentsJob;
 use xGrz\Dhl24\Models\DHLContentSuggestion;
 use xGrz\Dhl24\Models\DHLCostCenter;
 use xGrz\Dhl24\Models\DHLShipment;
-use xGrz\Dhl24\Models\DHLStatus;
+use xGrz\Dhl24\Models\DHLTrackingState;
 use xGrz\Dhl24\Services\DHLContentService;
 use xGrz\Dhl24\Services\DHLCostCenterService;
 use xGrz\Dhl24\Services\DHLStateService;
@@ -78,7 +78,7 @@ class DHL24
         return (new DHLCostCenterService($costsCenter));
     }
 
-    public static function states(DHLStatus|string|null $status = null): DHLStateService
+    public static function states(DHLTrackingState|string|null $status = null): DHLStateService
     {
         return new DHLStateService($status);
     }

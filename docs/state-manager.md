@@ -22,7 +22,7 @@ If default description provided by DHL API is not good enough fill free to add y
 $state = new xGrz\Dhl24\Services\DHLTrackingStatusService($status);
 $state->updateDescription('Your description message');
 ```
-As status parameter you have to provide `DHLStatus` model or symbol of this status (for ex. 'DOR').
+As status parameter you have to provide `DHLTrackingState` model or symbol of this status (for ex. 'DOR').
 ___
 
 ## UPDATE STATUS TYPE

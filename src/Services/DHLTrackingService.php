@@ -10,7 +10,7 @@ use xGrz\Dhl24\Events\ShipmentSentEvent;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Facades\DHLConfig;
 use xGrz\Dhl24\Models\DHLShipment;
-use xGrz\Dhl24\Models\DHLStatus;
+use xGrz\Dhl24\Models\DHLTrackingState;
 
 class DHLTrackingService
 {
@@ -62,7 +62,7 @@ class DHLTrackingService
     /**
      * @throws DHL24Exception
      */
-    private function trackingEventDispatcher(DHLStatus $status): void
+    private function trackingEventDispatcher(DHLTrackingState $status): void
     {
         foreach ($this->eventDispatcher as $typeName => $event) {
             if (DHLStatusType::findByName($typeName) === $status->type) {
@@ -83,7 +83,7 @@ class DHLTrackingService
 
     public static function finishingStates(): array
     {
-        return DHLStatus::finishedState()->get()->map(function ($status) {
+        return DHLTrackingState::finishedState()->get()->map(function ($status) {
             return $status->symbol;
         })->toArray();
     }

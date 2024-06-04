@@ -13,14 +13,14 @@ return new class extends Migration {
                 ->references('id')
                 ->on('dhl_shipments')
                 ->onDelete('CASCADE');
-            $table->string('status', 10);
+            $table->string('code', 10);
             $table->string('terminal', 20)->nullable();
             $table->dateTime('event_timestamp');
 
             $table
-                ->foreign('status')
-                ->references('symbol')
-                ->on('dhl_statuses');
+                ->foreign('code')
+                ->references('code')
+                ->on('dhl_tracking_states');
         });
     }
 

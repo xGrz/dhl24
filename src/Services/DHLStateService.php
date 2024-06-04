@@ -4,32 +4,32 @@ namespace xGrz\Dhl24\Services;
 
 use Illuminate\Database\Eloquent\Builder;
 use xGrz\Dhl24\Enums\DHLStatusType;
-use xGrz\Dhl24\Models\DHLStatus;
+use xGrz\Dhl24\Models\DHLTrackingState;
 
 class DHLStateService
 {
 
-    private ?DHLStatus $status = null;
+    private ?DHLTrackingState $status = null;
 
-    public function __construct(DHLStatus|string|null $status = null)
+    public function __construct(DHLTrackingState|string|null $status = null)
     {
         if ($status) $this->status = self::loadStatus($status);
     }
 
     public function query(): Builder
     {
-        return DHLStatus::query();
+        return DHLTrackingState::query();
     }
 
     public function create(string $symbol, string $description): static
     {
-        DHLStatus::create(['symbol' => $symbol, 'description' => $description]);
+        DHLTrackingState::create(['symbol' => $symbol, 'description' => $description]);
         return $this;
     }
 
     public function exists(string $symbol): bool
     {
-        return DHLStatus::where('symbol', $symbol)->count();
+        return DHLTrackingState::where('symbol', $symbol)->count();
     }
 
     public function rename(string $name): static
@@ -50,10 +50,10 @@ class DHLStateService
     }
 
 
-    private function loadStatus(DHLStatus|string $status): DHLStatus
+    private function loadStatus(DHLTrackingState|string $status): DHLTrackingState
     {
-        return $status instanceof DHLStatus
+        return $status instanceof DHLTrackingState
             ? $status
-            : DHLStatus::where('symbol', $status)->first();
+            : DHLTrackingState::where('symbol', $status)->first();
     }
 }

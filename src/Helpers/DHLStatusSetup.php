@@ -4,7 +4,7 @@ namespace xGrz\Dhl24\Helpers;
 
 use Illuminate\Database\Seeder;
 use xGrz\Dhl24\Enums\DHLStatusType;
-use xGrz\Dhl24\Models\DHLStatus;
+use xGrz\Dhl24\Models\DHLTrackingState;
 
 class DHLStatusSetup extends Seeder
 {
@@ -94,10 +94,10 @@ class DHLStatusSetup extends Seeder
                 'system_description' => 'przesyłka oczekuje na odbiór przez klienta w terminalu DHL'],
         ];
 
-        foreach ($states as $symbol => $state) {
-            if (!DHLStatus::where('symbol', $symbol)->exists()) {
-                (new DHLStatus())
-                    ->fill(['symbol' => $symbol])
+        foreach ($states as $code => $state) {
+            if (!DHLTrackingState::where('code', $code)->exists()) {
+                (new DHLTrackingState())
+                    ->fill(['code' => $code])
                     ->fill($state)
                     ->save();
             }

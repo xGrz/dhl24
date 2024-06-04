@@ -107,7 +107,7 @@ class DHLShipment extends Model
 
     public function tracking(): BelongsToMany
     {
-        return $this->belongsToMany(DHLStatus::class, 'dhl_shipment_tracking', 'shipment_id', 'status')
+        return $this->belongsToMany(DHLTrackingState::class, 'dhl_shipment_tracking', 'shipment_id', 'code')
             ->withPivot(['terminal', 'event_timestamp'])
             ->orderByPivot('event_timestamp', 'desc')
             ->using(DHLTracking::class);

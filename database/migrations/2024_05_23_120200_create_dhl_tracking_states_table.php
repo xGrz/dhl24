@@ -8,8 +8,8 @@ use xGrz\Dhl24\Helpers\DHLStatusSetup;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('dhl_statuses', function (Blueprint $table) {
-            $table->string('symbol', 10)->primary();
+        Schema::create('dhl_tracking_states', function (Blueprint $table) {
+            $table->string('code', 10)->primary();
             $table->string('system_description');
             $table->string('description')->nullable();
             $table->integer('type')->nullable();
