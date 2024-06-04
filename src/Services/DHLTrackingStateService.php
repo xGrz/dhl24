@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use xGrz\Dhl24\Enums\DHLStatusType;
 use xGrz\Dhl24\Models\DHLTrackingState;
 
-class DHLStateService
+class DHLTrackingStateService
 {
 
     private ?DHLTrackingState $status = null;
@@ -19,6 +19,11 @@ class DHLStateService
     public function query(): Builder
     {
         return DHLTrackingState::query();
+    }
+
+    public function get(): ?DHLTrackingState
+    {
+        return $this->status;
     }
 
     public function create(string $symbol, string $description): static
@@ -49,11 +54,19 @@ class DHLStateService
         return DHLStatusType::getOptions();
     }
 
+    public function findForTracking(string $statusSymbol, string $description = null): DHLTrackingState
+    {
+        $this->status = DHLTrackingState::updateOrCreate(
+            ['code' => $statusSymbol],
+            ['system_description' => $description],
+        );
+        return $this->status;
+    }
 
     private function loadStatus(DHLTrackingState|string $status): DHLTrackingState
     {
         return $status instanceof DHLTrackingState
             ? $status
-            : DHLTrackingState::where('symbol', $status)->first();
+            : DHLTrackingState::where('code', $status)->first();
     }
 }
