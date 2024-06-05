@@ -3,7 +3,7 @@
 namespace xGrz\Dhl24\Services;
 
 use Illuminate\Support\Collection;
-use xGrz\Dhl24\Actions\Track;
+use xGrz\Dhl24\APIStructs\TrackingEvent;
 use xGrz\Dhl24\Enums\DHLStatusType;
 use xGrz\Dhl24\Events\ShipmentDeliveredEvent;
 use xGrz\Dhl24\Events\ShipmentSentEvent;
@@ -14,7 +14,7 @@ use xGrz\Dhl24\Models\DHLTrackingState;
 
 class DHLTrackingService
 {
-
+    public ?DHLShipment $shipment;
     protected array $eventDispatcher = [
         DHLStatusType::SENT->name => ShipmentSentEvent::class,
         DHLStatusType::DELIVERED->name => ShipmentDeliveredEvent::class,
@@ -24,48 +24,53 @@ class DHLTrackingService
     /**
      * @throws DHL24Exception
      */
-    public function __construct(protected DHLShipment $shipment)
+    public function __construct(DHLShipment $shipment)
     {
-        $this->shipment->loadMissing('tracking');
-        self::getTracking();
+        $this->shipment = $shipment->loadMissing('tracking');
     }
 
     /**
-     * @throws DHL24Exception
+     * @param TrackingEvent[] $trackingEvents
      */
-    private function getTracking(): void
+    public function processEvents(array $trackingEvents): static
     {
-        if (!$this->shipment->number) throw new DHL24Exception('Shipment number not assigned');
-        $trackingEvents = (new Track())->get($this->shipment->number);
-        if (empty($trackingEvents)) return;
+        $newEventsCount = 0;
         foreach ($trackingEvents as $event) {
-            if (!self::eventExists($event)) {
-                $this
-                    ->shipment
-                    ->tracking()
-                    ->attach($event['status'], ['terminal' => $event['terminal'], 'event_timestamp' => $event['event_timestamp']]);
-
-                self::trackingEventDispatcher($event['status']);
-            }
+            self::addEvent($event);
         }
+        return $this;
     }
 
-    private function eventExists(array $event): bool
+    public function addEvent(TrackingEvent $event): static
     {
-        return $this->shipment->tracking->filter(function ($trackingEvent) use ($event) {
-            return $trackingEvent->symbol === $event['status']->symbol
-                && $trackingEvent->pivot->terminal === $event['terminal']
-                && $trackingEvent->pivot->event_timestamp->equalTo($event['event_timestamp']);
-        })->count();
+        if (self::eventExists($event)) return $this;
+
+        $this
+            ->shipment
+            ->tracking()
+            ->attach(
+                $event->code,
+                ['terminal' => $event->terminal, 'event_timestamp' => $event->timestamp]
+            );
+        self::trackingEventDispatcher($event);
+        $this->shipment->load('tracking');
+        return $this;
     }
 
-    /**
-     * @throws DHL24Exception
-     */
-    private function trackingEventDispatcher(DHLTrackingState $status): void
+    public function eventExists(TrackingEvent $trackingEvent): bool
+    {
+        return $this->shipment
+            ->tracking
+            ->filter(fn($event) => $event->code === $trackingEvent->code
+                && $event->pivot->terminal === $trackingEvent->terminal
+                && $event->pivot->event_timestamp->equalTo($trackingEvent->timestamp)
+            )->count();
+    }
+
+    private function trackingEventDispatcher(TrackingEvent $trackingEvent): void
     {
         foreach ($this->eventDispatcher as $typeName => $event) {
-            if (DHLStatusType::findByName($typeName) === $status->type) {
+            if (DHLStatusType::findByName($typeName) === $trackingEvent->state->type) {
                 $event::dispatch($this->shipment);
             }
         }
@@ -74,7 +79,7 @@ class DHLTrackingService
     public static function getUndeliveredShipments(): Collection
     {
         return DHLShipment::whereDoesntHave('tracking', function ($q) {
-            $q->whereIn('status', self::finishingStates());
+            $q->whereIn('code', self::finishingStates());
         })
             ->where('updated_at', '>', now()->subDays(DHLConfig::getTrackingMaxShipmentAge())->startOfDay())
             ->where('shipment_date', '>', now()->subDays(DHLConfig::getTrackingMaxShipmentAge())->startOfDay())
@@ -84,8 +89,23 @@ class DHLTrackingService
     public static function finishingStates(): array
     {
         return DHLTrackingState::finishedState()->get()->map(function ($status) {
-            return $status->symbol;
+            return $status->code;
         })->toArray();
     }
+
+//
+//    /**
+//     * @throws DHL24Exception
+//     */
+//    private function getTracking(): void
+//    {
+//        if (!$this->shipment->number) throw new DHL24Exception('Shipment number not assigned');
+//        $trackingEvents = (new Track())->get($this->shipment->number);
+//        if (empty($trackingEvents)) return;
+//        self::processEvents($trackingEvents);
+//    }
+//
+
+
 
 }

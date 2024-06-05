@@ -22,9 +22,6 @@ class DHLTrackingState extends Model
     protected $casts = [
         'type' => DHLStatusType::class,
     ];
-    protected $appends = [
-        'name'
-    ];
 
     public function scopeOrderByTypes(Builder $query): void
     {

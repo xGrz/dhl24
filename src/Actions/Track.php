@@ -2,9 +2,8 @@
 
 namespace xGrz\Dhl24\Actions;
 
-use Carbon\Carbon;
+use xGrz\Dhl24\APIStructs\TrackingEvent;
 use xGrz\Dhl24\Models\DHLShipment;
-use xGrz\Dhl24\Services\DHLTrackingStatusService;
 
 class Track extends ApiCalls
 {
@@ -32,12 +31,12 @@ class Track extends ApiCalls
         $this->data['receivedBy'] = $tracking->receivedBy;
         collect($tracking->events->item)
             ->each(function ($event) {
-                $this->data['events'][] = [
-                    'status' => DHLTrackingStatusService::findForTracking($event->status, $event->description),
-                    'terminal' => $event->terminal,
-                    'event_timestamp' => Carbon::parse($event->timestamp),
-                ];
-
+                $this->data['events'][] = new TrackingEvent(
+                    $event->status,
+                    $event->terminal,
+                    $event->timestamp,
+                    $event->description
+                );
             });
         return $this->data['events'];
     }
