@@ -16,6 +16,8 @@ class TrackShipmentJob implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public int $uniqueFor = 170;
+
     public function __construct(public DHLShipment $shipment)
     {
     }
@@ -30,7 +32,7 @@ class TrackShipmentJob implements ShouldQueue, ShouldBeUnique
 
     public function uniqueId(): string
     {
-        return $this->shipment->number;
+        return 'ShipmentId:' . $this->shipment->id;
     }
 
 }

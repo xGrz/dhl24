@@ -126,11 +126,11 @@ class DHLTrackingService
     /**
      * @throws DHL24Exception
      */
-    public static function updateAllShipments(bool $shouldBeDispatchedAsJob = false): void
+    public static function updateAll(bool $shouldBeDispatchedAsJob = true): void
     {
         foreach (self::getUndeliveredShipments() as $shipment) {
             $shouldBeDispatchedAsJob
-            ? TrackShipmentJob::dispatch($shipment)
+                ? TrackShipmentJob::dispatch($shipment)
                 : (new static($shipment))->updateTracking();
         }
 
