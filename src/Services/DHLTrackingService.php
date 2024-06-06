@@ -3,12 +3,15 @@
 namespace xGrz\Dhl24\Services;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use xGrz\Dhl24\Actions\Track;
 use xGrz\Dhl24\APIStructs\TrackingEvent;
 use xGrz\Dhl24\Enums\DHLStatusType;
 use xGrz\Dhl24\Events\ShipmentDeliveredEvent;
 use xGrz\Dhl24\Events\ShipmentSentEvent;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Facades\DHLConfig;
+use xGrz\Dhl24\Jobs\TrackShipmentJob;
 use xGrz\Dhl24\Models\DHLShipment;
 use xGrz\Dhl24\Models\DHLTrackingState;
 
@@ -84,7 +87,9 @@ class DHLTrackingService
             ->where('updated_at', '>', now()->subDays(DHLConfig::getTrackingMaxShipmentAge())->startOfDay())
             ->where('shipment_date', '>', now()->subDays(DHLConfig::getTrackingMaxShipmentAge())->startOfDay())
             ->get();
+
     }
+
 
     public static function finishingStates(): array
     {
@@ -93,19 +98,43 @@ class DHLTrackingService
         })->toArray();
     }
 
-//
-//    /**
-//     * @throws DHL24Exception
-//     */
-//    private function getTracking(): void
-//    {
-//        if (!$this->shipment->number) throw new DHL24Exception('Shipment number not assigned');
-//        $trackingEvents = (new Track())->get($this->shipment->number);
-//        if (empty($trackingEvents)) return;
-//        self::processEvents($trackingEvents);
-//    }
-//
 
+    /**
+     * @throws DHL24Exception
+     */
+    public function getTracking(): array
+    {
+        if (!$this->shipment->number) throw new DHL24Exception('Shipment number not assigned');
+        Log::info('Shipment tracking executed', [
+            'shipment_id' => $this->shipment->id,
+            'tracking_number' => $this->shipment->number
+        ]);
+        return (new Track())->get($this->shipment->number);
+    }
+
+    /**
+     * @throws DHL24Exception
+     */
+    public function updateTracking(): void
+    {
+        $trackingEvents = self::getTracking();
+        if (empty($trackingEvents)) return;
+        self::processEvents($trackingEvents);
+    }
+
+
+    /**
+     * @throws DHL24Exception
+     */
+    public static function updateAllShipments(bool $shouldBeDispatchedAsJob = false): void
+    {
+        foreach (self::getUndeliveredShipments() as $shipment) {
+            $shouldBeDispatchedAsJob
+            ? TrackShipmentJob::dispatch($shipment)
+                : (new static($shipment))->updateTracking();
+        }
+
+    }
 
 
 }

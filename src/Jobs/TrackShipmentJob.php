@@ -25,7 +25,7 @@ class TrackShipmentJob implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
-        new DHLTrackingService($this->shipment);
+        (new DHLTrackingService($this->shipment))->updateTracking();
     }
 
     public function uniqueId(): string

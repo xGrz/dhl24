@@ -11,7 +11,7 @@ class TrackingEvent
     public DHLTrackingState $state;
     public Carbon $timestamp;
 
-    public function __construct(public string $code, public string $terminal, Carbon|string $timestamp, string $system_description = null)
+    public function __construct(public string $code, public ?string $terminal, Carbon|string $timestamp, string $system_description = null)
     {
         self::processTimestamp($timestamp);
         self::getTrackingStateModel($system_description);

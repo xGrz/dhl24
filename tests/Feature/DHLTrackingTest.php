@@ -136,7 +136,15 @@ class DHLTrackingTest extends TestCase
         $shipment->refresh()->loadMissing('tracking');
 
         $this->assertCount(4, $shipment->tracking);
+    }
 
+    public function test_sent_shipment_event_is_dispatched()
+    {
+
+    }
+
+    public function test_delivered_shipment_event_is_dispatched()
+    {
 
     }
 

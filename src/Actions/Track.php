@@ -20,7 +20,7 @@ class Track extends ApiCalls
     public function get(DHLShipment|string|int $shipment): array
     {
         if ($shipment instanceof DHLShipment) {
-            $this->payload['shipmentId'] = $shipment->id;
+            $this->payload['shipmentId'] = $shipment->number;
         } else {
             $this->payload['shipmentId'] = $shipment;
         }
@@ -29,16 +29,25 @@ class Track extends ApiCalls
         if (!$tracking->events->item) return [];
 
         $this->data['receivedBy'] = $tracking->receivedBy;
-        collect($tracking->events->item)
-            ->each(function ($event) {
-                $this->data['events'][] = new TrackingEvent(
-                    $event->status,
-                    $event->terminal,
-                    $event->timestamp,
-                    $event->description
-                );
-            });
+        self::processEvents($tracking->events->item);
         return $this->data['events'];
+    }
+
+    private function processEvents($events): void
+    {
+        is_array($events)
+            ? collect($events)->each(fn($ev) => self::setEvent($ev))
+            : $this->setEvent($events);
+    }
+
+    private function setEvent($event): void
+    {
+        $this->data['events'][] = new TrackingEvent(
+            $event->status,
+            $event->terminal,
+            $event->timestamp,
+            $event->description
+        );
     }
 
     public function getReceivedBy(): string|null

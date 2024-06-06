@@ -38,8 +38,8 @@ class DHLTrackingState extends Model
     public function label(): Attribute
     {
         return Attribute::make(
-            get: fn(string $value) => $this->description ?? $this->system_description,
-            set: fn(string $value) => $this->description = $value,
+            get: fn(?string $value) => $this->description ?? $this->system_description,
+            set: fn(?string $value) => $this->description = $value,
         );
     }
 
