@@ -10,19 +10,21 @@ If DHL provide new status code out package will store it in local db with descri
 ## GET LIST OF STATUSES
 
 ```php
-xGrz\Dhl24\Services\DHLTrackingStatusService::getStates();
+\xGrz\Dhl24\Facades\DHL24::states()
+    ->query()
+    ->orderByTypes()
+    ->get();
 ```
-You will get full list of statuses (as eloquent collection).
+You will get full list of statuses (as eloquent collection). `orderByTypes` is scope sorting results by `types` and `names`.
 ___
 
 ## UPDATE STATUS DESCRIPTION
 If default description provided by DHL API is not good enough fill free to add your custom description.
 
 ```php
-$state = new xGrz\Dhl24\Services\DHLTrackingStatusService($status);
-$state->updateDescription('Your description message');
+\xGrz\Dhl24\Facades\DHL24::states('DOR')->rename('Your description message');
 ```
-As status parameter you have to provide `DHLTrackingState` model or symbol of this status (for ex. 'DOR').
+As `states` parameter you have to provide `DHLTrackingState` model or symbol of this status (for ex. 'DOR').
 ___
 
 ## UPDATE STATUS TYPE
@@ -33,14 +35,15 @@ We use those types for dispatching events like ShipmentSent or ShipmentDelivered
 For update type you simply use:
 
 ```php
-$state = new xGrz\Dhl24\Services\DHLTrackingStatusService($status);
-$state->updateType(xGrz\Dhl24\Enums\DHLStatusType::CREATED);
+use xGrz\Dhl24\Enums\DHLStatusType;
+
+\xGrz\Dhl24\Facades\DHL24::states('DOR')->setType(DHLStatusType::CREATED);
 ```
-Status Types are hardcoded as enum. 
+Status Types are hardcoded as enums. 
 
 If you want to get full list of status types (for ex. as option list) use this method:
 ```php
-xGrz\Dhl24\Services\DHLTrackingStatusService::getStatusTypes();
+\xGrz\Dhl24\Facades\DHL24::states()->getTypeOptions();
 ```
 This method will return key/value array. Key is numeric value of type, value is label.
 Label is customizable with lang file (key dhl::shipment.statusType.***).
