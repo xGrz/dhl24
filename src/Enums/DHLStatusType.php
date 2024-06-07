@@ -44,15 +44,14 @@ enum DHLStatusType: int implements WithLabel
     {
         return match ($this) {
             DHLStatusType::NOT_FOUND, DHLStatusType::ERROR => 'text-red-600',
-            DHLStatusType::CREATED => 'text-yellow-200',
-            DHLStatusType::SENT => 'text-green-300',
-            DHLStatusType::IN_TRANSPORT => 'text-indigo-400',
-            DHLStatusType::IN_DELIVERY => 'text-cyan-400',
+            DHLStatusType::CREATED => 'text-sky-800',
+            DHLStatusType::SENT, DHLStatusType::IN_TRANSPORT => 'text-sky-600',
+            DHLStatusType::IN_DELIVERY => 'text-sky-500',
             DHLStatusType::HOLD => 'text-amber-600',
-            DHLStatusType::WAITING_TO_BE_PICKED_UP => '',
+            DHLStatusType::WAITING_TO_BE_PICKED_UP => 'text-lime-700',
             DHLStatusType::DELIVERED, DHLStatusType::PICKED_UP => 'text-green-700',
             DHLStatusType::DELIVERY_FAILED => 'text-orange-500',
-            DHLStatusType::RETURNED => 'text-red-500',
+            DHLStatusType::RETURNED => 'text-red-800',
             default => 'text-red-200'
         };
     }
