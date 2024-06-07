@@ -26,7 +26,7 @@ class Track extends ApiCalls
         }
 
         $tracking = $this->call()?->getTrackAndTraceInfoResult;
-        if (!$tracking->events->item) return [];
+        if (!isset($tracking->events->item)) return [];
 
         $this->data['receivedBy'] = $tracking->receivedBy;
         self::processEvents($tracking->events->item);
