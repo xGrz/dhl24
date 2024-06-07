@@ -4,6 +4,7 @@ namespace xGrz\Dhl24\Observers;
 
 use Illuminate\Support\Facades\Bus;
 use xGrz\Dhl24\Events\ShipmentCreatedEvent;
+use xGrz\Dhl24\Facades\DHLConfig;
 use xGrz\Dhl24\Jobs\GetShipmentCostJob;
 use xGrz\Dhl24\Jobs\GetShipmentLabelJob;
 use xGrz\Dhl24\Models\DHLShipment;
@@ -39,6 +40,9 @@ class DHLShipmentObserver
         }
     }
 
+    /**
+     * @throws \Throwable
+     */
     private function dispatchFinalizeShipmentJobs(DHLShipment $shipment): void
     {
         if (!empty($shipment->number) && ($shipment->isDirty('number'))) {
@@ -48,6 +52,7 @@ class DHLShipmentObserver
                     new GetShipmentCostJob($shipment),
                 ]
             ])
+                ->onQueue(DHLConfig::getQueueName())
                 ->then(
                     fn() => ShipmentCreatedEvent::dispatch($shipment)
                 )

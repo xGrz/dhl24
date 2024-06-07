@@ -130,7 +130,7 @@ class DHLTrackingService
     {
         foreach (self::getUndeliveredShipments() as $shipment) {
             $shouldBeDispatchedAsJob
-                ? TrackShipmentJob::dispatch($shipment)
+                ? TrackShipmentJob::dispatch($shipment)->onQueue(DHLConfig::getQueueName())
                 : (new static($shipment))->updateTracking();
         }
 

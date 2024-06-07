@@ -33,6 +33,7 @@ return [
      */
     'restrictions-check' => false,
     'track_shipment_max_age' => 30,
+    'queue' => 'default',
 
 
 ];

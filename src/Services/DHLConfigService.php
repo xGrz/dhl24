@@ -93,6 +93,11 @@ class DHLConfigService
         return config('dhl24.track_shipment_max_age', 14);
     }
 
+    public function getQueueName()
+    {
+        return config('dhl24.queue', 'default');
+    }
+
     public function getRestrictionCheckSetting(): bool
     {
         return !config('dhl24.restrictions-check', false);
