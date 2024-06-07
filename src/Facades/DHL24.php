@@ -16,8 +16,10 @@ use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Jobs\TrackShipmentJob;
 use xGrz\Dhl24\Models\DHLContentSuggestion;
 use xGrz\Dhl24\Models\DHLCostCenter;
+use xGrz\Dhl24\Models\DHLCourierBooking;
 use xGrz\Dhl24\Models\DHLShipment;
 use xGrz\Dhl24\Models\DHLTrackingState;
+use xGrz\Dhl24\Services\DHLBookingService;
 use xGrz\Dhl24\Services\DHLContentService;
 use xGrz\Dhl24\Services\DHLCostCenterService;
 use xGrz\Dhl24\Services\DHLTrackingService;
@@ -81,6 +83,11 @@ class DHL24
     public static function states(DHLTrackingState|string|null $status = null): DHLTrackingStateService
     {
         return new DHLTrackingStateService($status);
+    }
+
+    public static function booking(DHLCourierBooking|int|null $booking = null): DHLBookingService
+    {
+        return (new DHLBookingService($booking));
     }
 
     public static function wizard(DHLShipment $shipment = null): DHLShipmentWizard
