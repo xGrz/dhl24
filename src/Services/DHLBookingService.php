@@ -13,7 +13,7 @@ class DHLBookingService
 
     public function __construct(DHLCourierBooking|int|null $booking)
     {
-        if ($booking) $this->booking = self::loadBooking();
+        if ($booking) $this->booking = self::loadBooking($booking);
     }
 
     public function query(): Builder
