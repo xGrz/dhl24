@@ -13,7 +13,7 @@ use xGrz\Dhl24\Actions\Version;
 use xGrz\Dhl24\Enums\DHLLabelType;
 use xGrz\Dhl24\Enums\DHLServicePointType;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
-use xGrz\Dhl24\Jobs\TrackShipmentsJob;
+use xGrz\Dhl24\Jobs\TrackShipmentJob;
 use xGrz\Dhl24\Models\DHLContentSuggestion;
 use xGrz\Dhl24\Models\DHLCostCenter;
 use xGrz\Dhl24\Models\DHLShipment;
@@ -102,10 +102,16 @@ class DHL24
             ?? DHLShipment::withDetails()->where('number', $shipment)->first();
     }
 
-    public static function updateShipmentTracking(): int
+    /**
+     * @throws DHL24Exception
+     */
+    public static function trackAllShipments(bool $shouldBeDispatchedAsJob = true): void
     {
-        return (new TrackShipmentsJob())->handle();
+        foreach (DHLTrackingService::getUndeliveredShipments() as $shipment) {
+            self::trackShipment($shipment, $shouldBeDispatchedAsJob);
+        }
     }
+
 
     /**
      * @throws DHL24Exception
@@ -113,7 +119,7 @@ class DHL24
     public static function trackShipment(DHLShipment|string|int $shipment, bool $shouldDispatchJob = true): void
     {
         $shouldDispatchJob
-            ? (new TrackShipmentsJob($shipment))->handle()
+            ? TrackShipmentJob::dispatch($shipment)->onQueue(DHLConfig::getQueueName())
             : (new DHLTrackingService($shipment));
     }
 

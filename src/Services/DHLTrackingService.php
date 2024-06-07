@@ -11,7 +11,6 @@ use xGrz\Dhl24\Events\ShipmentDeliveredEvent;
 use xGrz\Dhl24\Events\ShipmentSentEvent;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Facades\DHLConfig;
-use xGrz\Dhl24\Jobs\TrackShipmentJob;
 use xGrz\Dhl24\Models\DHLShipment;
 use xGrz\Dhl24\Models\DHLTrackingState;
 
@@ -120,20 +119,6 @@ class DHLTrackingService
         $trackingEvents = self::getTracking();
         if (empty($trackingEvents)) return;
         self::processEvents($trackingEvents);
-    }
-
-
-    /**
-     * @throws DHL24Exception
-     */
-    public static function updateAll(bool $shouldBeDispatchedAsJob = true): void
-    {
-        foreach (self::getUndeliveredShipments() as $shipment) {
-            $shouldBeDispatchedAsJob
-                ? TrackShipmentJob::dispatch($shipment)->onQueue(DHLConfig::getQueueName())
-                : (new static($shipment))->updateTracking();
-        }
-
     }
 
 
