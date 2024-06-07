@@ -4,6 +4,8 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use xGrz\Dhl24\APIStructs\TrackingEvent;
+use xGrz\Dhl24\Events\ShipmentDeliveredEvent;
+use xGrz\Dhl24\Events\ShipmentSentEvent;
 use xGrz\Dhl24\Facades\DHLConfig;
 use xGrz\Dhl24\Models\DHLShipment;
 use xGrz\Dhl24\Models\DHLTracking;
@@ -140,12 +142,43 @@ class DHLTrackingTest extends TestCase
 
     public function test_sent_shipment_event_is_dispatched()
     {
+        Event::fake([
+           ShipmentSentEvent::class
+        ]);
+
+        $shipment = self::createRandomShipment();
+        $eventDescription = DHLTrackingState::where('code', 'EDWP')->first();
+        $eventDescriptionSent = DHLTrackingState::where('code', 'DWP')->first();
+        $event = new TrackingEvent($eventDescription->code, 'TestTerminal', now(), $eventDescription->system_description);
+        $eventSent = new TrackingEvent($eventDescriptionSent->code, 'TestTerminal', now(), $eventDescriptionSent->system_description);
+        (new DHLTrackingService($shipment))->addEvent($event);
+
+        Event::assertNotDispatched(ShipmentSentEvent::class);
+
+        (new DHLTrackingService($shipment))->addEvent($eventSent);
+
+        Event::assertDispatched(ShipmentSentEvent::class);
 
     }
 
     public function test_delivered_shipment_event_is_dispatched()
     {
+        Event::fake([
+            ShipmentDeliveredEvent::class
+        ]);
 
+        $shipment = self::createRandomShipment();
+        $eventDescription = DHLTrackingState::where('code', 'EDWP')->first();
+        $eventDescriptionDelivered = DHLTrackingState::where('code', 'DOR')->first();
+        $event = new TrackingEvent($eventDescription->code, 'TestTerminal', now(), $eventDescription->system_description);
+        $eventSent = new TrackingEvent($eventDescriptionDelivered->code, 'TestTerminal', now(), $eventDescriptionDelivered->system_description);
+        (new DHLTrackingService($shipment))->addEvent($event);
+
+        Event::assertNotDispatched(ShipmentDeliveredEvent::class);
+
+        (new DHLTrackingService($shipment))->addEvent($eventSent);
+
+        Event::assertDispatched(ShipmentDeliveredEvent::class);
     }
 
 }
