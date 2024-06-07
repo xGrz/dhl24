@@ -35,6 +35,7 @@ class Track extends ApiCalls
 
     private function processEvents($events): void
     {
+        // When single event is found API returns that object. When multiple events are present API returns array of event objects.
         is_array($events)
             ? collect($events)->each(fn($ev) => self::setEvent($ev))
             : $this->setEvent($events);
