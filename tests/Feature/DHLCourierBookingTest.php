@@ -15,7 +15,7 @@ class DHLCourierBookingTest extends TestCase
         $this->expectException(DHL24Exception::class);
         $this->expectExceptionCode(1001);
 
-        DHL24::booking()->add(now()->subDays(1), now(), 'SomeInfo');
+        DHL24::booking()->book(now()->subDays(1), now(), 'SomeInfo');
     }
 
     public function test_add_booking_throws_errors_when_from_is_later_then_to()
@@ -23,7 +23,7 @@ class DHLCourierBookingTest extends TestCase
         $this->expectException(DHL24Exception::class);
         $this->expectExceptionCode(1002);
 
-        DHL24::booking()->add(now()->addSecond(), now(), 'SomeInfo');
+        DHL24::booking()->book(now()->addSecond(), now(), 'SomeInfo');
     }
 
     public function test_add_booking_throws_error_when_pickup_dates_window_is_less_then_2h()
@@ -31,14 +31,14 @@ class DHLCourierBookingTest extends TestCase
         $this->expectException(DHL24Exception::class);
         $this->expectExceptionCode(1003);
 
-        DHL24::booking()->add(now(), now()->addHours(2)->subSecond(), 'SomeInfo');
+        DHL24::booking()->book(now(), now()->addHours(2)->subSecond(), 'SomeInfo');
     }
 
     public function test_add_booking_with_pickup_window_grater_then_2h()
     {
         $from = now();
         $to = now()->copy()->addHours(2);
-        DHL24::booking()->add($from, $to, 'SomeInfo');
+        DHL24::booking()->book($from, $to, 'SomeInfo');
 
         $this->assertDatabaseHas(DHLCourierBooking::class, [
             'pickup_from' => $from->milliseconds(0),

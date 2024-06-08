@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('dhl_courier_bookings', function (Blueprint $table) {
             $table->id();
+            $table->string('order_id');
             $table->dateTime('pickup_from');
             $table->dateTime('pickup_to');
             $table->string('additional_info', 50)->nullable();
-            $table->string('order_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

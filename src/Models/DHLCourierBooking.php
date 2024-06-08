@@ -20,4 +20,10 @@ class DHLCourierBooking extends Model
         return $this->hasMany(DHLShipment::class, 'courier_booking_id');
     }
 
+
+//    public function shipments(): HasMany
+//    {
+//        return $this->hasMany(DHLShipment::class, 'courier_booking_id');
+//    }
+
 }

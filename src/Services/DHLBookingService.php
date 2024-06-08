@@ -4,6 +4,7 @@ namespace xGrz\Dhl24\Services;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use xGrz\Dhl24\Actions\BookCourierCancel;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Models\DHLCourierBooking;
 
@@ -25,7 +26,7 @@ class DHLBookingService
     /**
      * @throws DHL24Exception
      */
-    public function add(Carbon $from, Carbon $to, string $info = null): static
+    public function book(Carbon $from, Carbon $to, string $info = null): static
     {
         if (!$from->isSameDay($to)) throw new DHL24Exception('Pickup from and pickup to has different dates.', 1001);
         if ($from > $to) throw new DHL24Exception('Pickup from must be later than pickup to date.', 1002);
@@ -33,6 +34,16 @@ class DHLBookingService
 
         self::storeCreateBooking($from, $to, $info);
         return $this;
+    }
+
+    public function cancel(): bool
+    {
+        return (new BookCourierCancel())->delete($this->booking);
+    }
+
+    public function bookingHours()
+    {
+
     }
 
 

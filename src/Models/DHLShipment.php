@@ -75,10 +75,10 @@ class DHLShipment extends Model
         return $this->belongsTo(DHLCostCenter::class);
     }
 
-//    public function courier_booking(): BelongsTo
-//    {
-//        return $this->belongsTo(DHLCourierBooking::class);
-//    }
+    public function courier_booking(): BelongsTo
+    {
+        return $this->belongsTo(DHLCourierBooking::class);
+    }
 
     public function items(): HasMany
     {
