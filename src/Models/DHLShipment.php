@@ -61,7 +61,7 @@ class DHLShipment extends Model
     {
         return [
             'items',
-            // 'courier_booking',
+            'courier_booking',
             'cost_center',
             'tracking'
         ];

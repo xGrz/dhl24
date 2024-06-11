@@ -15,15 +15,15 @@ class DHLCourierBooking extends Model
         'id'
     ];
 
+    protected $casts = [
+        'pickup_from' => 'datetime',
+        'pickup_to' => 'datetime'
+    ];
+
     public function shipments(): HasMany
     {
         return $this->hasMany(DHLShipment::class, 'courier_booking_id');
     }
 
-
-//    public function shipments(): HasMany
-//    {
-//        return $this->hasMany(DHLShipment::class, 'courier_booking_id');
-//    }
 
 }

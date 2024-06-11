@@ -20,6 +20,22 @@ ___
 
 ## Installation
 
+```
+composer require xgrz/dhl24
+```
+
 ## Credentials configuration
 
+In your .env file:
+```
+DHL24_WSDL=https://dhl24.com.pl/webapi2.html
+DHL24_USERNAME=
+DHL24_PASSWORD=
+DHLPARCELSHOP_LOGIN=
+DHLPARCELSHOP_PASSWORD=
+DHL24_SAP=
+```
+
 ## Package settings
+
+
