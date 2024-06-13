@@ -248,6 +248,9 @@ class DHLShipmentWizard
         return $this;
     }
 
+    /**
+     * @throws DHL24Exception
+     */
     public function create()
     {
         $shipmentNumber = (new CreateShipment())->create($this);

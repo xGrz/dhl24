@@ -34,6 +34,13 @@ return [
     'restrictions-check' => false,
     'track_shipment_max_age' => 30,
     'queue' => 'default',
+    'courier-booking' => [
+        // Required difference between pickup start and end (in hours)
+        'window' => 2,
+
+        //  Interval for selecting pickup/end of pickup time (in minutes)
+        'interval' => 15,
+    ],
 
 
 ];

@@ -67,6 +67,6 @@ enum DHLShipmentItemType: string implements WithLabel
 
     public function getLangKey(): string
     {
-        return 'shipment.type';
+        return 'shipment.package-type';
     }
 }

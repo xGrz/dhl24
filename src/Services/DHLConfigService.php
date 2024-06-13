@@ -102,6 +102,16 @@ class DHLConfigService
     {
         return !config('dhl24.restrictions-check', false);
     }
+
+    public function getBookingWindow(): int
+    {
+        return config('dhl24.courier-booking.window', 2);
+    }
+
+    public function getBookingTimeInterval(): int
+    {
+        return config('dhl24.courier-booking.interval', 15);
+    }
     private static function normalizeDirectoryPath(string $path): string
     {
         return str($path)

@@ -17,7 +17,7 @@ enum DHLDomesticShipmentType: string implements WithLabel
 
     public function getLangKey(): string
     {
-        return 'shipment.service';
+        return 'shipment.shipment-type';
     }
 
     public static function getOptions(): array
@@ -33,4 +33,5 @@ enum DHLDomesticShipmentType: string implements WithLabel
 
         return $options;
     }
+
 }
