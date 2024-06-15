@@ -38,9 +38,18 @@ class DHLBookingService
         return $this;
     }
 
+    /**
+     * @throws DHL24Exception
+     */
     public function cancel(DHLCourierBooking $booking): bool
     {
-        return (new BookCourierCancel())->delete($booking);
+        $result =  (new BookCourierCancel())->delete($booking);
+        if ($result) {
+            DHLShipment::query()
+                ->where('courier_booking_id', $booking->id)
+                ->update(['courier_booking_id' => null]);
+        }
+        return $result;
     }
 
     /**

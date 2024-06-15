@@ -53,7 +53,6 @@ class DHLPostalCodeService
     {
         $pickupDate = $from->format('d-m-Y');
         $startTime = $from->ceilMinutes(DHLConfig::getBookingTimeInterval())->format('H:i');
-        dump($pickupDate, $startTime);
         return in_array($startTime, $this->bookings[$pickupDate]['from']);
     }
 
