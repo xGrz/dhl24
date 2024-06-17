@@ -22,7 +22,9 @@ ___
 
 ```
 composer require xgrz/dhl24
+php artisan migrate
 ```
+
 
 ## Credentials configuration
 
