@@ -28,17 +28,28 @@ ___
 
 ## Automatic shipment tracking
 
-### Laravel <11
+### Laravel 10
 
-In your `app/Console/Kerner.php` file add following lines in `schedule` method:
+In your `app/Console/Kernel.php` file add following lines in `schedule` method:
 ```php
 protected function schedule(Schedule $schedule): void
-    {
-        $schedule
-            ->call(fn() => DHL24::trackAllShipments())
-            ->name('DHL24 | Shipment tracking')
-            ->everyMinute();
-    }
+{
+    $schedule
+        ->call(fn() => DHL24::trackAllShipments())
+        ->name('DHL24 | Shipment tracking')
+        ->everyMinute();
+}
+```
+### Laravel 11
+
+In your `routes/console.php` you have to add:
+```php
+use Illuminate\Support\Facades\Schedule;
+use xGrz\Dhl24\Facades\DHL24;
+
+Schedule::call(fn() => DHL24::trackAllShipments())
+    ->name('DHL24 | Shipment tracking')
+    ->everyMinute();
 ```
 
-Fill free to change schedule configuration (name, interval).
+> Fill free to change schedule configuration (name, interval)
