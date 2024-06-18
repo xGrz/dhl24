@@ -23,8 +23,12 @@ class DHLPostalCodeService
     /**
      * @throws DHL24Exception
      */
-    public function __construct(string $postalCode = null, Collection|EloquentCollection|DHLShipment $shipments = null)
+    public function __construct(Collection|EloquentCollection|DHLShipment $shipments)
     {
+        $postalCode = $shipments instanceof DHLShipment
+            ? $shipments->shipper_postal_code
+            : $shipments->first()->shipper_postal_code;
+
         $this->postalCode = str_replace([' ', '-'], '', $postalCode);
         self::setupShipmentType($shipments);
         $this->getBookingOptions();
@@ -101,17 +105,6 @@ class DHLPostalCodeService
             ];
     }
 
-
-    public static function forShipment(DHLShipment $shipment): static
-    {
-        return new static($shipment->shipper_postal_code);
-    }
-
-    private static function formatPostalCode(string $postalCode): string
-    {
-        return str_replace([' ', '-'], '', $postalCode);
-    }
-
     private function getBookingStart(string $from, string $to): array
     {
         $from = Carbon::parse($from)->ceilMinutes(DHLConfig::getBookingTimeInterval());
@@ -137,7 +130,6 @@ class DHLPostalCodeService
         }
         return $endHours;
     }
-
 
     private function setupShipmentType(Collection|DHLShipment $shipments = null): void
     {
