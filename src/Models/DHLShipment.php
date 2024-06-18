@@ -67,9 +67,6 @@ class DHLShipment extends Model
         ];
     }
 
-
-
-
     public function cost_center(): BelongsTo
     {
         return $this->belongsTo(DHLCostCenter::class);
@@ -113,21 +110,13 @@ class DHLShipment extends Model
             ->using(DHLTracking::class);
     }
 
-//    public function latestStatus()
-//    {
-//        return $this->belongsToMany(DHLStatus::class, 'dhl_shipment_tracking', 'shipment_id', 'status')
-//            ->withPivot(['terminal', 'event_timestamp'])
-//            ->orderByPivot('event_timestamp', 'desc')
-//            ->using(DHLTracking::class)
-//            ->take(1)
-//            ;
-//
-//        return $this
-//            ->hasOne(DHLTracking::class, 'shipment_id')
-//            ->orderBy('event_timestamp', 'desc')
-//            ->withPiv
-//            ->join('dhl_statuses', 'dhl_statuses.symbol', '=', 'dhl_shipment_tracking.status');
-//    }
+    public function isExpress(): bool
+    {
+        $this->loadMissing('items');
+        $overWeight = $this->items->map(fn($item) => $item->weight)->max() >= 30;
+        $hasPallet = $this->items->filter(fn($item) => $item->type === DHLShipmentItemType::PALLET)->count();
+        return !($hasPallet || $overWeight);
+    }
 
 
 }
