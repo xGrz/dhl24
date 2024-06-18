@@ -41,6 +41,21 @@ class PostalCodeServices extends ApiCalls
             : $this->result['exPickupTo'];
     }
 
+    public function drPickupStart(): string
+    {
+        return $this->result['drPickupFrom'] === 'brak'
+            ? '0:00'
+            : $this->result['drPickupFrom'];
+
+    }
+
+    public function drPickupEnd(): string
+    {
+        return $this->result['drPickupTo'] === 'brak'
+            ? '0:00'
+            : $this->result['drPickupTo'];
+    }
+
     public function getPickupDate(): string
     {
         return $this->payload['pickupDate'];
