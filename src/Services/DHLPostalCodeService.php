@@ -3,7 +3,9 @@
 namespace xGrz\Dhl24\Services;
 
 use Carbon\CarbonPeriod;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use xGrz\Dhl24\Actions\PostalCodeServices;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Facades\DHLConfig;
@@ -12,14 +14,19 @@ use xGrz\Dhl24\Models\DHLShipment;
 class DHLPostalCodeService
 {
     private string $postalCode = '';
+
+    // default true for express shipments is required;
+    private bool $expressShipments = true;
+
     private array $bookings = [];
 
     /**
      * @throws DHL24Exception
      */
-    public function __construct(string $postalCode = null)
+    public function __construct(string $postalCode = null, Collection|EloquentCollection|DHLShipment $shipments = null)
     {
-        $this->postalCode = $postalCode;
+        $this->postalCode = str_replace([' ', '-'], '', $postalCode);
+        self::setupShipmentType($shipments);
         $this->getBookingOptions();
     }
 
@@ -56,13 +63,15 @@ class DHLPostalCodeService
         return in_array($startTime, $this->bookings[$pickupDate]['from']);
     }
 
-    private function getBookingOptions(int $maxDays = 5): void
+    /**
+     * @throws DHL24Exception
+     */
+    private function getBookingOptions(): void
     {
-        if ($maxDays > 5) $maxDays = 5; // performance: max 5 days;
         if (!$this->postalCode) throw new DHL24Exception('Pickup postal code is required.', 1010);
         $pickupDate = now();
-        for ($calls = 0; count($this->bookings) < $maxDays && $calls < 10; $calls++) {
-            $bookingHours = self::bookingHours($this->postalCode, $pickupDate);
+        for ($calls = 0; count($this->bookings) < 4 && $calls < 10; $calls++) {
+            $bookingHours = self::bookingHours($pickupDate);
             if (count($bookingHours['from']) > 0 && count($bookingHours['to']) > 0) {
                 $this->bookings[$pickupDate->format('d-m-Y')] = $bookingHours;
             }
@@ -70,23 +79,28 @@ class DHLPostalCodeService
         }
     }
 
-    private function bookingHours(string $postalCode = null, Carbon $pickupDate = null): array
+    /**
+     * @throws DHL24Exception
+     */
+    private function bookingHours($pickupDate = null): array
     {
-        $postalCode = $postalCode ? self::formatPostalCode($postalCode) : $this->shipment->shipper_postal_code;
-        if (!$postalCode) throw new DHL24Exception('Pickup postal code is required.', 1010);
+        if (!$this->postalCode) throw new DHL24Exception('Pickup postal code is required.', 1010);
         if (!$pickupDate) $pickupDate = $this->shipment?->shipment_date ?? now();
 
-        $postalCodeServices = (new PostalCodeServices())->get($postalCode, $pickupDate);
-        return [
-            'from' => self::getBookingStart($postalCodeServices->exPickupStart(), $postalCodeServices->exPickupEnd()),
-            'to' => self::getBookingEnd($postalCodeServices->exPickupStart(), $postalCodeServices->exPickupEnd())
-        ];
+        $postalCodeServices = (new PostalCodeServices())->get($this->postalCode, $pickupDate);
+
+        return $this->expressShipments
+            ? [
+                'from' => self::getBookingStart($postalCodeServices->exPickupStart(), $postalCodeServices->exPickupEnd()),
+                'to' => self::getBookingEnd($postalCodeServices->exPickupStart(), $postalCodeServices->exPickupEnd())
+            ]
+            :
+            [
+                'from' => self::getBookingStart($postalCodeServices->drPickupStart(), $postalCodeServices->drPickupEnd()),
+                'to' => self::getBookingEnd($postalCodeServices->drPickupStart(), $postalCodeServices->drPickupEnd())
+            ];
     }
 
-    public static function forPostalCode(string $postalCode): static
-    {
-        return new static(self::formatPostalCode($postalCode));
-    }
 
     public static function forShipment(DHLShipment $shipment): static
     {
@@ -125,4 +139,19 @@ class DHLPostalCodeService
     }
 
 
+    private function setupShipmentType(Collection|DHLShipment $shipments = null): void
+    {
+
+        if (!$shipments) return; // default true;
+        if ($shipments instanceof DHLShipment) {
+            $this->expressShipments = $shipments->isExpress();
+            return;
+        }
+        foreach ($shipments as $shipment) {
+            if(!$shipment->isExpress()) {
+                $this->expressShipments = false;
+            }
+        }
+        // if all shipments are express default true is not changed;
+    }
 }
