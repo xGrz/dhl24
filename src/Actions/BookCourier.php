@@ -24,9 +24,9 @@ class BookCourier extends ApiCalls
     public function book(array|int $shipmentIdList, DHLCourierBooking $booking): string
     {
         $shipmentIdList = collect($shipmentIdList)->toArray();
+        sort($shipmentIdList);
         $this->payload['shipmentIdList'] = $shipmentIdList;
         self::buildPayloadFromBooking($booking);
-
         $bookId = $this->call()?->bookCourierResult?->item;
         if ($bookId) {
             $booking
