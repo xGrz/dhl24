@@ -55,9 +55,9 @@ class DHLBookingService
     /**
      * @throws DHL24Exception
      */
-    public function options(string $postalCode): DHLPostalCodeService
+    public function options(string $postalCode, Collection|DHLShipment $shipments = null): DHLPostalCodeService
     {
-        return new DHLPostalCodeService($postalCode);
+        return new DHLPostalCodeService($postalCode, $shipments);
     }
 
     private function prepareBooking(Carbon $from, Carbon $to, string $info = null): DHLCourierBooking
