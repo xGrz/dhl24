@@ -12,4 +12,9 @@ class DHLCostCenterObserver
             DHLCostCenter::where('is_default', true)->update(['is_default' => false]);
         }
     }
+
+    public function deleting(DHLCostCenter $costCenter): void
+    {
+        $costCenter->update(['is_default' => false]);
+    }
 }
