@@ -419,7 +419,10 @@ class DHLShipmentWizard
             foreach ($dhlItem as $prop => $value) {
                 if ($value instanceof \BackedEnum) $dhlItem[$prop] = $value->value;
                 if (empty($value)) unset($dhlItem[$prop]);
-                if ($item->non_standard) $dhlItem['non_standard'] = true;
+            }
+            if (isset($dhlItem['non_standard'])) {
+                $dhlItem['nonStandard'] = $dhlItem['non_standard'];
+                unset($dhlItem['non_standard']);
             }
             return $dhlItem;
         });
