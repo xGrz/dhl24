@@ -56,15 +56,19 @@ class Label extends ApiCalls
 
     public function setType(DHLLabelType $type = null): static
     {
-        $this->payload['itemsToPrint'][0]['labelType'] = $type?->value  ?? DHLConfig::getDefaultLabelType()->value;
+        $this->payload['itemsToPrint'][0]['labelType'] = $type?->value ?? DHLConfig::getDefaultLabelType()->value;
         return $this;
     }
 
     public function setShipment(DHLShipment|string|int $shipment): static
     {
+
         $this->payload['itemsToPrint'][0]['shipmentId'] = $shipment instanceof DHLShipment
             ? $shipment->number
-            : $shipment;
+            : DHLShipment::where('id', $shipment)
+                ->orWhere('number', $shipment)
+                ->first()
+                ?->number;
         return $this;
     }
 }
