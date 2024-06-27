@@ -80,10 +80,11 @@ class DHLCostCenterService
         return DHLShipment::query()->where('cost_center_id', $this->costsCenter->id);
     }
 
-    private static function isNameExists(string $name): ?DHLCostCenter
+    private function isNameExists(string $name): ?DHLCostCenter
     {
         return DHLCostCenter::withTrashed()
             ->where('name', $name)
+            ->when($this->costsCenter, fn (Builder $query) => $query->where('id', '<>', $this->costsCenter->id))
             ->first();
     }
 
