@@ -5,6 +5,7 @@ namespace xGrz\Dhl24\Facades;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use xGrz\Dhl24\Actions\DeleteShipment;
 use xGrz\Dhl24\Actions\Label;
 use xGrz\Dhl24\Actions\MyShipments;
 use xGrz\Dhl24\Actions\ServicePoints;
@@ -120,6 +121,12 @@ class DHL24
     }
 
 
+    public function deleteShipment(DHLShipment|int $shipment): true
+    {
+        return (new DeleteShipment())->delete($shipment);
+    }
+
+
     /**
      * @throws DHL24Exception
      */
@@ -130,11 +137,16 @@ class DHL24
             : (new DHLTrackingService($shipment));
     }
 
-    public static function getShipment(DHLShipment|string|int $shipment): ?DHLShipment
+    public static function getShipment(DHLShipment|string|int $shipment, bool $withRelations = false): ?DHLShipment
     {
         if ($shipment instanceof DHLShipment) return $shipment;
-        return DHLShipment::where('number', $shipment)->first()
-            ?? DHLShipment::find($shipment)->first();
+        return DHLShipment::where('number', $shipment)
+            ->orWhere('id', $shipment)
+            ->when(
+                $withRelations,
+                fn($query) => $query->with(DHLShipment::getRelationsListForDetails())
+            )
+            ->first();
     }
 
 }
