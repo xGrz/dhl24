@@ -15,6 +15,7 @@ use xGrz\Dhl24\Enums\DHLAddressType;
 use xGrz\Dhl24\Enums\DHLDomesticShipmentType;
 use xGrz\Dhl24\Enums\DHLPayerType;
 use xGrz\Dhl24\Enums\DHLShipmentItemType;
+use xGrz\Dhl24\Enums\DHLStatusType;
 use xGrz\Dhl24\Observers\DHLShipmentObserver;
 
 #[ObservedBy(DHLShipmentObserver::class)]
@@ -116,6 +117,20 @@ class DHLShipment extends Model
         $overWeight = $this->items->map(fn($item) => $item->weight)->max() >= 30;
         $hasPallet = $this->items->filter(fn($item) => $item->type === DHLShipmentItemType::PALLET)->count();
         return !($hasPallet || $overWeight);
+    }
+
+    public function isBookingAvailable(): bool
+    {
+        if ($this->courier_booking_id) return false;
+
+        $lastTrackingStatus = $this->tracking->first();
+        return is_null($lastTrackingStatus)
+            || $lastTrackingStatus->type === DHLStatusType::CREATED;
+    }
+
+    public function canBeDeleted(): bool
+    {
+        return self::isBookingAvailable();
     }
 
 

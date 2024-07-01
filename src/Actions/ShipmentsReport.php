@@ -5,6 +5,7 @@ namespace xGrz\Dhl24\Actions;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
+use xGrz\Dhl24\Enums\DHLReportType;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Facades\DHLConfig;
 
@@ -51,9 +52,9 @@ class ShipmentsReport extends ApiCalls
         return $this;
     }
 
-    public function setType(string $type): static
+    public function setType(DHLReportType $type): static
     {
-        // $this->payload['type'] = $type;
+        $this->payload['type'] = $type->value;
         return $this;
     }
 

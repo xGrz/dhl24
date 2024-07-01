@@ -12,6 +12,7 @@ use xGrz\Dhl24\Actions\ServicePoints;
 use xGrz\Dhl24\Actions\ShipmentsReport;
 use xGrz\Dhl24\Actions\Version;
 use xGrz\Dhl24\Enums\DHLLabelType;
+use xGrz\Dhl24\Enums\DHLReportType;
 use xGrz\Dhl24\Enums\DHLServicePointType;
 use xGrz\Dhl24\Exceptions\DHL24Exception;
 use xGrz\Dhl24\Jobs\TrackShipmentJob;
@@ -55,7 +56,7 @@ class DHL24
         return (new MyShipments())->get($from, $to, $page);
     }
 
-    public static function report(Carbon $date = null, string $type = 'ALL'): ?ShipmentsReport
+    public static function report(Carbon $date = null, DHLReportType $type = DHLReportType::ALL): ?ShipmentsReport
     {
         return (new ShipmentsReport)
             ->setDate($date ?? now())
@@ -121,7 +122,10 @@ class DHL24
     }
 
 
-    public function deleteShipment(DHLShipment|int $shipment): true
+    /**
+     * @throws DHL24Exception
+     */
+    public static function deleteShipment(DHLShipment|int $shipment): true
     {
         return (new DeleteShipment())->delete($shipment);
     }
